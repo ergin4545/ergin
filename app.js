@@ -4,7 +4,7 @@ window.onload = function(){
 
     console.log("ERGİN uygulaması başladı");
 
-    const connectBtn = document.getElementById("connectBtn");
+    const "btnConnect" = document.getElementById("connectBtn");
     const disconnectBtn = document.getElementById("disconnectBtn");
     const scanBtn = document.getElementById("scanBtn");
 
