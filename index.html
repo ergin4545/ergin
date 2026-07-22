@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ERGİN</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+
+<div class="container">
+
+<img src="logo.png" class="logo">
+
+<h1>ERGİN</h1>
+
+<div id="statusBadge" class="status">
+Bağlı Değil
+</div>
+
+<button id="btnConnect">
+📶 Bluetooth Bağlan
+</button>
+
+<button id="btnDisconnect">
+❌ Bağlantıyı Kes
+</button>
+
+<button id="btnStart">
+▶️ Taramayı Başlat
+</button>
+
+<button id="btnStop">
+⏹️ Taramayı Durdur
+</button>
+
+<div id="scanGrid" class="grid">
+</div>
+
+<div id="scanInfo">
+Hazır...
+</div>
+
+</div>
+
+<script src="bluetooth.js"></script>
+<script src="scan.js"></script>
+<script src="storage.js"></script>
+<script src="settings.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
