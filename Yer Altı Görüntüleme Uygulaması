@@ -1,0 +1,18 @@
+# Yer Altı Görüntüleme Uygulaması
+
+Bu proje yer altı tarama, sensör bağlantısı ve veri görüntüleme amaçlı hazırlanmıştır.
+
+## Dosyalar
+- index.html
+- stil.css
+- uygulama.js
+- bluetooth.js
+- tarama.js
+- ayarlar.js
+- depolama.js
+
+## Özellikler
+- Bluetooth bağlantısı
+- Sensör tarama altyapısı
+- Ayarlar bölümü
+- Veri depolama
