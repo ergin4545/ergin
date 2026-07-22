@@ -16,3 +16,19 @@ Bu proje yer altı tarama, sensör bağlantısı ve veri görüntüleme amaçlı
 - Sensör tarama altyapısı
 - Ayarlar bölümü
 - Veri depolama
+## Kullanım
+
+1. Uygulamayı açın.
+2. Bluetooth cihaz bağlantısını yapın.
+3. Tarama başlat butonuna basın.
+4. Gelen sensör verilerini ekrandan takip edin.
+
+## Teknolojiler
+- HTML
+- CSS
+- JavaScript
+- Bluetooth API
+- Sensör veri işleme
+
+## Geliştirme Aşaması
+Bu proje geliştirme aşamasındadır.
