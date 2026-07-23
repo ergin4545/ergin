@@ -1,11 +1,19 @@
-// Scan & Graphic Logic
-let scanData = [];
+// Canlı Tarama Matrisi (5x5 Başlangıç Boyutu)
+let matrixRows = 5;
+let matrixCols = 5;
+let scanData = Array(matrixRows).fill(0).map(() => Array(matrixCols).fill(0));
+
+let currentRow = 0;
+let currentCol = 0;
 let isScanning = false;
 
 // Taramayı Başlat
 function startScan() {
   isScanning = true;
-  scanData = generateSampleData(); // Örnek veri seti veya sensör verisi
+  // Matrisi sıfırla
+  scanData = Array(matrixRows).fill(0).map(() => Array(matrixCols).fill(0));
+  currentRow = 0;
+  currentCol = 0;
   updatePlot();
   calculateAnalysis();
 }
@@ -15,31 +23,61 @@ function stopScan() {
   isScanning = false;
 }
 
+// Bluetooth'tan Gelen Canlı Verileri Matrise Yerleştir
+function processLiveBluetoothData(incomingNumbers) {
+  if (!isScanning) return;
+
+  incomingNumbers.forEach(val => {
+    if (currentRow < matrixRows) {
+      scanData[currentRow][currentCol] = val;
+      currentCol++;
+
+      // Satır dolduysa bir alt satıra geç
+      if (currentCol >= matrixCols) {
+        currentCol = 0;
+        currentRow++;
+      }
+    }
+  });
+
+  // Ekrandaki haritayı ve analizi anlık güncelle
+  updatePlot();
+  calculateAnalysis();
+}
+
 // 3D / 2D Grafiği Güncelle
 function updatePlot() {
   const plotDiv = document.getElementById("scanPlot");
   if (!plotDiv || !window.Plotly) return;
 
-  const traceType = (typeof currentViewMode !== 'undefined' && currentViewMode === '2d') ? 'heatmap' : 'surface';
+  const is2D = (typeof currentViewMode !== 'undefined' && currentViewMode === '2d');
+  const traceType = is2D ? 'heatmap' : 'surface';
 
   const data = [{
     z: scanData,
     type: traceType,
-    colorscale: 'Jet'
+    colorscale: 'Jet',
+    colorbar: {
+      thickness: 15,
+      len: 0.9,
+      tickfont: { color: '#ffffff', size: 10 }
+    }
   }];
 
   const layout = {
     paper_bgcolor: "rgba(0,0,0,0)",
     plot_bgcolor: "rgba(0,0,0,0)",
+    autosize: true,
     margin: { l: 10, r: 10, b: 10, t: 10 },
     scene: {
-      xaxis: { title: '' },
-      yaxis: { title: '' },
-      zaxis: { title: '' }
+      xaxis: { visible: false },
+      yaxis: { visible: false },
+      zaxis: { visible: false },
+      camera: { eye: { x: 1.4, y: 1.4, z: 1.2 } }
     }
   };
 
-  Plotly.react("scanPlot", data, layout, { responsive: true });
+  Plotly.react("scanPlot", data, layout, { responsive: true, displayModeBar: false });
 }
 
 // Anomali ve Veri Analizini Hesapla
@@ -61,23 +99,12 @@ function calculateAnalysis() {
   if (diffEl) diffEl.innerText = diff;
 
   if (statusMsg) {
-    if (diff > 50) {
+    if (diff > 50 && max > 0) {
       statusMsg.innerText = "⚠️ Yüksek anomali tespit edildi! (Metal / Yapı şüphesi)";
       statusMsg.style.color = "#ff4444";
     } else {
-      statusMsg.innerText = "Nötr Zemin / Normal Veri";
+      statusMsg.innerText = "Canlı Veri Dinleniyor...";
       statusMsg.style.color = "#00ff88";
     }
   }
 }
-
-// Örnek Tarama Matrisi
-function generateSampleData() {
-  return [
-    [100, 102, 105, 103, 100],
-    [101, 150, 180, 140, 102], // Yüksek değer (Metal)
-    [99,  145, 210, 135, 98],
-    [100,  50,  40,  60, 101], // Düşük değer (Boşluk)
-    [102, 101, 100, 103, 102]
-  ];
-                                          }
