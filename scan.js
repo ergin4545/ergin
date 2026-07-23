@@ -2,72 +2,129 @@
 
 let scanning = false;
 let timer = null;
-let cells = [];
+let currentView = '3d'; // '3d' veya '2d'
 
-function createGrid(){
+// 5x5 Matris Verimiz (Varsayılan nötr toprak seviyesi)
+let matrixData = [
+  [500, 502, 498, 505, 500],
+  [495, 510, 505, 490, 502],
+  [500, 505, 520, 515, 498],
+  [508, 492, 501, 500, 505],
+  [500, 498, 502, 499, 501]
+];
 
-const grid = document.getElementById("scanGrid");
-
-grid.innerHTML = "";
-
-cells = [];
-
-for(let i=0;i<25;i++){
-
-const cell = document.createElement("div");
-
-cell.className = "cell";
-
-grid.appendChild(cell);
-
-cells.push(cell);
-
+function createGrid() {
+  renderChart();
 }
 
+function switchView(viewType) {
+  currentView = viewType;
+  renderChart();
 }
 
-function startScan(){
+function renderChart() {
+  const container = document.getElementById("scanPlot");
+  if (!container) return;
 
-if(scanning) return;
+  // GR3 Plus cihazlarında kullanılan klasik Jet Color Map (Mavi -> Yeşil -> Sarı -> Kırmızı)
+  const jetColorscale = [
+    [0.0, '#00008f'],  // Derin Boşluk (Koyu Mavi)
+    [0.25, '#007fff'], // Boşluk / Tünel (Açık Mavi)
+    [0.5, '#00ff7f'],  // Saf Toprak (Yeşil)
+    [0.75, '#ffff00'], // Hafif Anomali (Sarı)
+    [1.0, '#ff0000']   // Yoğun Metal / Obje (Kırmızı)
+  ];
 
-scanning = true;
+  let trace;
 
-timer = setInterval(()=>{
+  if (currentView === '3d') {
+    trace = {
+      z: matrixData,
+      type: 'surface',
+      colorscale: jetColorscale,
+      showscale: true,
+      contours: {
+        z: { show: true, usecolormap: true, highlightcolor: "#fff", project: { z: true } }
+      }
+    };
+  } else {
+    trace = {
+      z: matrixData,
+      type: 'heatmap',
+      colorscale: jetColorscale,
+      smoothygaps: true, // Akışkan yumuşak geçiş
+      showscale: true
+    };
+  }
 
-const value = Math.floor(Math.random()*1000);
+  const layout = {
+    paper_bgcolor: '#111',
+    plot_bgcolor: '#111',
+    margin: { l: 20, r: 20, b: 20, t: 30 },
+    font: { color: '#fff' },
+    scene: {
+      xaxis: { title: 'X (Metre)', gridcolor: '#333' },
+      yaxis: { title: 'Y (Metre)', gridcolor: '#333' },
+      zaxis: { title: 'Sinyal / Derinlik', gridcolor: '#333' },
+      camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+    }
+  };
 
-document.getElementById("scanInfo").innerHTML =
-"Tarama Değeri : "+value;
+  const config = { responsive: true, displayModeBar: false };
 
-const index = Math.floor(Math.random()*25);
-
-if(value>700){
-
-cells[index].style.background="#ff0000";
-
-}else if(value>350){
-
-cells[index].style.background="#ffd000";
-
-}else{
-
-cells[index].style.background="#0080ff";
-
+  Plotly.react('scanPlot', [trace], layout, config);
+  calculateAritmetic();
 }
 
-saveData(value);
+// Videodaki Aritmetik Birim Farkı Analiz Mantığı
+function calculateAritmetic() {
+  let flat = matrixData.flat();
+  let max = Math.max(...flat);
+  let min = Math.min(...flat);
+  let diff = max - min;
 
-},500);
+  document.getElementById("maxVal").innerText = max;
+  document.getElementById("minVal").innerText = min;
+  document.getElementById("diffVal").innerText = diff;
 
+  const statusMsg = document.getElementById("statusMsg");
+
+  if (diff > 350) {
+    statusMsg.innerText = "⚠️ YÜKSEK ANOMALİ: Bölgede belirgin bir yapı veya metal hedeflendi!";
+    statusMsg.style.color = "#ff4444";
+  } else if (diff > 180) {
+    statusMsg.innerText = "ℹ️ DÜŞÜK ANOMALİ: Katmanlı toprak veya zemin değişikliği.";
+    statusMsg.style.color = "#ffbb00";
+  } else {
+    statusMsg.innerText = "✅ STABİL: Saf / Bozulmamış Toprak yapısı.";
+    statusMsg.style.color = "#00cc66";
+  }
 }
 
-function stopScan(){
+function startScan() {
+  if (scanning) return;
+  scanning = true;
 
-scanning = false;
+  const settings = typeof getSettings === 'function' ? getSettings() : { scanSpeed: 300 };
 
-clearInterval(timer);
+  timer = setInterval(() => {
+    // Rastgele nokta güncelleyerek tarama simülasyonu yapıyoruz
+    // Bluetooth bağlandığında buraya sensörden gelen gerçek veri basılacak
+    let row = Math.floor(Math.random() * 5);
+    let col = Math.floor(Math.random() * 5);
+    
+    // Anomali simülasyonu (200 - 900 arası değerler)
+    matrixData[row][col] = Math.floor(Math.random() * 700) + 200;
 
-document.getElementById("scanInfo").innerHTML =
-"Tarama Durduruldu";
+    renderChart();
 
+    if (typeof saveData === 'function') {
+      saveData(matrixData[row][col]);
+    }
+  }, settings.scanSpeed || 300);
 }
+
+function stopScan() {
+  scanning = false;
+  clearInterval(timer);
+    }
