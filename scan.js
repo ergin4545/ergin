@@ -119,4 +119,4 @@ function calculateAnalysis() {
   document.getElementById("maxVal").innerText = max;
   document.getElementById("minVal").innerText = min;
   document.getElementById("diffVal").innerText = diff;
-                      }
+}
