@@ -1,4 +1,4 @@
-// Uygulama Başlatma ve Buton Dinleyicileri
+// Uygulama ve Buton Tıklama Yönetimi
 document.addEventListener("DOMContentLoaded", () => {
   const btnConnect = document.getElementById("btnConnect");
   const btnDisconnect = document.getElementById("btnDisconnect");
@@ -6,13 +6,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnStopScan = document.getElementById("btnStopScan");
   const btn3D = document.getElementById("btn3D");
   const btn2D = document.getElementById("btn2D");
+  const statusDiv = document.getElementById("status");
 
+  // Bluetooth Bağlan
   if (btnConnect) {
     btnConnect.addEventListener("click", async () => {
       try {
         if (typeof connectBluetooth === 'function') {
           await connectBluetooth();
-          alert("Bluetooth Cihazına Bağlanıldı!");
+          if (statusDiv) {
+            statusDiv.innerText = "Bluetooth Bağlandı";
+            statusDiv.style.background = "#008855";
+          }
+        } else {
+          alert("Bluetooth fonksiyonu yüklenemedi!");
         }
       } catch (err) {
         alert("Bağlantı Hatası: " + err);
@@ -20,15 +27,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Bağlantıyı Kes
   if (btnDisconnect) {
     btnDisconnect.addEventListener("click", () => {
       if (typeof disconnectBluetooth === 'function') {
         disconnectBluetooth();
-        alert("Bağlantı Kesildi.");
+        if (statusDiv) {
+          statusDiv.innerText = "Cihaz Bağlı Değil";
+          statusDiv.style.background = "#b00020";
+        }
       }
     });
   }
 
+  // Taramayı Başlat
   if (btnStartScan) {
     btnStartScan.addEventListener("click", () => {
       if (typeof startScan === 'function') {
@@ -37,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Taramayı Durdur
   if (btnStopScan) {
     btnStopScan.addEventListener("click", () => {
       if (typeof stopScan === 'function') {
@@ -45,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 3D Görünüm
   if (btn3D) {
     btn3D.addEventListener("click", () => {
       window.currentViewMode = '3d';
@@ -52,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 2D Görünüm
   if (btn2D) {
     btn2D.addEventListener("click", () => {
       window.currentViewMode = '2d';
