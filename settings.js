@@ -1,71 +1,52 @@
-// ERGİN Ayarlar Sistemi
+// settings.js
 
 const SETTINGS_KEY = "ergin_settings";
 
+const defaultSettings = {
 
-// Varsayılan ayarlar
+deviceName:"ERGİN",
 
-let defaultSettings = {
+scanSpeed:500,
 
-    deviceName: "ERGİN Cihaz",
-    scanSpeed: 1000,
-    autoSave: true
+autoSave:true
 
 };
 
-
-// Ayarları kaydetme
-
 function saveSettings(settings){
 
-    localStorage.setItem(
-        SETTINGS_KEY,
-        JSON.stringify(settings)
-    );
-
-    alert("Ayarlar kaydedildi");
+localStorage.setItem(
+SETTINGS_KEY,
+JSON.stringify(settings)
+);
 
 }
-
-
-// Ayarları alma
 
 function getSettings(){
 
-    let data = localStorage.getItem(SETTINGS_KEY);
+let data = localStorage.getItem(SETTINGS_KEY);
 
+if(data){
 
-    if(data){
-
-        return JSON.parse(data);
-
-    }
-
-
-    return defaultSettings;
+return JSON.parse(data);
 
 }
 
+return defaultSettings;
 
-// Ayar değiştirme
+}
 
 function updateSetting(key,value){
 
-    let settings = getSettings();
+let settings=getSettings();
 
-    settings[key] = value;
+settings[key]=value;
 
-    saveSettings(settings);
+saveSettings(settings);
 
 }
 
-
-// Ayarları sıfırlama
-
 function resetSettings(){
 
-    localStorage.removeItem(SETTINGS_KEY);
-
-    alert("Ayarlar sıfırlandı");
+localStorage.removeItem(SETTINGS_KEY);
 
 }

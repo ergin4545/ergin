@@ -1,78 +1,55 @@
-// ERGİN Veri Kayıt Sistemi
+// storage.js
 
 const STORAGE_KEY = "ergin_scan_history";
 
+function saveData(value){
 
-// Veri kaydetme
+let history = getHistory();
 
-function saveData(data){
+history.push({
 
-    let history = getData();
+value:value,
+time:new Date().toLocaleString()
 
-    let record = {
+});
 
-        value:data,
-        date:new Date().toLocaleString()
-
-    };
-
-
-    history.push(record);
-
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(history)
-    );
-
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(history)
+);
 
 }
 
+function getHistory(){
 
-// Kayıtları alma
+let data = localStorage.getItem(STORAGE_KEY);
 
-function getData(){
+if(data){
 
-    let data = localStorage.getItem(STORAGE_KEY);
-
-
-    if(data){
-
-        return JSON.parse(data);
-
-    }
-
-
-    return [];
+return JSON.parse(data);
 
 }
 
-
-// Kayıtları temizleme
-
-function clearData(){
-
-    localStorage.removeItem(STORAGE_KEY);
-
-    alert("Kayıtlar silindi");
+return [];
 
 }
 
+function clearHistory(){
 
-// Son kayıt
+localStorage.removeItem(STORAGE_KEY);
 
-function getLastData(){
+}
 
-    let history=getData();
+function getLastRecord(){
 
+let history = getHistory();
 
-    if(history.length>0){
+if(history.length===0){
 
-        return history[history.length-1];
+return null;
 
-    }
+}
 
-
-    return null;
+return history[history.length-1];
 
 }

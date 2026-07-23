@@ -1,95 +1,58 @@
-// ERGİN Ana Uygulama Kontrolü
+// app.js
 
-window.onload = function(){
+window.addEventListener("load", () => {
 
-    console.log("ERGİN uygulaması başladı");
+const statusBadge = document.getElementById("statusBadge");
 
-    const connectBtn = document.getElementBy Id("btnConnect") = document.getElementBy Id("btnConnect") = document.getElementBy Id("btnConnect") = document.getElementById("connectBtn");
-    const disconnectBtn = document.getElementById("disconnectBtn");
-    const scanBtn = document.getElementById("scanBtn");
+const connectBtn = document.getElementById("connectBtn");
+const disconnectBtn = document.getElementById("disconnectBtn");
+const scanBtn = document.getElementById("scanBtn");
+const stopBtn = document.getElementById("stopBtn");
 
+createGrid();
 
-    if(connectBtn){
+connectBtn.addEventListener("click", async () => {
 
-        connectBtn.addEventListener("click", function(){
+try{
 
-            if(typeof connectBluetooth === "function"){
+await connectBluetooth();
 
-                connectBluetooth();
+statusBadge.innerHTML="Bluetooth Bağlandı";
+statusBadge.style.background="#009944";
 
-            }else{
+}catch(e){
 
-                alert("Bluetooth modülü bulunamadı");
-
-            }
-
-        });
-
-    }
-
-
-    if(disconnectBtn){
-
-        disconnectBtn.addEventListener("click", function(){
-
-            if(typeof disconnectBluetooth === "function"){
-
-                disconnectBluetooth();
-
-            }
-
-        });
-
-    }
-
-
-    if(scanBtn){
-
-        scanBtn.addEventListener("click", function(){
-
-            if(typeof startScan === "function"){
-
-                startScan();
-
-            }else{
-
-                alert("Tarama sistemi hazır değil");
-
-            }
-
-        });
-
-    }
-
-};
-
-
-// Bluetooth bağlantı durumu güncelleme
-
-function updateStatus(text,color){
-
-    let badge=document.getElementById("statusBadge");
-
-    if(badge){
-
-        badge.innerHTML=text;
-        badge.style.background=color;
-
-    }
+alert(e.message);
 
 }
 
+});
 
-// Gelen veriyi ekrana basma
+disconnectBtn.addEventListener("click",()=>{
 
-function showData(data){
+disconnectBluetooth();
 
-    let output=document.getElementById("scanValue");
+statusBadge.innerHTML="Bağlı Değil";
+statusBadge.style.background="#b00020";
 
-    if(output){
+});
 
-        output.innerHTML=data;
+scanBtn.addEventListener("click",()=>{
 
-    }
+startScan();
 
-}
+statusBadge.innerHTML="Tarama Aktif";
+statusBadge.style.background="#0066ff";
+
+});
+
+stopBtn.addEventListener("click",()=>{
+
+stopScan();
+
+statusBadge.innerHTML="Hazır";
+statusBadge.style.background="#555";
+
+});
+
+});
