@@ -75,7 +75,6 @@ button:active {
   border: 1px solid #00c8ff;
 }
 
-/* Grafiğin Çizildiği Alan (Çakışmayı Önleyen Kısım) */
 .plot-container {
   width: 100%;
   height: 350px;
@@ -86,7 +85,6 @@ button:active {
   overflow: hidden;
 }
 
-/* Analiz Paneli */
 .analysis-box {
   background: #111827;
   border: 1px solid #1f293d;
@@ -111,4 +109,4 @@ button:active {
 .analysis-box span {
   font-weight: bold;
   color: #ffffff;
-}
+  }
