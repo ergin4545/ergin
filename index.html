@@ -2,51 +2,134 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ERGİN 3D</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FURINA FE 3D Pulse System</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Plotly.js Kütüphanesi -->
+  <!-- Plotly.js CDN -->
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 </head>
 <body>
 
-  <div class="container">
-    <img src="logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
-    <h1>ERGİN 3D</h1>
+  <!-- ÜST BİLGİ VE BAĞLANTI BARI -->
+  <header class="app-header">
+    <div class="logo-title">
+      <h1>FURINA FE</h1>
+      <span>3D PULSE SYSTEM</span>
+    </div>
+    <button id="btConnectBtn" class="bt-btn" onclick="toggleBluetooth()">
+      <span id="btStatusIcon">🔴</span> <span id="btStatusText">Bağlan</span>
+    </button>
+  </header>
 
-    <div id="status" class="status">Cihaz Bağlı Değil</div>
+  <!-- ANA MENÜ (DASHBOARD) -->
+  <main id="mainMenu" class="view-section active">
+    <div class="menu-grid">
+      <button class="menu-card" onclick="switchView('pointerView')">
+        <div class="card-icon">🎯</div>
+        <div class="card-title">Pointer</div>
+        <div class="card-desc">Anlık Canlı Sinyal</div>
+      </button>
 
-    <div class="buttons">
-      <button id="btnConnect">📶 Bluetooth Bağlan</button>
-      <button id="btnDisconnect">❌ Bağlantıyı Kes</button>
-      <button id="btnStartScan">▶️ Taramayı Başlat</button>
-      <button id="btnStopScan">⏹️ Taramayı Durdur</button>
+      <button class="menu-card" onclick="switchView('scanView')">
+        <div class="card-icon">🗺️</div>
+        <div class="card-title">Zemin Taraması</div>
+        <div class="card-desc">2D / 3D Canlı Harita</div>
+      </button>
+
+      <button class="menu-card" onclick="switchView('archiveView'); loadArchiveList();">
+        <div class="card-icon">📁</div>
+        <div class="card-title">Arşiv</div>
+        <div class="card-desc">Kayıtlı Taramalar</div>
+      </button>
+
+      <button class="menu-card" onclick="switchView('settingsView')">
+        <div class="card-icon">⚙️</div>
+        <div class="card-title">Ayarlar</div>
+        <div class="card-desc">Cihaz & Kalibrasyon</div>
+      </button>
+    </div>
+  </main>
+
+  <!-- 1. POINTER MODU SAYFASI -->
+  <section id="pointerView" class="view-section">
+    <div class="section-header">
+      <button class="back-btn" onclick="switchView('mainMenu')">⬅ Geri</button>
+      <h2>POINTER MODE</h2>
     </div>
 
-    <div class="view-controls">
-      <button id="btn3D">3D Yüzey Haritası</button>
-      <button id="btn2D">2D Isı Haritası</button>
+    <div class="pointer-container">
+      <div class="gauge-box">
+        <div class="gauge-circle">
+          <span id="pointerVal">0</span>
+          <small>SİNYAL</small>
+        </div>
+      </div>
+      <div id="pointerPlot" class="chart-box"></div>
+    </div>
+  </section>
+
+  <!-- 2. ZEMİN TARAMASI SAYFASI -->
+  <section id="scanView" class="view-section">
+    <div class="section-header">
+      <button class="back-btn" onclick="switchView('mainMenu')">⬅ Geri</button>
+      <h2>ZEMİN TARAMASI</h2>
+      <div class="scan-controls">
+        <button id="startScanBtn" onclick="toggleScan()">▶ Taramayı Başlat</button>
+        <button onclick="saveCurrentScan()">💾 Kaydet</button>
+      </div>
     </div>
 
-    <!-- Grafik Alanı -->
-    <div class="plot-container">
-      <div id="scanPlot" style="width:100%; height:100%;"></div>
+    <!-- Grafik Mod Seçici -->
+    <div class="mode-toggle-bar">
+      <button class="toggle-btn active" onclick="setScanMode('2d')">2D Izgara</button>
+      <button class="toggle-btn" onclick="setScanMode('3d')">3D Hacim</button>
     </div>
+
+    <div id="scanPlot" class="chart-box-large"></div>
 
     <!-- Analiz Paneli -->
-    <div class="analysis-box">
-      <h3>📊 Anomali & Veri Analizi</h3>
-      <p>En Yüksek (Metal): <span id="maxVal">0</span></p>
-      <p>En Düşük (Boşluk): <span id="minVal">0</span></p>
-      <p>Aritmetik Fark: <span id="diffVal">0</span></p>
-      <p id="statusMsg" style="color: #00ff88; font-weight: bold; margin-top: 5px;">Veri Bekleniyor...</p>
+    <div class="analysis-bar">
+      <div>MAX: <strong id="maxVal">0</strong></div>
+      <div>MIN: <strong id="minVal">0</strong></div>
+      <div>FARK: <strong id="diffVal">0</strong></div>
+      <div id="statusMsg">Sistem Hazır</div>
     </div>
-  </div>
+  </section>
+
+  <!-- 3. ARŞİV SAYFASI -->
+  <section id="archiveView" class="view-section">
+    <div class="section-header">
+      <button class="back-btn" onclick="switchView('mainMenu')">⬅ Geri</button>
+      <h2>KAYITLI TARAMALAR</h2>
+    </div>
+    <div id="archiveList" class="archive-list">
+      <!-- Kayıtlar buraya yüklenecek -->
+    </div>
+  </section>
+
+  <!-- 4. AYARLAR SAYFASI -->
+  <section id="settingsView" class="view-section">
+    <div class="section-header">
+      <button class="back-btn" onclick="switchView('mainMenu')">⬅ Geri</button>
+      <h2>AYARLAR</h2>
+    </div>
+    <div class="settings-box">
+      <label>Matris Genişliği (Sütun):
+        <input type="number" id="cfgCols" value="8" min="2" max="20">
+      </label>
+      <label>Matris Uzunluğu (Satır):
+        <input type="number" id="cfgRows" value="8" min="2" max="20">
+      </label>
+      <label>Sesli İkaz (Bip):
+        <input type="checkbox" id="cfgSound" checked>
+      </label>
+    </div>
+  </section>
 
   <!-- JS Dosyaları -->
-  <script src="Bluetooth.js"></script>
+  <script src="bluetooth.js"></script>
   <script src="scan.js"></script>
   <script src="app.js"></script>
-
 </body>
-</html>
+  </html>
+  
