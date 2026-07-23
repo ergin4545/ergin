@@ -81,3 +81,11 @@ margin-top:20px;
 font-size:17px;
 color:#7fdfff;
 }
+/* Sitedeki tüm görselleri ve direkt logo resmini sınırla */
+img {
+  max-width: 140px !important;
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  margin: 15px auto !important;
+}
