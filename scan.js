@@ -1,6 +1,8 @@
-// Scan & Graphic Logic
-let matrixRows = 5;
-let matrixCols = 5;
+// Scan & Graphic Logic (Izgara + Değer Yazan Tam Veri Haritası)
+let matrixRows = 8;
+let matrixCols = 8;
+
+// Başlangıç 8x8 boş zemin matrisi
 let scanData = Array(matrixRows).fill(0).map(() => Array(matrixCols).fill(0));
 
 let currentRow = 0;
@@ -28,7 +30,7 @@ function processLiveBluetoothData(incomingNumbers) {
 
   incomingNumbers.forEach(val => {
     if (currentRow < matrixRows) {
-      scanData[currentRow][currentCol] = val;
+      scanData[currentRow][currentCol] = parseFloat(val.toFixed(2));
       currentCol++;
 
       if (currentCol >= matrixCols) {
@@ -48,34 +50,57 @@ function updatePlot() {
   if (!plotDiv || !window.Plotly) return;
 
   const is2D = (typeof currentViewMode !== 'undefined' && currentViewMode === '2d');
-  
-  // 2D Isı Haritası için veri konfigürasyonu
+
+  // Her hücrenin üstüne sayı değerini basmak için metin matrisi oluştur
+  let textMatrix = scanData.map(row => row.map(val => val.toString()));
+
   const data = [{
     z: scanData,
+    text: textMatrix,
+    texttemplate: "%{text}", // Karelerin içine gerçek sayıları yazar
+    textfont: {
+      color: '#ffffff',
+      size: 9,
+      family: 'Arial'
+    },
     type: is2D ? 'heatmap' : 'surface',
     colorscale: 'Jet',
-    zsmooth: is2D ? 'best' : false, // 2D modunda pikselleşmeyi önler, yumuşak geçiş yapar
+    zsmooth: is2D ? 'best' : false,
+    showscale: true,
     colorbar: {
       thickness: 12,
-      len: 0.85,
+      len: 0.9,
       tickfont: { color: '#ffffff', size: 10 }
     }
   }];
 
-  // 2D ve 3D için özel Layout ayarları
   let layout = {
     paper_bgcolor: "rgba(0,0,0,0)",
     plot_bgcolor: "rgba(0,0,0,0)",
     autosize: true,
-    margin: { l: 15, r: 15, b: 15, t: 15 }
+    margin: { l: 10, r: 10, b: 10, t: 10 }
   };
 
   if (is2D) {
-    // 2D modunda görüntüyü tam kareye oturtur, oranları bozmaz/zoom yaptırmaz
-    layout.xaxis = { visible: false, constrain: 'domain' };
-    layout.yaxis = { visible: false, scaleanchor: 'x', scaleratio: 1 };
+    // Görseldeki gibi sarı/beyaz ızgara çizgilerini aktif et
+    layout.xaxis = {
+      visible: true,
+      showgrid: true,
+      gridcolor: 'rgba(255, 255, 255, 0.4)',
+      gridwidth: 1,
+      showticklabels: false,
+      constrain: 'domain'
+    };
+    layout.yaxis = {
+      visible: true,
+      showgrid: true,
+      gridcolor: 'rgba(255, 255, 255, 0.4)',
+      gridwidth: 1,
+      showticklabels: false,
+      scaleanchor: 'x',
+      scaleratio: 1
+    };
   } else {
-    // 3D modunda eksen çizgilerini gizler
     layout.scene = {
       xaxis: { visible: false },
       yaxis: { visible: false },
@@ -84,10 +109,10 @@ function updatePlot() {
     };
   }
 
-  // Üstteki gereksiz zoom/büyüteç araç çubuğunu gizle
   const config = {
     responsive: true,
     displayModeBar: false,
+    doubleClick: false,
     scrollZoom: false
   };
 
@@ -113,13 +138,17 @@ function calculateAnalysis() {
   if (diffEl) diffEl.innerText = diff;
 
   if (statusMsg) {
-    if (diff > 50 && max > 0) {
+    if (diff > 50) {
       statusMsg.innerText = "⚠️ Yüksek anomali tespit edildi! (Metal / Yapı şüphesi)";
       statusMsg.style.color = "#ff4444";
     } else {
-      statusMsg.innerText = "Nötr Zemin / Veri Bekleniyor";
+      statusMsg.innerText = "Nötr Zemin / Veri Dinleniyor...";
       statusMsg.style.color = "#00ff88";
     }
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(updatePlot, 300);
+});
   
