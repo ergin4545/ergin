@@ -19,38 +19,32 @@
   <!-- 6'lı Izgara Menü -->
   <main class="grid grid-cols-2 gap-3 my-auto">
     
-    <!-- 1. 3D Zemin Taraması -->
     <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
       <div class="text-3xl mb-1">🗺️</div>
       <span class="font-bold text-sm leading-tight">3D Ground Scan</span>
     </button>
 
-    <!-- 2. Alan Tarama (LRL) -->
-    <button onclick="alert('Alan Tarama henüz aktif değil.')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
+    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
       <div class="text-3xl mb-1">📡</div>
       <span class="font-bold text-sm leading-tight">Long Range Locator</span>
     </button>
 
-    <!-- 3. Anlık Sinyal -->
-    <button onclick="window.location.href='pointer.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
+    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
       <div class="text-3xl mb-1">📈</div>
       <span class="font-bold text-sm leading-tight">Simultaneous Data</span>
     </button>
 
-    <!-- 4. Kayıtlı Tarama Aç -->
-    <button onclick="window.location.href='archive.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
+    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
       <div class="text-3xl mb-1">📁</div>
       <span class="font-bold text-sm leading-tight">Open Scan</span>
     </button>
 
-    <!-- 5. Lisans -->
-    <button onclick="alert('Lisans: Aktif (Ergin 3D - Pro)')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
+    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
       <div class="text-3xl mb-1">🔑</div>
       <span class="font-bold text-sm leading-tight">Licence</span>
     </button>
 
-    <!-- 6. Bilgi -->
-    <button onclick="window.location.href='settings.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
+    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
       <div class="text-3xl mb-1">ℹ️</div>
       <span class="font-bold text-sm leading-tight">Information</span>
     </button>
@@ -59,35 +53,17 @@
 
   <!-- Alt Durum Çubuğu -->
   <footer class="bg-gray-900 border border-gray-800 rounded-xl p-2 flex justify-between items-center text-xs">
-    <button id="btnConnect" onclick="toggleConnect()" class="bg-gray-200 text-black px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 active:scale-95">
-      <span>🔵</span> Connect the Device
-    </button>
+    <div class="bg-gray-800 text-amber-400 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 border border-gray-700">
+      🔵 Bluetooth Bekleniyor
+    </div>
 
     <div class="flex items-center gap-3">
       <div class="text-left">
-        <div id="deviceName" class="text-gray-400 font-medium">ERGİN 3D-X</div>
-        <div id="voltText" class="text-emerald-400 font-bold">🔋 7.81 V</div>
-      </div>
-      <div class="text-emerald-400 font-bold flex items-center gap-1">
-        🔑 <span class="hidden sm:inline">Licence Active</span>
+        <div class="text-gray-400 font-medium">ERGİN 3D-X</div>
+        <div class="text-emerald-400 font-bold">🔋 7.81 V</div>
       </div>
     </div>
   </footer>
 
-  <script>
-    let connected = false;
-    function toggleConnect() {
-      const btn = document.getElementById('btnConnect');
-      if(!connected) {
-        btn.innerHTML = "🟢 Connected";
-        btn.className = "bg-emerald-500 text-white px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5";
-        connected = true;
-      } else {
-        btn.innerHTML = "🔵 Connect the Device";
-        btn.className = "bg-gray-200 text-black px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5";
-        connected = false;
-      }
-    }
-  </script>
 </body>
 </html>
