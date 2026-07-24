@@ -3,10 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- PWA ve Tam Ekran (Uygulama Modu) Ayarları -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#000000">
   <title>ERGİN 3D Pro - Uydu Konum & Tarama</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-  <!-- Harita ve Arama (Leaflet & Control Geocoder) -->
+  <!-- Harita ve Arama (Leaflet) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
@@ -40,7 +44,7 @@
       width: 100%;
       height: 100%;
       z-index: 2;
-      pointer-events: none; /* Haritanın elle kaydırılabilmesi için dokunmayı alta verir */
+      /* 3D grafiğin çevrilebilmesi için dokunma aktif edildi */
     }
   </style>
 </head>
@@ -129,27 +133,23 @@
   <!-- UYDU + ARAMA + 3D TARAMA EKRANI -->
   <div id="pageScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-1">
     
-    <!-- ÜST BİLGİ VE ARAMA ÇUBUĞU -->
     <header class="flex flex-col gap-1.5 px-3 py-2 text-xs border border-white/20 glass-card rounded-2xl z-10">
       <div class="flex justify-between items-center">
         <div class="font-bold text-cyan-400">ERGİN 3D <span id="coordDisplay" class="text-gray-300 ml-1">Konum Seç</span></div>
         <div id="signalDisplay" class="font-bold text-amber-400">SİNYAL: 0</div>
         <div id="btStatus" class="text-amber-400 font-bold">🔴 Bağlı Değil</div>
       </div>
-      <!-- Yer Arama Çubuğu -->
       <div class="flex gap-1">
         <input type="text" id="searchInput" placeholder="Yer Ara (Örn: Ankara Çankaya)" class="w-full bg-black/60 border border-white/30 px-2.5 py-1.5 rounded-xl text-white text-xs outline-none">
         <button onclick="searchLocation()" class="bg-cyan-600 font-bold px-3 py-1.5 rounded-xl text-xs">Git</button>
       </div>
     </header>
 
-    <!-- HARİTA VE 3D GRAFİK ALANI -->
     <main class="relative w-full flex-1 bg-black my-2 rounded-2xl border border-white/20 overflow-hidden min-h-[200px]">
       <div id="map"></div>
       <div id="scanPlot"></div>
     </main>
 
-    <!-- KONTROL PANELİ -->
     <footer class="flex flex-col gap-1.5 glass-card p-2 rounded-2xl z-10">
       <div class="grid grid-cols-5 gap-1 text-[10px]">
         <button class="bg-purple-600 text-white font-bold py-1.5 rounded-lg">Uydu</button>
@@ -188,7 +188,7 @@
     </div>
     <div class="glass-card p-4 rounded-2xl my-auto text-xs space-y-2 text-gray-200">
       <p>• ERGİN 3D Pro Uydu Harita & Tarama</p>
-      <p>• Yazılım Sürümü: v3.3 Pro GeoSearch</p>
+      <p>• Yazılım Sürümü: v3.6 Rotate Mode</p>
     </div>
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
@@ -211,7 +211,6 @@
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
 
-  <!-- JAVASCRIPT -->
   <script>
     let isLicensed = localStorage.getItem("ergin_licensed") === "true";
     let bluetoothDevice = null;
@@ -248,16 +247,24 @@
 
     function initMap() {
       if (!map) {
-        // Türkiye merkezli uydu haritası
-        map = L.map('map', { zoomControl: false, attributionControl: false }).setView([39.9208, 32.8541], 16);
+        // Harita rotasyon (çevirme) özelliği aktif edildi
+        map = L.map('map', { 
+          zoomControl: false, 
+          attributionControl: false, 
+          maxZoom: 22,
+          touchRotate: true, // İki parmakla haritayı döndürme
+          rotate: true
+        }).setView([39.9208, 32.8541], 18);
+        
+        // Yüksek çözünürlüklü uydu katmanı (Taşları dahi net gösteren maxZoom: 22)
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-          maxZoom: 19
+          maxZoom: 22,
+          maxNativeZoom: 19
         }).addTo(map);
 
-        // Haritada herhangi bir yere tıklandığında orayı işaretle ve koordinat göster
         map.on('click', function(e) {
-          let lat = e.latlng.lat.toFixed(4);
-          let lng = e.latlng.lng.toFixed(4);
+          let lat = e.latlng.lat.toFixed(6);
+          let lng = e.latlng.lng.toFixed(6);
           document.getElementById('coordDisplay').innerText = `${lat}, ${lng}`;
 
           if (selectedMarker) {
@@ -271,7 +278,6 @@
       }
     }
 
-    // Arama Çubuğu ile Yer Bulma ve Odaklanma (Nominatim API)
     async function searchLocation() {
       let query = document.getElementById('searchInput').value.trim();
       if (!query) return;
@@ -282,7 +288,7 @@
         if (data && data.length > 0) {
           let lat = parseFloat(data[0].lat);
           let lon = parseFloat(data[0].lon);
-          map.setView([lat, lon], 17);
+          map.setView([lat, lon], 20);
 
           if (selectedMarker) {
             map.removeLayer(selectedMarker);
@@ -290,7 +296,7 @@
           selectedMarker = L.marker([lat, lon]).addTo(map)
             .bindPopup(data[0].display_name).openPopup();
 
-          document.getElementById('coordDisplay').innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+          document.getElementById('coordDisplay').innerText = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
         } else {
           alert("❌ Konum bulunamadı, lütfen başka bir yer yazın.");
         }
@@ -403,12 +409,14 @@
         scene: { 
           xaxis: { visible: false }, 
           yaxis: { visible: false }, 
-          zaxis: { visible: false } 
+          zaxis: { visible: false },
+          camera: {
+            eye: { x: 1.25, y: 1.25, z: 1.25 } // 3D açıları döndürme ve inceleme payı
+          }
         } 
       };
       Plotly.react('scanPlot', data, layout, { responsive: true, displayModeBar: false });
     }
   </script>
 </body>
-      </html>
-        
+</html>
