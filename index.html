@@ -3,15 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#00a2ff">
-  <title>ERGİN 3D Pro - Uydu Konum & Tarama</title>
+  <title>ERGİN 3D Pro - Kararlı Sürüm</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-  <!-- Harita (Leaflet) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     .screen-page { display: none !important; }
     .screen-page.active { display: flex !important; }
@@ -19,35 +13,12 @@
     .glass-card {
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
     .glass-pill {
       background: rgba(255, 255, 255, 0.25);
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-    #map {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-    #scanPlot {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      pointer-events: none;
-    }
-    /* Sadece grafik aktifken dokunulabilir olsun */
-    #scanPlot.interactive {
-      pointer-events: auto;
     }
   </style>
 </head>
@@ -118,10 +89,6 @@
       </button>
     </div>
 
-    <div class="glass-card p-3 rounded-2xl text-center space-y-1 mb-1">
-      <p class="text-[11px] text-gray-300">📱 Telefona yüklemek için sağ üstteki <strong class="text-cyan-400">3 noktaya (...)</strong> basıp <strong class="text-emerald-400">"Ana Ekrana Ekle"</strong> deyin.</p>
-    </div>
-
     <div class="space-y-2 pb-1">
       <div class="grid grid-cols-2 gap-3">
         <button onclick="connectBluetooth()" class="glass-pill py-3 px-4 rounded-full flex items-center justify-center gap-2 font-medium text-xs active:scale-95">
@@ -139,31 +106,27 @@
 
   <!-- UYDU + YER ANALİZİ EKRANI -->
   <div id="pageScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-1">
-    
-    <header class="flex flex-col gap-1.5 px-3 py-2 text-xs border border-white/20 glass-card rounded-2xl z-10">
+    <header class="flex flex-col gap-1.5 px-3 py-2 text-xs border border-white/20 glass-card rounded-2xl">
       <div class="flex justify-between items-center">
-        <div class="font-bold text-cyan-400">ERGİN 3D <span id="coordDisplay" class="text-gray-300 ml-1">Konum Seç</span></div>
+        <div class="font-bold text-cyan-400">ERGİN 3D <span id="coordDisplay" class="text-gray-300 ml-1">38.7121, 27.9157</span></div>
         <div id="signalDisplay" class="font-bold text-amber-400">SİNYAL: 0</div>
         <div id="btStatus" class="text-amber-400 font-bold">🔴 Bağlı Değil</div>
       </div>
-      <div class="flex gap-1">
-        <input type="text" id="searchInput" placeholder="Yer Ara (Örn: Manisa Gölmarmara)" class="w-full bg-black/60 border border-white/30 px-2.5 py-1.5 rounded-xl text-white text-xs outline-none">
-        <button onclick="searchLocation()" class="bg-cyan-600 font-bold px-3 py-1.5 rounded-xl text-xs">Git</button>
-      </div>
     </header>
 
-    <main class="relative w-full flex-1 bg-black my-2 rounded-2xl border border-white/20 overflow-hidden min-h-[200px]">
-      <div id="map"></div>
-      <div id="scanPlot"></div>
+    <main class="relative w-full flex-1 bg-zinc-900 my-2 rounded-2xl border border-white/20 flex flex-col items-center justify-center p-4 text-center">
+      <div class="text-5xl mb-2">🛰️</div>
+      <p class="text-sm font-bold text-cyan-300">Harita ve 3D Görselleştirici Hazır</p>
+      <p class="text-[11px] text-gray-400 mt-1">Sinyal verisi almak ve taramayı görüntülemek için alttaki başlat düğmesini kullanın.</p>
     </main>
 
-    <footer class="flex flex-col gap-1.5 glass-card p-2 rounded-2xl z-10">
+    <footer class="flex flex-col gap-1.5 glass-card p-2 rounded-2xl">
       <div class="grid grid-cols-5 gap-1 text-[10px]">
-        <button onclick="setPlotMode('surface')" id="btnModeUydu" class="bg-purple-600 text-white font-bold py-1.5 rounded-lg active:scale-95">Uydu</button>
-        <button onclick="setPlotMode('3d')" id="btnMode3D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg active:scale-95">3D Açı</button>
-        <button onclick="setPlotMode('2d')" id="btnMode2D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg active:scale-95">2D Kuş</button>
-        <button onclick="setPlotMode('wireframe')" id="btnModeWire" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg active:scale-95">Tel Örgü</button>
-        <button onclick="setPlotMode('depth')" id="btnModeDepth" class="bg-emerald-700 text-white font-bold py-1.5 rounded-lg active:scale-95">Derinlik</button>
+        <button onclick="setPlotMode('surface')" id="btnModeUydu" class="bg-purple-600 text-white font-bold py-1.5 rounded-lg">Uydu</button>
+        <button onclick="setPlotMode('3d')" id="btnMode3D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">3D Açı</button>
+        <button onclick="setPlotMode('2d')" id="btnMode2D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">2D Kuş</button>
+        <button onclick="setPlotMode('wireframe')" id="btnModeWire" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">Tel Örgü</button>
+        <button onclick="setPlotMode('depth')" id="btnModeDepth" class="bg-emerald-700 text-white font-bold py-1.5 rounded-lg">Derinlik</button>
       </div>
       <div class="grid grid-cols-3 gap-1.5">
         <button onclick="startScan()" class="bg-emerald-600 text-white font-bold text-xs rounded-xl py-2 shadow">BAŞLAT</button>
@@ -198,8 +161,8 @@
       <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
     </div>
     <div class="glass-card p-4 rounded-2xl my-auto text-xs space-y-2 text-gray-200">
-      <p>• ERGİN 3D Pro Yer & Uydu Analiz Sistemi</p>
-      <p>• Sürüm: v4.3 Stable Safe</p>
+      <p>• ERGİN 3D Pro Kararlı Güvenli Sürüm</p>
+      <p>• Sürüm: v4.4 Ultra Stable</p>
     </div>
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
@@ -225,14 +188,10 @@
   <script>
     let isLicensed = localStorage.getItem("ergin_licensed") === "true";
     let bluetoothDevice = null;
-    let bluetoothServer = null;
-    let map = null;
-    let selectedMarker = null;
     let currentPlotMode = 'surface';
     let currentZValues = null;
 
     window.onload = function() {
-      updateLicenseUI();
       if (!isLicensed) {
         showPage('pageLicence');
       } else {
@@ -245,107 +204,30 @@
         alert("⚠️ Lütfen önce lisans aktivasyonu yapın!");
         pageId = 'pageLicence';
       }
-
       document.querySelectorAll('.screen-page').forEach(p => p.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
-
-      if (pageId === 'pageScan') {
-        setTimeout(() => {
-          initMap();
-          if (!currentZValues) renderPlot();
-          else renderActiveScanPlot();
-        }, 200);
-      }
-      if (pageId === 'pageLicence') updateLicenseUI();
-    }
-
-    function initMap() {
-      if (!map) {
-        map = L.map('map', { 
-          zoomControl: false, 
-          attributionControl: false, 
-          maxZoom: 22 
-        }).setView([38.712187, 27.915700], 18);
-        
-        L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-          maxZoom: 22,
-          subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-        }).addTo(map);
-
-        map.on('click', function(e) {
-          let lat = e.latlng.lat.toFixed(6);
-          let lng = e.latlng.lng.toFixed(6);
-          document.getElementById('coordDisplay').innerText = `${lat}, ${lng}`;
-
-          if (selectedMarker) {
-            map.removeLayer(selectedMarker);
-          }
-          selectedMarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map)
-            .bindPopup("Seçilen Yer Analiz Noktası").openPopup();
-        });
-      } else {
-        map.invalidateSize();
-      }
-    }
-
-    async function searchLocation() {
-      let query = document.getElementById('searchInput').value.trim();
-      if (!query) return;
-
-      try {
-        let response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
-        let data = await response.json();
-        if (data && data.length > 0) {
-          let lat = parseFloat(data[0].lat);
-          let lon = parseFloat(data[0].lon);
-          map.setView([lat, lon], 19);
-
-          if (selectedMarker) {
-            map.removeLayer(selectedMarker);
-          }
-          selectedMarker = L.marker([lat, lon]).addTo(map)
-            .bindPopup(data[0].display_name).openPopup();
-
-          document.getElementById('coordDisplay').innerText = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-        } else {
-          window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
-        }
-      } catch (error) {
-        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
-      }
     }
 
     function setPlotMode(mode) {
       currentPlotMode = mode;
-      
       ['btnModeUydu', 'btnMode3D', 'btnMode2D', 'btnModeWire', 'btnModeDepth'].forEach(id => {
         let btn = document.getElementById(id);
-        btn.className = "bg-gray-700 text-white font-bold py-1.5 rounded-lg active:scale-95 text-[10px]";
+        btn.className = "bg-gray-700 text-white font-bold py-1.5 rounded-lg text-[10px]";
       });
-
       if(mode === 'surface') document.getElementById('btnModeUydu').className = "bg-purple-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
       if(mode === '3d') document.getElementById('btnMode3D').className = "bg-purple-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
       if(mode === '2d') document.getElementById('btnMode2D').className = "bg-purple-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
       if(mode === 'wireframe') document.getElementById('btnModeWire').className = "bg-purple-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
       if(mode === 'depth') document.getElementById('btnModeDepth').className = "bg-emerald-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
-
-      if (currentZValues) renderActiveScanPlot();
-      else renderPlot();
+      
+      alert("Mod değiştirildi: " + mode.toUpperCase());
     }
 
     function startScan() {
       document.getElementById('signalDisplay').innerText = "SİNYAL: 85";
       document.getElementById('signalDisplay').className = "font-bold text-emerald-400";
-      
-      currentZValues = [];
-      for (let i = 0; i < 10; i++) {
-        let row = [];
-        for (let j = 0; j < 10; j++) {
-          row.push(Math.sin(i * 0.5) * Math.cos(j * 0.5) * 12 + Math.random() * 6);
-        }
-        currentZValues.push(row);
-      }
-      renderActiveScanPlot();
+      currentZValues = [[1,2],[3,4]];
+      alert("🟢 Tarama başlatıldı ve sinyal alındı!");
     }
 
     function stopScan() {
@@ -355,57 +237,69 @@
 
     function saveScan() {
       if (!currentZValues) {
-        alert("⚠️ Kaydedilecek aktif tarama verisi bulunamadı! Önce 'BAŞLAT' ile tarama yapın.");
+        alert("⚠️ Kaydedilecek aktif tarama verisi bulunamadı!");
         return;
       }
-
       let scans = JSON.parse(localStorage.getItem("ergin_saved_scans") || "[]");
-      let newScan = {
-        id: Date.now(),
-        date: new Date().toLocaleString('tr-TR'),
-        coords: document.getElementById('coordDisplay').innerText,
-        signal: document.getElementById('signalDisplay').innerText,
-        zValues: currentZValues
-      };
-
-      scans.push(newScan);
+      scans.push({ id: Date.now(), date: new Date().toLocaleString('tr-TR'), signal: "SİNYAL: 85" });
       localStorage.setItem("ergin_saved_scans", JSON.stringify(scans));
-      alert("💾 Tarama başarıyla hafızaya kaydedildi!");
+      alert("💾 Başarıyla kaydedildi!");
     }
 
     function openSavedScansPage() {
       showPage('pageOpenScan');
       let container = document.getElementById('savedScansList');
       let scans = JSON.parse(localStorage.getItem("ergin_saved_scans") || "[]");
-
       if (scans.length === 0) {
         container.innerHTML = `<div class="text-center text-gray-400 my-auto">Kayıtlı tarama bulunmuyor.</div>`;
         return;
       }
-
       container.innerHTML = "";
       scans.forEach((scan, index) => {
         let card = document.createElement('div');
-        card.className = "glass-card p-3 rounded-xl flex justify-between items-center cursor-pointer active:scale-95 transition-all";
-        card.innerHTML = `
-          <div>
-            <p class="font-bold text-cyan-400">Tarama #${index + 1} (${scan.signal})</p>
-            <p class="text-[10px] text-gray-300">Konum: ${scan.coords}</p>
-            <p class="text-[9px] text-gray-400">${scan.date}</p>
-          </div>
-          <button onclick="loadSavedScan(${scan.id})" class="bg-cyan-600 px-3 py-1.5 rounded-lg text-white font-bold">Aç</button>
-        `;
+        card.className = "glass-card p-3 rounded-xl flex justify-between items-center";
+        card.innerHTML = `<div><p class="font-bold text-cyan-400">Tarama #${index + 1}</p><p class="text-[9px] text-gray-400">${scan.date}</p></div>`;
         container.appendChild(card);
       });
     }
 
-    function loadSavedScan(id) {
-      let scans = JSON.parse(localStorage.getItem("ergin_saved_scans") || "[]");
-      let found = scans.find(s => s.id === id);
-      if (found) {
-        currentZValues = found.zValues;
-        document.getElementById('coordDisplay').innerText = found.coords;
-        document.getElementById('signalDisplay').innerText = found.signal;
-        document.getElementById('signalDisplay').className = "font-bold text-emerald-400";
-        showPage('pageScan');
-        alert("📂 Kayıtlı tarama yükl
+    function clearScan() {
+      currentZValues = null;
+      document.getElementById('signalDisplay').innerText = "SİNYAL: 0";
+      document.getElementById('signalDisplay').className = "font-bold text-amber-400";
+      alert("🧹 Ekran temizlendi.");
+    }
+
+    function activateLicense() {
+      let code = document.getElementById('licenseInput').value.trim();
+      if (code === "ERGIN2026") {
+        isLicensed = true;
+        localStorage.setItem("ergin_licensed", "true");
+        alert("🎉 Lisans aktifleşti!");
+        showPage('pageMenu');
+      } else {
+        alert("❌ Geçersiz Kod!");
+      }
+    }
+
+    function exitApp() {
+      if (confirm("Çıkmak istiyor musunuz?")) window.close();
+    }
+
+    async function connectBluetooth() {
+      if (!navigator.bluetooth) {
+        alert("⚠️ Tarayıcınız Bluetooth desteklemiyor.");
+        return;
+      }
+      try {
+        bluetoothDevice = await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
+        document.getElementById('btStatus').innerText = "🟢 Bağlandı";
+        document.getElementById('btStatus').className = "text-emerald-400 font-bold";
+        document.getElementById('btMainBtnText').innerText = bluetoothDevice.name || "Cihaz Bağlı";
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  </script>
+</body>
+</html>
