@@ -29,7 +29,7 @@
 
       <div id="activationBox" class="bg-gray-950 p-3.5 rounded-xl border border-gray-800 space-y-2.5">
         <p class="text-[11px] text-gray-300 text-center">Devam etmek için aktivasyon kodunu girin.</p>
-        <input type="text" id="licenseInput" placeholder="Aktivasyon Kodunu Girin" class="w-full bg-black border border-gray-700 p-2.5 rounded-lg text-white text-center text-sm outline-none">
+        <input type="text" id="licenseInput" placeholder="ERGIN2026" class="w-full bg-black border border-gray-700 p-2.5 rounded-lg text-white text-center text-sm outline-none">
         <button onclick="activateLicense()" class="w-full bg-emerald-600 font-bold p-3 rounded-lg text-white text-sm">LİSANSI AKTİFLEŞTİR</button>
       </div>
     </div>
@@ -92,6 +92,9 @@
     </header>
 
     <main class="relative w-full flex-1 bg-black my-1.5 rounded-xl border border-gray-800 overflow-hidden min-h-[220px]">
+      <!-- Canlı Arka Kamera Akışı -->
+      <video id="cameraStream" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-50 z-0"></video>
+      <!-- 3D Grafik Alanı -->
       <div id="scanPlot" class="relative w-full h-full z-10"></div>
     </main>
 
@@ -262,7 +265,7 @@
     }
 
     let GRID_SIZE = 10, rawGrid = Array(10).fill(0).map(() => Array(10).fill(0));
-    let isWireframe = false, isScanning = false;
+    let isWireframe = false, isScanning = false, cameraActive = false;
 
     function renderPlot(cameraEye) {
       if (typeof Plotly === 'undefined') return;
@@ -272,15 +275,33 @@
       }, { responsive: true, displayModeBar: false });
     }
 
+    async function toggleCamera() {
+      let videoElem = document.getElementById('cameraStream');
+      if (!cameraActive) {
+        try {
+          let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+          videoElem.srcObject = stream;
+          videoElem.classList.remove('hidden');
+          cameraActive = true;
+        } catch (e) {
+          alert("Kamera izni alınamadı! Lütfen tarayıcı ayarlarından kamera izni verin.");
+        }
+      } else {
+        let stream = videoElem.srcObject;
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        videoElem.srcObject = null;
+        videoElem.classList.add('hidden');
+        cameraActive = false;
+      }
+    }
+
     function startScanning() { isScanning = true; document.getElementById('btnStart').disabled = true; document.getElementById('btnStop').disabled = false; }
     function stopScanning() { isScanning = false; document.getElementById('btnStart').disabled = false; document.getElementById('btnStop').disabled = true; }
     function clearMap() { rawGrid = Array(10).fill(0).map(() => Array(10).fill(0)); renderPlot(); }
     function setView(mode) { renderPlot(mode === '2d' ? { eye: { x: 0, y: 0, z: 2.2 } } : { eye: { x: 1.3, y: 1.3, z: 1.3 } }); }
     function toggleWireframe() { isWireframe = !isWireframe; renderPlot(); }
     function showDepth() { alert("Tahmini Derinlik Hesaplandı."); }
-    async function toggleCamera() { alert("Kamera Modu Aktif"); }
     async function connectBluetooth() { alert("Bluetooth Arama Başlatıldı"); }
   </script>
 </body>
-          </html>
-            
+</html>
