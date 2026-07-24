@@ -3,177 +3,224 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ERGİN 3D - Scan</title>
+  <title>ERGİN 3D - Pro Ultimate Scanner</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 </head>
-<body class="bg-black text-white h-screen flex flex-col justify-between p-2 select-none">
+<body class="bg-black text-white h-screen flex flex-col justify-between p-2 select-none overflow-hidden">
 
-  <header class="flex justify-between items-center px-2 py-1 text-xs border-b border-gray-800">
-    <div class="font-bold text-red-600">
-      ERGİN 3D <span id="xyText" class="ml-2">X= 10:10 , Y= 10:10</span>
+  <!-- Üst Bilgi Barı -->
+  <header class="flex justify-between items-center px-2 py-1 text-xs border-b border-gray-800 bg-gray-950 rounded-lg">
+    <div class="font-bold text-cyan-400">
+      ERGİN 3D <span id="xyText" class="ml-1 text-white text-[10px]">X:1 Y:1</span>
     </div>
-    <div id="btStatus" class="flex items-center gap-1 text-amber-400 font-bold">
-      🔴 Cihaz Bağlı Değil
+    <div id="signalVal" class="font-black text-yellow-400 text-xs">SİNYAL: 0</div>
+    <div id="btStatus" class="flex items-center gap-1 text-amber-400 font-bold text-[11px]">
+      🔴 Bağlı Değil
     </div>
   </header>
 
-  <main class="relative w-full h-[52vh] bg-black my-1">
-    <div id="scanPlot" class="w-full h-full"></div>
+  <!-- 3D Grafik Alanı (Kamera / AR Arkasındaki Şeffaf Tuval) -->
+  <main id="mainContainer" class="relative w-full h-[50vh] bg-black my-1 rounded-xl border border-gray-800 overflow-hidden">
+    <video id="cameraStream" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-60"></video>
+    <div id="scanPlot" class="relative w-full h-full z-10"></div>
   </main>
 
+  <!-- Kontrol Paneli (Hepsini Tek Yerde Toplayan Menü) -->
   <footer class="flex flex-col gap-1.5 bg-gray-950 p-2 rounded-xl border border-gray-800">
     
-    <div class="flex items-center gap-2">
-      <div class="flex flex-col text-xs font-bold text-gray-400">
-        <span>Filter Type</span>
-        <select id="filterSelect" onchange="changeFilter(this.value)" class="bg-gray-200 text-black px-2 py-1 rounded font-bold text-xs mt-0.5">
-          <option value="1">F. 1</option>
-          <option value="2">F. 2</option>
-          <option value="3">F. 3</option>
-        </select>
-      </div>
-
-      <div class="grid grid-cols-4 gap-1 flex-1">
-        <button onclick="setView('3d')" class="bg-gray-300 text-black rounded p-1 text-center font-bold text-xs flex flex-col items-center">
-          🧊 <span>3D</span>
-        </button>
-        <button onclick="setView('2d')" class="bg-gray-300 text-black rounded p-1 text-center font-bold text-xs flex flex-col items-center">
-          🗺️ <span>2D</span>
-        </button>
-        <button onclick="toggleWireframe()" class="bg-gray-300 text-black rounded p-1 text-center font-bold text-xs flex flex-col items-center">
-          🕸️ <span>Mesh</span>
-        </button>
-        <button onclick="showDepth()" class="bg-gray-300 text-black rounded p-1 text-center font-bold text-xs flex flex-col items-center">
-          📏 <span>m</span>
-        </button>
-      </div>
+    <!-- Üst Satır: Filtre, Kamera ve Görünüm -->
+    <div class="grid grid-cols-5 gap-1">
+      <button onclick="toggleCamera()" class="bg-indigo-600 text-white rounded p-1.5 text-center font-bold text-[11px] flex flex-col items-center">
+        📷 <span>Kamera</span>
+      </button>
+      <button onclick="setView('3d')" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[11px] flex flex-col items-center">
+        🧊 <span>3D Açı</span>
+      </button>
+      <button onclick="setView('2d')" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[11px] flex flex-col items-center">
+        🗺️ <span>2D Kuş</span>
+      </button>
+      <button onclick="toggleWireframe()" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[11px] flex flex-col items-center">
+        🕸️ <span>Tel Örgü</span>
+      </button>
+      <button onclick="showDepth()" class="bg-emerald-600 text-white rounded p-1.5 text-center font-bold text-[11px] flex flex-col items-center">
+        📏 <span>Derinlik</span>
+      </button>
     </div>
 
-    <div class="flex gap-2 items-center">
+    <!-- Orta Satır: Renk Skalası ve Eşik (Threshold) Ayarları -->
+    <div class="flex gap-2 items-center bg-gray-900 p-1.5 rounded-lg border border-gray-800">
       
-      <div class="flex flex-col gap-1 w-28">
-        <div class="h-3 rounded w-full" style="background: linear-gradient(to right, blue, cyan, green, yellow, red);"></div>
-        
-        <div class="grid grid-cols-2 gap-1 text-center">
-          <div class="bg-gray-300 text-black rounded p-1 flex flex-col justify-between items-center">
-            <span class="text-[9px] font-bold">THRES</span>
-            <button onclick="adjThres(1)" class="text-cyan-600 font-black text-sm">▲</button>
-            <span id="thresVal" class="font-bold text-xs">45</span>
-            <button onclick="adjThres(-1)" class="text-cyan-600 font-black text-sm">▼</button>
-          </div>
-          <div class="bg-gray-300 text-black rounded p-1 flex flex-col justify-between items-center">
-            <span class="text-[9px] font-bold">GAIN</span>
-            <button onclick="adjGain(1)" class="text-cyan-600 font-black text-sm">▲</button>
-            <span id="gainVal" class="font-bold text-xs">7</span>
-            <button onclick="adjGain(-1)" class="text-cyan-600 font-black text-sm">▼</button>
-          </div>
-        </div>
+      <div class="flex flex-col gap-1 w-1/2">
+        <div class="text-[8px] text-center font-bold text-gray-400">BOŞLUK (Mavi) ◄► METAL (Kırmızı)</div>
+        <div class="h-2.5 rounded w-full border border-gray-700" style="background: linear-gradient(to right, blue, cyan, green, yellow, red);"></div>
       </div>
 
-      <div class="flex-1 grid grid-cols-3 gap-1">
-        <div class="bg-gray-300 text-black rounded p-1 flex flex-col items-center justify-center col-span-1">
-          <span class="text-[9px] font-bold">ANGLE</span>
-          <span id="angleVal" class="text-emerald-700 font-bold text-xs">262°</span>
+      <div class="flex flex-col w-1/2 text-[10px]">
+        <div class="flex justify-between font-bold text-gray-300">
+          <span>Eşik (Filtre):</span>
+          <span id="threshText" class="text-cyan-400">0</span>
         </div>
-
-        <button onclick="clearMap()" class="bg-emerald-200 text-emerald-950 border border-emerald-400 font-bold text-[10px] rounded p-1 leading-tight flex items-center justify-center text-center col-span-1">
-          NEW SCAN
-        </button>
-
-        <button onclick="connectBluetooth()" class="bg-amber-200 text-amber-950 border border-amber-400 font-bold text-[10px] rounded p-1 leading-tight flex items-center justify-center text-center col-span-1">
-          GET DATA
-        </button>
-
-        <button onclick="window.location.href='index.html'" class="bg-rose-500 text-white font-bold text-[10px] rounded p-2 leading-tight flex items-center justify-center text-center col-span-3">
-          MAIN MENU
-        </button>
+        <input type="range" id="threshSlider" min="-50" max="50" value="0" oninput="updateThreshold(this.value)" class="w-full accent-cyan-400 h-1 bg-gray-700 rounded cursor-pointer">
       </div>
 
+    </div>
+
+    <!-- Alt Satır: İşlem Butonları -->
+    <div class="grid grid-cols-3 gap-1.5">
+      <button onclick="clearMap()" class="bg-rose-900 text-rose-100 border border-rose-700 font-bold text-xs rounded p-1.5 flex items-center justify-center">
+        🗑️ TEMİZLE
+      </button>
+      <button onclick="connectBluetooth()" class="bg-amber-400 text-black font-bold text-xs rounded p-1.5 flex items-center justify-center">
+        🔵 CİHAZA BAĞLAN
+      </button>
+      <button onclick="window.location.href='index.html'" class="bg-gray-700 text-white font-bold text-xs rounded p-1.5 flex items-center justify-center">
+        🏠 MENÜ
+      </button>
     </div>
 
   </footer>
 
   <script>
-    let baseGrid = Array(10).fill(0).map(() => Array(10).fill(0));
+    let GRID_SIZE = 10;
+    let rawGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
+    let displayGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
     let currentRow = 0;
-    let thres = 45;
-    let gain = 7;
+    let currentCol = 0;
     let isWireframe = false;
+    let thresholdValue = 0;
     let bluetoothDevice;
+    let cameraStreamActive = false;
 
     function renderPlot(cameraEye) {
       if (typeof Plotly === 'undefined') return;
 
       let trace = {
-        z: baseGrid,
+        z: displayGrid,
         type: 'surface',
         colorscale: 'Jet',
         showscale: false,
         hidesurface: isWireframe,
         wireframe: {
-          x: { show: true, color: '#ffffff', width: 1 },
-          y: { show: true, color: '#ffffff', width: 1 }
+          x: { show: true, color: '#444444', width: 1 },
+          y: { show: true, color: '#444444', width: 1 }
         }
       };
 
       let layout = {
         autosize: true,
         margin: { l: 0, r: 0, b: 0, t: 0 },
-        paper_bgcolor: '#000000',
-        plot_bgcolor: '#000000',
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
         scene: {
-          xaxis: { title: '', color: '#ffffff', gridcolor: '#444' },
-          yaxis: { title: '', color: '#ffffff', gridcolor: '#444' },
-          zaxis: { title: '', color: '#ffffff', gridcolor: '#444' },
-          camera: cameraEye || { eye: { x: 1.4, y: 1.4, z: 1.4 } }
+          xaxis: { title: '', color: '#ffffff', gridcolor: '#333' },
+          yaxis: { title: '', color: '#ffffff', gridcolor: '#333' },
+          zaxis: { title: '', color: '#ffffff', gridcolor: '#333' },
+          camera: cameraEye || { eye: { x: 1.3, y: 1.3, z: 1.3 } }
         }
       };
 
       Plotly.react('scanPlot', [trace], layout, { responsive: true, displayModeBar: false });
     }
 
+    // JDY-33 Bluetooth Bağlantısı
     async function connectBluetooth() {
       try {
         document.getElementById('btStatus').innerText = "🔍 Aranıyor...";
         bluetoothDevice = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: ['00001101-0000-1000-8000-00805f9b34fb', '6e400001-b5a3-f393-e0a9-e50e24dcca9e']
+          filters: [{ namePrefix: 'JDY' }, { namePrefix: 'jdy' }],
+          optionalServices: [
+            '0000ffe0-0000-1000-8000-00805f9b34fb',
+            '00001101-0000-1000-8000-00805f9b34fb'
+          ]
         });
 
         const server = await bluetoothDevice.gatt.connect();
         document.getElementById('btStatus').innerText = "🟢 Bağlandı";
-        document.getElementById('btStatus').className = "text-emerald-400 font-bold";
+        document.getElementById('btStatus').className = "text-emerald-400 font-bold text-[11px]";
 
-        const primaryService = (await server.getPrimaryServices())[0];
-        const characteristics = await primaryService.getCharacteristics();
-        const rxCharacteristic = characteristics[0];
+        const service = await server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
+        const characteristic = await service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
 
-        await rxCharacteristic.startNotifications();
-        rxCharacteristic.addEventListener('characteristicvaluechanged', handleDataReceived);
-
+        await characteristic.startNotifications();
+        characteristic.addEventListener('characteristicvaluechanged', handleDataReceived);
       } catch (error) {
-        console.error("BT Hata:", error);
-        document.getElementById('btStatus').innerText = "🔴 Bağlanamadı";
-        alert("Bluetooth Taraması Başlatılamadı: " + error.message);
+        document.getElementById('btStatus').innerText = "🔴 Hata";
+        alert("Bağlantı Hatası: " + error.message);
       }
     }
 
+    // Gelen Veriyi İşleme
     function handleDataReceived(event) {
       let decoder = new TextDecoder('utf-8');
       let rawString = decoder.decode(event.target.value).trim();
-      let values = rawString.split(',').map(Number);
+      let values = rawString.split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
 
-      if (values.length > 0 && currentRow < 10) {
-        baseGrid[currentRow] = values;
-        currentRow = (currentRow + 1) % 10;
-        renderPlot();
+      if (values.length > 0) {
+        for (let val of values) {
+          rawGrid[currentRow][currentCol] = val;
+          document.getElementById('signalVal').innerText = "SİNYAL: " + val;
+          document.getElementById('xyText').innerText = `X:${currentCol + 1} Y:${currentRow + 1}`;
+
+          currentCol++;
+          if (currentCol >= GRID_SIZE) {
+            currentCol = 0;
+            currentRow = (currentRow + 1) % GRID_SIZE;
+          }
+        }
+        applyFilterAndRender();
+      }
+    }
+
+    // Eşik / Filtre Uygulama
+    function updateThreshold(val) {
+      thresholdValue = parseInt(val);
+      document.getElementById('threshText').innerText = thresholdValue;
+      applyFilterAndRender();
+    }
+
+    function applyFilterAndRender() {
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          let v = rawGrid[r][c];
+          // Eşik değerinin altındaki gürültüleri sıfırla (görseli netleştir)
+          if (Math.abs(v) < Math.abs(thresholdValue)) {
+            displayGrid[r][c] = 0;
+          } else {
+            displayGrid[r][c] = v;
+          }
+        }
+      }
+      renderPlot();
+    }
+
+    // Kamera / AR Modunu Aç-Kapat
+    async function toggleCamera() {
+      let videoElem = document.getElementById('cameraStream');
+      if (!cameraStreamActive) {
+        try {
+          let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+          videoElem.srcObject = stream;
+          videoElem.classList.remove('hidden');
+          cameraStreamActive = true;
+        } catch (e) {
+          alert("Kamera izni verilemedi: " + e.message);
+        }
+      } else {
+        let stream = videoElem.srcObject;
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        videoElem.classList.add('hidden');
+        cameraStreamActive = false;
       }
     }
 
     function clearMap() {
-      baseGrid = Array(10).fill(0).map(() => Array(10).fill(0));
+      rawGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
+      displayGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
       currentRow = 0;
+      currentCol = 0;
+      document.getElementById('xyText').innerText = "X:1 Y:1";
+      document.getElementById('signalVal').innerText = "SİNYAL: 0";
       renderPlot();
     }
 
@@ -181,7 +228,7 @@
       if (mode === '2d') {
         renderPlot({ eye: { x: 0, y: 0, z: 2.2 } });
       } else {
-        renderPlot({ eye: { x: 1.4, y: 1.4, z: 1.4 } });
+        renderPlot({ eye: { x: 1.3, y: 1.3, z: 1.3 } });
       }
     }
 
@@ -190,20 +237,11 @@
       renderPlot();
     }
 
-    function adjThres(v) {
-      thres += v;
-      document.getElementById('thresVal').innerText = thres;
-    }
-
-    function adjGain(v) {
-      gain += v;
-      document.getElementById('gainVal').innerText = gain;
-    }
-
     function showDepth() {
-      let maxVal = Math.max(...baseGrid.flat());
-      let depth = (maxVal / 100 * 1.2).toFixed(2);
-      alert("Derinlik: " + depth + " Metre");
+      let flat = rawGrid.flat();
+      let minVal = Math.min(...flat);
+      let maxVal = Math.max(...flat);
+      alert(`📊 ANELİZ RAPORU:\n\n• En Düşük Sinyal (Boşluk): ${minVal}\n• En Yüksek Sinyal (Metal): ${maxVal}\n• Tahmini Derinlik: ${(Math.abs(minVal) * 0.12).toFixed(2)} Metre`);
     }
 
     window.onload = () => {
