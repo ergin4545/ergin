@@ -1,4 +1,4 @@
-// DEDSIS 3D Style - Advanced Ground Radar Engine
+// ERGİN 3D - Advanced Ground Radar Engine
 let matrixRows = 10;
 let matrixCols = 10;
 let scanData = Array(matrixRows).fill(0).map(() => Array(matrixCols).fill(0));
