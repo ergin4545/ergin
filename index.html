@@ -3,18 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ERGİN 3D Pro</title>
+  <title>ERGİN 3D Pro - Uydu & Yeraltı Haritası</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <!-- Harita için Leaflet Kütüphanesi -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     .screen-page { display: none !important; }
     .screen-page.active { display: flex !important; }
     body {
-      background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), 
-                  url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop') center/cover no-repeat fixed;
+      background: #000;
     }
     .glass-card {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -24,6 +26,19 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    #scanPlot {
+      position: relative;
+      z-index: 2;
+      background: transparent !important;
     }
   </style>
 </head>
@@ -64,8 +79,8 @@
 
     <div class="grid grid-cols-2 gap-3.5 my-auto py-2">
       <button onclick="showPage('pageScan')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
-        <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">📐</div>
-        <span class="text-xs font-semibold leading-tight">3D Zemin Taraması</span>
+        <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">🛰️</div>
+        <span class="text-xs font-semibold leading-tight">Uydu & 3D Zemin Taraması</span>
       </button>
 
       <button onclick="showPage('pageLrl')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
@@ -109,21 +124,25 @@
     </div>
   </div>
 
-  <!-- 3D TARAMA EKRANI (TAM KONTROL PANELİ İLE) -->
+  <!-- UYDU + 3D TARAMA EKRANI -->
   <div id="pageScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-1">
-    <header class="flex justify-between items-center px-3 py-2 text-xs border-b border-white/20 glass-card rounded-xl">
+    <header class="flex justify-between items-center px-3 py-2 text-xs border-b border-white/20 glass-card rounded-xl z-10">
       <div class="font-bold text-cyan-400">ERGİN 3D <span id="coordDisplay" class="text-gray-300 ml-1">X:1 Y:1</span></div>
       <div id="signalDisplay" class="font-bold text-amber-400">SİNYAL: 0</div>
       <div id="btStatus" class="text-amber-400 font-bold">🔴 Bağlı Değil</div>
     </header>
 
-    <main class="relative w-full flex-1 bg-black/80 my-2 rounded-2xl border border-white/20 overflow-hidden min-h-[220px]">
-      <div id="scanPlot" class="relative w-full h-full z-10"></div>
+    <!-- ARKA PLAN UYDU HARİTASI VE ÜZERİNDEKİ 3D KATMAN -->
+    <main class="relative w-full flex-1 bg-black my-2 rounded-2xl border border-white/20 overflow-hidden min-h-[220px]">
+      <!-- Gerçek Uydu Haritası Arka Planı -->
+      <div id="map"></div>
+      <!-- 3D Veri Katmanı -->
+      <div id="scanPlot" class="w-full h-full"></div>
     </main>
 
-    <footer class="flex flex-col gap-1.5 glass-card p-2 rounded-2xl">
+    <footer class="flex flex-col gap-1.5 glass-card p-2 rounded-2xl z-10">
       <div class="grid grid-cols-5 gap-1 text-[10px]">
-        <button class="bg-purple-600 text-white font-bold py-1.5 rounded-lg">Kamera</button>
+        <button class="bg-purple-600 text-white font-bold py-1.5 rounded-lg">Uydu</button>
         <button class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">3D Açı</button>
         <button class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">2D Kuş</button>
         <button class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">Tel Örgü</button>
@@ -158,8 +177,8 @@
       <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
     </div>
     <div class="glass-card p-4 rounded-2xl my-auto text-xs space-y-2 text-gray-200">
-      <p>• ERGİN 3D Pro Yeraltı Görüntüleme</p>
-      <p>• Yazılım Sürümü: v3.1 Pro</p>
+      <p>• ERGİN 3D Pro Uydu & Yeraltı Görüntüleme</p>
+      <p>• Yazılım Sürümü: v3.2 Pro Satellite</p>
     </div>
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
@@ -187,6 +206,7 @@
     let isLicensed = localStorage.getItem("ergin_licensed") === "true";
     let bluetoothDevice = null;
     let bluetoothServer = null;
+    let map = null;
 
     window.onload = function() {
       updateLicenseUI();
@@ -206,8 +226,25 @@
       document.querySelectorAll('.screen-page').forEach(p => p.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
 
-      if (pageId === 'pageScan') setTimeout(renderPlot, 100);
+      if (pageId === 'pageScan') {
+        setTimeout(() => {
+          initMap();
+          renderPlot();
+        }, 200);
+      }
       if (pageId === 'pageLicence') updateLicenseUI();
+    }
+
+    function initMap() {
+      if (!map) {
+        // Türkiye merkezli gerçek uydu haritası tabanı (Esri World Imagery Uydu Katmanı)
+        map = L.map('map', { zoomControl: false, attributionControl: false }).setView([39.9208, 32.8541], 17);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 19
+        }).addTo(map);
+      } else {
+        map.invalidateSize();
+      }
     }
 
     function activateLicense() {
@@ -280,11 +317,27 @@
 
     function renderPlot() {
       if (typeof Plotly === 'undefined') return;
-      let data = [{ z: Array(10).fill(0).map(() => Array(10).fill(0)), type: 'surface', colorscale: 'Jet', showscale: false }];
-      let layout = { autosize: true, margin: { l: 0, r: 0, b: 0, t: 0 }, paper_bgcolor: 'transparent', plot_bgcolor: 'transparent', scene: { xaxis: { visible: false }, yaxis: { visible: false }, zaxis: { visible: false } } };
+      let data = [{ 
+        z: Array(10).fill(0).map(() => Array(10).fill(0)), 
+        type: 'surface', 
+        colorscale: 'Jet', 
+        showscale: false,
+        opacity: 0.85 // Uydu haritasının üstünde şeffaf durması için
+      }];
+      let layout = { 
+        autosize: true, 
+        margin: { l: 0, r: 0, b: 0, t: 0 }, 
+        paper_bgcolor: 'transparent', 
+        plot_bgcolor: 'transparent', 
+        scene: { 
+          xaxis: { visible: false }, 
+          yaxis: { visible: false }, 
+          zaxis: { visible: false } 
+        } 
+      };
       Plotly.react('scanPlot', data, layout, { responsive: true, displayModeBar: false });
     }
   </script>
 </body>
-          </html>
-        
+                                                                                                      </html>
+                                                                                                      
