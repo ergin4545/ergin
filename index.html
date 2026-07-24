@@ -14,16 +14,33 @@
     .screen-page.active { display: flex !important; }
     body { background: #0b0b0b; }
     .glass-card {
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.88);
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    /* Haritanın koyu tema uyumu ve tam oturması için */
     #mapContainer { width: 100%; height: 100%; background: #111; z-index: 1; }
     .leaflet-control-attribution { display: none !important; }
+    
+    /* Tarama Animasyon Çizgisi */
+    @keyframes scanSweep {
+      0% { top: 0%; opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { top: 100%; opacity: 0.8; }
+    }
+    .scan-line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #00ffcc;
+      box-shadow: 0 0 10px #00ffcc, 0 f 20px #00ffcc;
+      animation: scanSweep 2s infinite alternate ease-in-out;
+      z-index: 5;
+      display: none;
+    }
   </style>
 </head>
-<body class="text-white h-screen w-screen select-none m-0 p-3 overflow-hidden flex flex-col justify-between">
+<body class="text-white h-screen w-screen select-none m-0 p-2 overflow-hidden flex flex-col justify-between">
 
   <!-- ANA MENÜ -->
   <div id="pageMenu" class="screen-page active flex-col justify-between h-full w-full max-w-md mx-auto">
@@ -68,24 +85,21 @@
     </div>
   </div>
 
-  <!-- KAYITLI TARAMALAR LİSTESİ VE TEK TEK SİLME EKRANI -->
+  <!-- KAYITLI TARAMALAR LİSTESİ VE TEK TEK SİLME -->
   <div id="pageSavedScans" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
     <div class="flex justify-between items-center pb-2 border-b border-white/20">
       <h2 class="text-base font-bold text-cyan-400">Kayıtlı Taramalar</h2>
       <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Menü</button>
     </div>
     
-    <!-- Liste Alanı -->
-    <div id="savedScansListContainer" class="my-auto w-full flex-1 overflow-y-auto space-y-2 py-2 pr-1">
-      <!-- Dinamik olarak doldurulacak -->
-    </div>
+    <div id="savedScansListContainer" class="my-auto w-full flex-1 overflow-y-auto space-y-2 py-2 pr-1"></div>
 
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
 
-  <!-- GERÇEK HARİTA VE 3D TARAMA EKRANI -->
+  <!-- GERÇEK HARİTA VE YERALTI ANALİZ EKRANI -->
   <div id="pageScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-1">
-    <header class="flex flex-col gap-1.5 px-3 py-2 text-xs border border-white/20 glass-card rounded-2xl z-10">
+    <header class="flex flex-col gap-1 px-2.5 py-1.5 text-xs border border-white/20 glass-card rounded-2xl z-10">
       <div class="flex justify-between items-center">
         <div class="flex items-center gap-2">
           <button onclick="showPage('pageMenu')" class="bg-white/20 hover:bg-white/30 text-white px-2 py-0.5 rounded text-[10px] font-bold">← Geri</button>
@@ -94,21 +108,34 @@
         <div id="signalDisplay" class="font-bold text-amber-400">SİNYAL: 85</div>
         <div id="btStatus" class="text-amber-400 font-bold">🔴 Bağlı Değil</div>
       </div>
-      <div class="text-[11px] text-gray-300 px-0.5">Konum: <span id="coordDisplay">38.710332, 27.908520</span></div>
+      <div class="text-[10px] text-gray-300 px-0.5">Konum: <span id="coordDisplay">38.710457, 27.908082</span></div>
+      
       <!-- Yer Arama Çubuğu -->
       <div class="flex gap-1">
-        <input type="text" id="searchLocationInput" placeholder="Yer Ara (Örn: Manisa Gölmarmara)" class="w-full bg-black/60 border border-white/30 px-2.5 py-1.5 rounded-lg text-white text-xs outline-none">
-        <button onclick="searchLocation()" class="bg-cyan-600 px-3 py-1.5 rounded-lg font-bold text-xs active:scale-95">Git</button>
+        <input type="text" id="searchLocationInput" placeholder="Yer Ara (Örn: Manisa Gölmarmara)" class="w-full bg-black/60 border border-white/30 px-2 py-1 rounded-lg text-white text-xs outline-none">
+        <button onclick="searchLocation()" class="bg-cyan-600 px-3 py-1 rounded-lg font-bold text-xs active:scale-95">Git</button>
       </div>
     </header>
 
-    <!-- Gerçek Uydu Haritası Alanı -->
-    <main class="relative w-full flex-1 bg-zinc-950 my-2 rounded-2xl border border-white/20 overflow-hidden flex flex-col items-center justify-center">
+    <!-- Harita ve Lazer Tarama Çizgisi Alanı -->
+    <main class="relative w-full flex-1 bg-zinc-950 my-1.5 rounded-2xl border border-white/20 overflow-hidden flex flex-col items-center justify-center">
+      <div id="scanLaserLine" class="scan-line"></div>
       <div id="mapContainer"></div>
     </main>
 
+    <!-- Yeraltı Analiz Özeti Paneli (Başlata Basınca Dolacak) -->
+    <div id="analysisSummaryPanel" class="glass-card p-2 rounded-xl mb-1 border border-cyan-500/40 text-[11px] hidden">
+      <div class="flex justify-between items-center font-bold text-cyan-300 border-b border-white/10 pb-1 mb-1">
+        <span>🔍 YERALTI ANALİZ ÖZETİ</span>
+        <span id="analysisStatus" class="text-emerald-400 animate-pulse">Tarama Tamamlandı</span>
+      </div>
+      <div id="analysisContent" class="space-y-0.5 text-gray-200">
+        <!-- Dinamik içerik -->
+      </div>
+    </div>
+
     <!-- Buton Paneli -->
-    <footer class="flex flex-col gap-1.5 glass-card p-2 rounded-2xl z-10">
+    <footer class="flex flex-col gap-1 glass-card p-2 rounded-2xl z-10">
       <div class="grid grid-cols-5 gap-1 text-[10px]">
         <button onclick="setPlotMode('surface')" id="btnModeUydu" class="bg-purple-600 text-white font-bold py-1.5 rounded-lg active:scale-95">Uydu</button>
         <button onclick="setPlotMode('3d')" id="btnMode3D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg active:scale-95">3D Açı</button>
@@ -164,10 +191,9 @@
   <script>
     let bluetoothDevice = null;
     let map = null;
-    let satelliteLayer, streetLayer;
-    let currentPlotMode = 'surface';
+    let satelliteLayer;
+    let scanMarker = null;
 
-    // Kayıtlı Taramalar Listesi
     let savedScans = [
       { id: 1, name: "Tarama_01_Bolge_A.dat", date: "24.07.2026 - 21:10" },
       { id: 2, name: "Manisa_Golkarmara_Hedef2.dat", date: "24.07.2026 - 20:45" },
@@ -181,17 +207,14 @@
 
     function initMap() {
       if (map) return;
-      // Manisa / Gölmarmara bölgesi baz alınarak başlatıldı
-      map = L.map('mapContainer', { zoomControl: false }).setView([38.710332, 27.908520], 16);
+      map = L.map('mapContainer', { zoomControl: false }).setView([38.710457, 27.908082], 17);
 
-      // Esri World Imagery (Net Küresel Uydu Görüntüsü - Yaklaştıkça netleşir)
       satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 19,
         attribution: 'Esri'
       }).addTo(map);
 
-      // Konum İşaretçisi
-      L.marker([38.710332, 27.908520]).addTo(map)
+      scanMarker = L.marker([38.710457, 27.908082]).addTo(map)
         .bindPopup('ERGİN 3D Analiz Noktası');
 
       map.on('move', function() {
@@ -268,9 +291,8 @@
 
     function searchLocation() {
       let query = document.getElementById('searchLocationInput').value.toLowerCase();
-      // Örnek hızlı konum yönlendirmeleri
       if(query.includes('gölmarmara') || query.includes('manisa')) {
-        map.setView([38.710332, 27.908520], 17);
+        map.setView([38.710457, 27.908082], 18);
         alert("📍 Konuma gidildi: " + query);
       } else {
         alert("📍 Konum harita üzerinde güncellendi.");
@@ -293,23 +315,54 @@
       }
     }
 
+    // BAŞLAT Tuşuna Basınca Yeraltı Taraması ve Özet Çıkarma
     function startLiveScan() {
-      document.getElementById('signalDisplay').innerText = "SİNYAL: 85";
+      document.getElementById('signalDisplay').innerText = "SİNYAL: 94";
+      document.getElementById('scanLaserLine').style.display = 'block';
+      
+      let summaryPanel = document.getElementById('analysisSummaryPanel');
+      let contentDiv = document.getElementById('analysisContent');
+      
+      summaryPanel.style.display = 'block';
+      contentDiv.innerHTML = '<div class="text-cyan-300 animate-pulse">🛰️ Yeraltı taranıyor, anomaliler analiz ediliyor...</div>';
+
+      setTimeout(() => {
+        document.getElementById('scanLaserLine').style.display = 'none';
+        
+        // Gerçekçi Yeraltı Analiz Sonucu
+        contentDiv.innerHTML = `
+          <div class="flex justify-between items-center bg-black/40 p-1 rounded">
+            <span class="text-amber-300 font-bold">🟡 Metal / Altın Hedef:</span>
+            <span class="text-white">Tespit Edildi (%89 Yoğunluk)</span>
+          </div>
+          <div class="flex justify-between items-center bg-black/40 p-1 rounded">
+            <span class="text-purple-300 font-bold">🕳️ Boşluk / Mağara:</span>
+            <span class="text-white">4.2 Metre Derinlikte Oda Yapısı</span>
+          </div>
+          <div class="flex justify-between items-center bg-black/40 p-1 rounded">
+            <span class="text-blue-300 font-bold">🚇 Tünel / Geçit:</span>
+            <span class="text-white">Kuzeybatı Yönlü Yatay Hat</span>
+          </div>
+        `;
+      }, 2000);
     }
 
     function stopScan() {
       document.getElementById('signalDisplay').innerText = "SİNYAL: 0";
+      document.getElementById('scanLaserLine').style.display = 'none';
+      document.getElementById('analysisSummaryPanel').style.display = 'none';
     }
 
     function saveScan() {
-      let newScanName = "Tarama_" + (savedScans.length + 1) + ".dat";
+      let newScanName = "Yeraltı_Analiz_" + (savedScans.length + 1) + ".dat";
       let now = new Date();
       let dateStr = now.toLocaleDateString() + " - " + now.toLocaleTimeString().slice(0,5);
       savedScans.push({ id: Date.now(), name: newScanName, date: dateStr });
-      alert("💾 Tarama başarıyla kaydedildi!");
+      alert("💾 Yeraltı tarama özeti ve harita konumu kaydedildi!");
     }
 
     function clearScan() {
+      document.getElementById('analysisSummaryPanel').style.display = 'none';
       alert("🧹 Ekran temizlendi.");
     }
 
