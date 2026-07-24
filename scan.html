@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ERGİN 3D - Live Ground Scan</title>
+  <title>ERGİN 3D - Scan</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 </head>
 <body class="bg-black text-white h-screen flex flex-col justify-between p-2 select-none">
 
-  <!-- Üst Bilgi Barı -->
   <header class="flex justify-between items-center px-2 py-1 text-xs border-b border-gray-800">
     <div class="font-bold text-red-600">
       ERGİN 3D <span id="xyText" class="ml-2">X= 10:10 , Y= 10:10</span>
@@ -19,15 +18,12 @@
     </div>
   </header>
 
-  <!-- 3D Grafiğin Yer Aldığı Küp Alanı -->
   <main class="relative w-full h-[52vh] bg-black my-1">
     <div id="scanPlot" class="w-full h-full"></div>
   </main>
 
-  <!-- Kontrol Paneli -->
   <footer class="flex flex-col gap-1.5 bg-gray-950 p-2 rounded-xl border border-gray-800">
     
-    <!-- Üst Kontrol Satırı: Filter + Modlar -->
     <div class="flex items-center gap-2">
       <div class="flex flex-col text-xs font-bold text-gray-400">
         <span>Filter Type</span>
@@ -54,7 +50,6 @@
       </div>
     </div>
 
-    <!-- Renk Skalası ve Ayar Okları -->
     <div class="flex gap-2 items-center">
       
       <div class="flex flex-col gap-1 w-28">
@@ -100,13 +95,12 @@
   </footer>
 
   <script>
-    // Başlangıçta 0 değerleriyle dolu 10x10 zemin haritası
     let baseGrid = Array(10).fill(0).map(() => Array(10).fill(0));
     let currentRow = 0;
     let thres = 45;
     let gain = 7;
     let isWireframe = false;
-    let bluetoothDevice, rxCharacteristic;
+    let bluetoothDevice;
 
     function renderPlot(cameraEye) {
       if (typeof Plotly === 'undefined') return;
@@ -139,7 +133,6 @@
       Plotly.react('scanPlot', [trace], layout, { responsive: true, displayModeBar: false });
     }
 
-    // Gerçek Bluetooth Bağlantı Fonksiyonu
     async function connectBluetooth() {
       try {
         document.getElementById('btStatus').innerText = "🔍 Aranıyor...";
@@ -152,27 +145,23 @@
         document.getElementById('btStatus').innerText = "🟢 Bağlandı";
         document.getElementById('btStatus').className = "text-emerald-400 font-bold";
 
-        // Seri veri akışını dinleme (GATT notification)
         const primaryService = (await server.getPrimaryServices())[0];
         const characteristics = await primaryService.getCharacteristics();
-        rxCharacteristic = characteristics[0];
+        const rxCharacteristic = characteristics[0];
 
         await rxCharacteristic.startNotifications();
         rxCharacteristic.addEventListener('characteristicvaluechanged', handleDataReceived);
 
       } catch (error) {
         console.error("BT Hata:", error);
-        document.getElementById('btStatus').innerText = "🔴 Bağlantı Başarısız";
-        alert("Bluetooth Bağlantısı Kurulamadı: " + error.message);
+        document.getElementById('btStatus').innerText = "🔴 Bağlanamadı";
+        alert("Bluetooth Taraması Başlatılamadı: " + error.message);
       }
     }
 
-    // Makineden Veri Geldiğinde Çalışan Kısım
     function handleDataReceived(event) {
       let decoder = new TextDecoder('utf-8');
       let rawString = decoder.decode(event.target.value).trim();
-      
-      // Virgülle ayrılmış sensör verisini sayı dizisine dönüştür
       let values = rawString.split(',').map(Number);
 
       if (values.length > 0 && currentRow < 10) {
@@ -214,7 +203,7 @@
     function showDepth() {
       let maxVal = Math.max(...baseGrid.flat());
       let depth = (maxVal / 100 * 1.2).toFixed(2);
-      alert("Hesaplanan Derinlik: " + depth + " Metre");
+      alert("Derinlik: " + depth + " Metre");
     }
 
     window.onload = () => {
