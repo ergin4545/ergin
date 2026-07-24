@@ -261,13 +261,14 @@
       }
     }
 
+    // Doğrudan Bluetooth Tarayıcı Penceresini Açan Güncellenmiş Fonksiyon
     async function connectBluetooth() {
       if (!navigator.bluetooth) {
-        alert("⚠️ Bu tarayıcı Bluetooth desteklemiyor! Lütfen Chrome kullanın.");
+        alert("⚠️ Bu tarayıcı Bluetooth desteklemiyor! Lütfen Google Chrome kullanın.");
         return;
       }
       try {
-        alert("Bluetooth cihaz arama başlatılıyor... Lütfen cihazınızı seçin.");
+        // Engeli kaldırmak için araya alert koymadan doğrudan tarama tetikleniyor
         bluetoothDevice = await navigator.bluetooth.requestDevice({
           acceptAllDevices: true,
           optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb', '6e400001-b5a3-f393-e0a9-e50e24dcca9e']
@@ -283,7 +284,6 @@
         bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnected);
       } catch (error) {
         console.log("Bluetooth bağlantı hatası: " + error);
-        alert("❌ Bağlantı iptal edildi veya kurulamadı.");
       }
     }
 
@@ -329,6 +329,7 @@
       if (!cameraActive) {
         try {
           let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+          videoElem.srcSource = stream;
           videoElem.srcObject = stream;
           videoElem.classList.remove('hidden');
           cameraActive = true;
@@ -372,5 +373,5 @@
     function saveCurrentScan() { alert("Tarama kaydedildi."); }
   </script>
 </body>
-          </html>
+  </html>
   
