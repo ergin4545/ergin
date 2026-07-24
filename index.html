@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>ERGİN 3D Pro</title>
+  <title>ERGİN 3D Pro GPS & Scan</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
   <style>
@@ -16,15 +16,13 @@
 
   <!-- ==================== 1. EKRAN: ANA MENÜ ==================== -->
   <div id="pageMenu" class="h-full flex flex-col justify-between p-4">
-    <!-- Üst Bar -->
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
       <h1 class="text-xl font-black text-cyan-400 tracking-wider">ERGİN 3D</h1>
       <span class="text-xl">🇹🇷</span>
     </div>
 
-    <!-- Menü Butonları Izgarası -->
     <div class="grid grid-cols-2 gap-3 my-auto">
-      <button onclick="showPage('pageScan')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
+      <button onclick="checkLicenseAndOpen('pageScan')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
         <span class="text-2xl mb-1">🗺️</span>
         <span>3D Ground Scan</span>
       </button>
@@ -39,7 +37,7 @@
         <span>Simultaneous Data</span>
       </button>
 
-      <button onclick="showPage('pageOpenScan')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
+      <button onclick="loadSavedScansList(); showPage('pageOpenScan')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
         <span class="text-2xl mb-1">📁</span>
         <span>Open Scan</span>
       </button>
@@ -55,7 +53,6 @@
       </button>
     </div>
 
-    <!-- Alt Bilgi Barı -->
     <div class="flex justify-between items-center bg-gray-950 p-3 rounded-xl border border-gray-800 text-xs">
       <div class="flex items-center gap-2 text-yellow-400 font-bold">
         <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
@@ -70,7 +67,6 @@
 
   <!-- ==================== 2. EKRAN: 3D TARAMA ==================== -->
   <div id="pageScan" class="h-full flex flex-col justify-between p-2 hidden">
-    <!-- Üst Bilgi Barı -->
     <header class="flex justify-between items-center px-2 py-1.5 text-xs border-b border-gray-800 bg-gray-950 rounded-lg shrink-0">
       <div class="font-bold text-cyan-400">
         ERGİN 3D <span id="xyText" class="ml-1 text-white text-[10px]">X:1 Y:1</span>
@@ -81,16 +77,12 @@
       </div>
     </header>
 
-    <!-- 3D Grafik Alanı -->
     <main class="relative w-full flex-1 bg-black my-1.5 rounded-xl border border-gray-800 overflow-hidden min-h-[200px]">
       <video id="cameraStream" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-60"></video>
       <div id="scanPlot" class="relative w-full h-full z-10"></div>
     </main>
 
-    <!-- Kontrol Paneli -->
     <footer class="flex flex-col gap-2 bg-gray-950 p-2 rounded-xl border border-gray-800 shrink-0 mb-4">
-      
-      <!-- Üst Araçlar -->
       <div class="grid grid-cols-5 gap-1">
         <button onclick="toggleCamera()" class="bg-indigo-600 text-white rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
           📷 <span>Kamera</span>
@@ -109,7 +101,6 @@
         </button>
       </div>
 
-      <!-- Eşik Ayarı -->
       <div class="flex gap-2 items-center bg-gray-900 p-1.5 rounded-lg border border-gray-800">
         <div class="flex flex-col gap-1 w-1/2">
           <div class="text-[8px] text-center font-bold text-gray-400">BOŞLUK ◄► METAL</div>
@@ -124,17 +115,19 @@
         </div>
       </div>
 
-      <!-- BAŞLAT VE DURDUR BUTONLARI -->
-      <div class="grid grid-cols-2 gap-1.5">
-        <button id="btnStart" onclick="startScanning()" class="bg-emerald-600 text-white font-bold text-xs rounded py-2 flex items-center justify-center gap-1 active:scale-95">
+      <!-- BAŞLAT / DURDUR / KAYDET -->
+      <div class="grid grid-cols-3 gap-1">
+        <button id="btnStart" onclick="startScanning()" class="bg-emerald-600 text-white font-bold text-[11px] rounded py-2 flex items-center justify-center gap-1 active:scale-95">
           ▶️ BAŞLAT
         </button>
-        <button id="btnStop" onclick="stopScanning()" class="bg-amber-600 text-white font-bold text-xs rounded py-2 flex items-center justify-center gap-1 active:scale-95 opacity-50" disabled>
+        <button id="btnStop" onclick="stopScanning()" class="bg-amber-600 text-white font-bold text-[11px] rounded py-2 flex items-center justify-center gap-1 active:scale-95 opacity-50" disabled>
           ⏹️ DURDUR
+        </button>
+        <button onclick="saveCurrentScan()" class="bg-blue-600 text-white font-bold text-[11px] rounded py-2 flex items-center justify-center gap-1 active:scale-95">
+          💾 KAYDET
         </button>
       </div>
 
-      <!-- Alt Ana İşlem Butonları -->
       <div class="grid grid-cols-3 gap-1.5">
         <button onclick="clearMap()" class="bg-rose-900 text-rose-100 border border-rose-700 font-bold text-xs rounded py-2 flex items-center justify-center active:scale-95">
           🗑️ TEMİZLE
@@ -152,27 +145,40 @@
   <!-- ==================== 3. EKRAN: LİSANS ==================== -->
   <div id="pageLicence" class="h-full flex flex-col justify-between p-4 hidden">
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
-      <h2 class="text-lg font-bold text-cyan-400">Lisans Bilgileri</h2>
+      <h2 class="text-lg font-bold text-cyan-400">Lisans Aktivasyonu</h2>
       <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
     </div>
-    <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 my-auto text-sm space-y-2">
-      <p><strong class="text-gray-400">Lisans Sahibi:</strong> ERGİN 3D Kullanıcısı</p>
-      <p><strong class="text-gray-400">Cihaz Kimliği:</strong> ERGIN-3D-8842</p>
-      <p><strong class="text-gray-400">Durum:</strong> <span class="text-emerald-400 font-bold">Lisanslı / Aktif</span></p>
+    <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 my-auto text-sm space-y-3">
+      <p class="text-gray-300">Uygulamayı tam sürüm kullanmak için aktivasyon kodunuzu giriniz.</p>
+      <div id="licenseStatusText" class="text-amber-400 font-bold">Durum: Lisans Bekleniyor</div>
+      <input type="password" id="licenseInput" placeholder="Aktivasyon Kodunu Girin" class="w-full bg-black border border-gray-700 p-2.5 rounded text-white text-center">
+      <button onclick="activateLicense()" class="w-full bg-emerald-600 font-bold p-2.5 rounded text-white">LİSANSI AKTİFLEŞTİR</button>
     </div>
-    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
+    <button onclick="showPage('pageMenu')" class="bg-gray-700 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
   </div>
 
-  <!-- ==================== 4. EKRAN: BİLGİ / DİĞER ==================== -->
+  <!-- ==================== 4. EKRAN: KAYITLI TARAMALAR (OPEN SCAN) ==================== -->
+  <div id="pageOpenScan" class="h-full flex flex-col justify-between p-4 hidden">
+    <div class="flex justify-between items-center py-2 border-b border-gray-800">
+      <h2 class="text-lg font-bold text-cyan-400">Kayıtlı Taramalar (Open Scan)</h2>
+      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
+    </div>
+    <div id="savedScansContainer" class="flex-1 overflow-y-auto my-2 space-y-2">
+      <!-- Kayıtlar buraya dinamik eklenecek -->
+    </div>
+    <button onclick="showPage('pageMenu')" class="bg-gray-700 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
+  </div>
+
+  <!-- ==================== DİĞER MENÜLER ==================== -->
   <div id="pageInfo" class="h-full flex flex-col justify-between p-4 hidden">
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
       <h2 class="text-lg font-bold text-cyan-400">Cihaz Bilgisi</h2>
       <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
     </div>
     <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 my-auto text-sm space-y-2 text-gray-300">
-      <p>• ERGİN 3D Pro Yer Altı Görüntüleme Sistemi</p>
-      <p>• Yazılım Sürümü: v2.4 Pro</p>
-      <p>• Bluetooth Bağlantısı: JDY-33 Destekli</p>
+      <p>• ERGİN 3D Pro Yer Altı Görüntüleme</p>
+      <p>• Yazılım Sürümü: v3.0 GPS Pro</p>
+      <p>• Konum Takibi: Aktif (GPS Destekli)</p>
     </div>
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
   </div>
@@ -182,7 +188,7 @@
       <h2 class="text-lg font-bold text-cyan-400">Long Range Locator</h2>
       <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
     </div>
-    <div class="text-center my-auto text-gray-400">Alan Taraması Modı Hazırlanıyor...</div>
+    <div class="text-center my-auto text-gray-400">Alan Taraması Modülü Hazırlanıyor...</div>
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
   </div>
 
@@ -195,19 +201,10 @@
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
   </div>
 
-  <div id="pageOpenScan" class="h-full flex flex-col justify-between p-4 hidden">
-    <div class="flex justify-between items-center py-2 border-b border-gray-800">
-      <h2 class="text-lg font-bold text-cyan-400">Open Scan</h2>
-      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
-    </div>
-    <div class="text-center my-auto text-gray-400">Kayıtlı Taramalar Klasörü Boş.</div>
-    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
-  </div>
-
-
   <!-- ==================== JAVASCRIPT MANTIĞI ==================== -->
   <script>
-    // Sayfa Değiştirme Fonksiyonu
+    let isLicensed = localStorage.getItem("ergin_licensed") === "true";
+
     function showPage(pageId) {
       const pages = ['pageMenu', 'pageScan', 'pageLicence', 'pageInfo', 'pageLrl', 'pageSimultaneous', 'pageOpenScan'];
       pages.forEach(p => {
@@ -218,9 +215,130 @@
       if (pageId === 'pageScan') {
         setTimeout(renderPlot, 100);
       }
+      if (pageId === 'pageLicence') {
+        updateLicenseUI();
+      }
     }
 
-    // --- 3D Grafik ve Bluetooth Kodları ---
+    function checkLicenseAndOpen(pageId) {
+      if (!isLicensed) {
+        alert("⚠️ Lütfen önce lisans aktivasyonu yapın!");
+        showPage('pageLicence');
+      } else {
+        showPage(pageId);
+      }
+    }
+
+    function activateLicense() {
+      let code = document.getElementById('licenseInput').value.trim();
+      // Örnek Lisans Şifren: "ERGIN2026" (İstediğin gibi değiştirebilirsin)
+      if (code === "ERGIN2026") {
+        isLicensed = true;
+        localStorage.setItem("ergin_licensed", "true");
+        alert("🎉 Lisans başarıyla aktifleşti!");
+        updateLicenseUI();
+        showPage('pageMenu');
+      } else {
+        alert("❌ Geçersiz Lisans Kodu!");
+      }
+    }
+
+    function updateLicenseUI() {
+      let statusText = document.getElementById('licenseStatusText');
+      if (isLicensed) {
+        statusText.innerText = "Durum: Lisans Aktif (Tam Sürüm)";
+        statusText.className = "text-emerald-400 font-bold";
+      } else {
+        statusText.innerText = "Durum: Lisans Bekleniyor";
+        statusText.className = "text-amber-400 font-bold";
+      }
+    }
+
+    // --- GPS ve Veri Kaydetme Mantığı ---
+    let currentCoords = { lat: null, lon: null };
+
+    // Sayfa açıldığında GPS konumunu almaya çalış
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(
+        (position) => {
+          currentCoords.lat = position.coords.latitude;
+          currentCoords.lon = position.coords.longitude;
+        },
+        (error) => { console.log("GPS Alınamadı: " + error.message); },
+        { enableHighAccuracy: true }
+      );
+    }
+
+    function saveCurrentScan() {
+      let scanName = prompt("Tarama için bir isim girin (Örn: Tepe Mezar Alanı):", "Tarama " + new Date().toLocaleDateString());
+      if (!scanName) return;
+
+      let scanData = {
+        name: scanName,
+        date: new Date().toLocaleString(),
+        grid: rawGrid,
+        lat: currentCoords.lat,
+        lon: currentCoords.lon
+      };
+
+      let savedScans = JSON.parse(localStorage.getItem("ergin_scans") || "[]");
+      savedScans.push(scanData);
+      localStorage.setItem("ergin_scans", JSON.stringify(savedScans));
+      alert("✅ Tarama başarıyla kaydedildi! GPS Konumu eklendi.");
+    }
+
+    function loadSavedScansList() {
+      let container = document.getElementById('savedScansContainer');
+      container.innerHTML = "";
+      let savedScans = JSON.parse(localStorage.getItem("ergin_scans") || "[]");
+
+      if (savedScans.length === 0) {
+        container.innerHTML = `<div class="text-center text-gray-500 my-10">Kayıtlı tarama bulunamadı.</div>`;
+        return;
+      }
+
+      savedScans.forEach((scan, index) => {
+        let gpsText = scan.lat ? `📍 Konum: ${scan.lat.toFixed(5)}, ${scan.lon.toFixed(5)}` : "📍 Konum Yok";
+        let mapLink = scan.lat ? `https://www.google.com/maps?q=${scan.lat},${scan.lon}` : "#";
+
+        let div = document.createElement('div');
+        div.className = "bg-gray-900 border border-gray-800 p-3 rounded-xl flex flex-col gap-2";
+        div.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-cyan-400 text-sm">${scan.name}</span>
+            <span class="text-[10px] text-gray-400">${scan.date}</span>
+          </div>
+          <div class="text-xs text-gray-300">${gpsText}</div>
+          <div class="flex gap-2 mt-1">
+            <button onclick="loadScanToScreen(${index})" class="flex-1 bg-emerald-600 text-white font-bold py-1.5 rounded text-xs">Yükle & İncele</button>
+            ${scan.lat ? `<a href="${mapLink}" target="_blank" class="bg-blue-600 text-white font-bold py-1.5 px-3 rounded text-xs flex items-center justify-center">Haritada Aç</a>` : ''}
+            <button onclick="deleteScan(${index})" class="bg-rose-900 text-white font-bold py-1.5 px-3 rounded text-xs">Sil</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function loadScanToScreen(index) {
+      let savedScans = JSON.parse(localStorage.getItem("ergin_scans") || "[]");
+      if (savedScans[index]) {
+        rawGrid = savedScans[index].grid;
+        applyFilterAndRender();
+        showPage('pageScan');
+        alert(`📂 "${savedScans[index].name}" yüklendi.`);
+      }
+    }
+
+    function deleteScan(index) {
+      if (confirm("Bu taramayı silmek istediğinize emin misiniz?")) {
+        let savedScans = JSON.parse(localStorage.getItem("ergin_scans") || "[]");
+        savedScans.splice(index, 1);
+        localStorage.setItem("ergin_scans", JSON.stringify(savedScans));
+        loadSavedScansList();
+      }
+    }
+
+    // --- 3D Grafik ve Bluetooth Mantığı ---
     let GRID_SIZE = 10;
     let rawGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
     let displayGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
@@ -295,105 +413,4 @@
         const characteristic = await service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
 
         await characteristic.startNotifications();
-        characteristic.addEventListener('characteristicvaluechanged', handleDataReceived);
-      } catch (error) {
-        document.getElementById('btStatus').innerText = "🔴 Hata";
-        alert("Bağlantı Hatası: " + error.message);
-      }
-    }
-
-    function handleDataReceived(event) {
-      if (!isScanning) return;
-
-      let decoder = new TextDecoder('utf-8');
-      let rawString = decoder.decode(event.target.value).trim();
-      let values = rawString.split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
-
-      if (values.length > 0) {
-        for (let val of values) {
-          rawGrid[currentRow][currentCol] = val;
-          document.getElementById('signalVal').innerText = "SİNYAL: " + val;
-          document.getElementById('xyText').innerText = `X:${currentCol + 1} Y:${currentRow + 1}`;
-
-          currentCol++;
-          if (currentCol >= GRID_SIZE) {
-            currentCol = 0;
-            currentRow = (currentRow + 1) % GRID_SIZE;
-          }
-        }
-        applyFilterAndRender();
-      }
-    }
-
-    function updateThreshold(val) {
-      thresholdValue = parseInt(val);
-      document.getElementById('threshText').innerText = thresholdValue;
-      applyFilterAndRender();
-    }
-
-    function applyFilterAndRender() {
-      for (let r = 0; r < GRID_SIZE; r++) {
-        for (let c = 0; c < GRID_SIZE; c++) {
-          let v = rawGrid[r][c];
-          if (Math.abs(v) < Math.abs(thresholdValue)) {
-            displayGrid[r][c] = 0;
-          } else {
-            displayGrid[r][c] = v;
-          }
-        }
-      }
-      renderPlot();
-    }
-
-    async function toggleCamera() {
-      let videoElem = document.getElementById('cameraStream');
-      if (!cameraStreamActive) {
-        try {
-          let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-          videoElem.srcObject = stream;
-          videoElem.classList.remove('hidden');
-          cameraStreamActive = true;
-        } catch (e) {
-          alert("Kamera izni verilemedi: " + e.message);
-        }
-      } else {
-        let stream = videoElem.srcObject;
-        if (stream) stream.getTracks().forEach(track => track.stop());
-        videoElem.classList.add('hidden');
-        cameraStreamActive = false;
-      }
-    }
-
-    function clearMap() {
-      rawGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
-      displayGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
-      currentRow = 0;
-      currentCol = 0;
-      document.getElementById('xyText').innerText = "X:1 Y:1";
-      document.getElementById('signalVal').innerText = "SİNYAL: 0";
-      renderPlot();
-    }
-
-    function setView(mode) {
-      if (mode === '2d') {
-        renderPlot({ eye: { x: 0, y: 0, z: 2.2 } });
-      } else {
-        renderPlot({ eye: { x: 1.3, y: 1.3, z: 1.3 } });
-      }
-    }
-
-    function toggleWireframe() {
-      isWireframe = !isWireframe;
-      renderPlot();
-    }
-
-    function showDepth() {
-      let flat = rawGrid.flat();
-      let minVal = Math.min(...flat);
-      let maxVal = Math.max(...flat);
-      alert(`📊 ANALİZ RAPORU:\n\n• En Düşük Sinyal (Boşluk): ${minVal}\n• En Yüksek Sinyal (Metal): ${maxVal}\n• Tahmini Derinlik: ${(Math.abs(minVal) * 0.12).toFixed(2)} Metre`);
-    }
-  </script>
-</body>
-          </html>
-  
+        characteristic.addEventListener('char
