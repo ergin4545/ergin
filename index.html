@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>ERGİN 3D Pro GPS & Scan</title>
+  <title>ERGİN 3D Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
   <style>
@@ -14,15 +14,41 @@
 </head>
 <body class="bg-black text-white h-screen select-none overflow-hidden font-sans">
 
-  <!-- ==================== 1. EKRAN: ANA MENÜ ==================== -->
-  <div id="pageMenu" class="h-full flex flex-col justify-between p-4">
+  <!-- ==================== 1. EKRAN: LİSANS KONTROL (İLK AÇILIŞ) ==================== -->
+  <div id="pageLicence" class="h-full flex flex-col justify-between p-4">
+    <div class="flex justify-between items-center py-2 border-b border-gray-800">
+      <h2 class="text-lg font-bold text-cyan-400">Lisans Bilgileri</h2>
+      <button onclick="goBackFromLicense()" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
+    </div>
+
+    <div class="my-auto space-y-4">
+      <!-- Lisans Bilgi Kutusu (İlk Resimdeki Gibi) -->
+      <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 text-sm space-y-2 shadow-lg">
+        <p><strong class="text-gray-400">Lisans Sahibi:</strong> ERGİN 3D Kullanıcısı</p>
+        <p><strong class="text-gray-400">Cihaz Kimliği:</strong> ERGIN-3D-8842</p>
+        <p><strong class="text-gray-400">Durum:</strong> <span id="licenseStatusBadge" class="text-amber-400 font-bold">Lisans Bekleniyor</span></p>
+      </div>
+
+      <!-- Aktivasyon Alanı -->
+      <div id="activationBox" class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
+        <p class="text-xs text-gray-300 text-center">Uygulamayı başlatmak için lisans anahtarınızı giriniz.</p>
+        <input type="password" id="licenseInput" placeholder="Aktivasyon Kodunu Girin" class="w-full bg-black border border-gray-700 p-2.5 rounded text-white text-center text-sm">
+        <button onclick="activateLicense()" class="w-full bg-emerald-600 font-bold p-2.5 rounded text-white text-sm active:scale-95">LİSANSI AKTİFLEŞTİR</button>
+      </div>
+    </div>
+
+    <button onclick="proceedToMenu()" id="btnGoMenu" class="bg-cyan-600 font-bold p-3 rounded-xl w-full hidden active:scale-95">Ana Menüye Git</button>
+  </div>
+
+  <!-- ==================== 2. EKRAN: ANA MENÜ ==================== -->
+  <div id="pageMenu" class="h-full flex flex-col justify-between p-4 hidden">
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
       <h1 class="text-xl font-black text-cyan-400 tracking-wider">ERGİN 3D</h1>
       <span class="text-xl">🇹🇷</span>
     </div>
 
     <div class="grid grid-cols-2 gap-3 my-auto">
-      <button onclick="checkLicenseAndOpen('pageScan')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
+      <button onclick="showPage('pageScan')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
         <span class="text-2xl mb-1">🗺️</span>
         <span>3D Ground Scan</span>
       </button>
@@ -65,7 +91,7 @@
     </div>
   </div>
 
-  <!-- ==================== 2. EKRAN: 3D TARAMA ==================== -->
+  <!-- ==================== 3. EKRAN: 3D TARAMA ==================== -->
   <div id="pageScan" class="h-full flex flex-col justify-between p-2 hidden">
     <header class="flex justify-between items-center px-2 py-1.5 text-xs border-b border-gray-800 bg-gray-950 rounded-lg shrink-0">
       <div class="font-bold text-cyan-400">
@@ -115,7 +141,6 @@
         </div>
       </div>
 
-      <!-- BAŞLAT / DURDUR / KAYDET -->
       <div class="grid grid-cols-3 gap-1">
         <button id="btnStart" onclick="startScanning()" class="bg-emerald-600 text-white font-bold text-[11px] rounded py-2 flex items-center justify-center gap-1 active:scale-95">
           ▶️ BAŞLAT
@@ -142,34 +167,17 @@
     </footer>
   </div>
 
-  <!-- ==================== 3. EKRAN: LİSANS ==================== -->
-  <div id="pageLicence" class="h-full flex flex-col justify-between p-4 hidden">
-    <div class="flex justify-between items-center py-2 border-b border-gray-800">
-      <h2 class="text-lg font-bold text-cyan-400">Lisans Aktivasyonu</h2>
-      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
-    </div>
-    <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 my-auto text-sm space-y-3">
-      <p class="text-gray-300">Uygulamayı tam sürüm kullanmak için aktivasyon kodunuzu giriniz.</p>
-      <div id="licenseStatusText" class="text-amber-400 font-bold">Durum: Lisans Bekleniyor</div>
-      <input type="password" id="licenseInput" placeholder="Aktivasyon Kodunu Girin" class="w-full bg-black border border-gray-700 p-2.5 rounded text-white text-center">
-      <button onclick="activateLicense()" class="w-full bg-emerald-600 font-bold p-2.5 rounded text-white">LİSANSI AKTİFLEŞTİR</button>
-    </div>
-    <button onclick="showPage('pageMenu')" class="bg-gray-700 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
-  </div>
-
   <!-- ==================== 4. EKRAN: KAYITLI TARAMALAR (OPEN SCAN) ==================== -->
   <div id="pageOpenScan" class="h-full flex flex-col justify-between p-4 hidden">
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
-      <h2 class="text-lg font-bold text-cyan-400">Kayıtlı Taramalar (Open Scan)</h2>
+      <h2 class="text-lg font-bold text-cyan-400">Kayıtlı Taramalar</h2>
       <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
     </div>
-    <div id="savedScansContainer" class="flex-1 overflow-y-auto my-2 space-y-2">
-      <!-- Kayıtlar buraya dinamik eklenecek -->
-    </div>
+    <div id="savedScansContainer" class="flex-1 overflow-y-auto my-2 space-y-2"></div>
     <button onclick="showPage('pageMenu')" class="bg-gray-700 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
   </div>
 
-  <!-- ==================== DİĞER MENÜLER ==================== -->
+  <!-- ==================== DİĞER SAYFALAR ==================== -->
   <div id="pageInfo" class="h-full flex flex-col justify-between p-4 hidden">
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
       <h2 class="text-lg font-bold text-cyan-400">Cihaz Bilgisi</h2>
@@ -177,8 +185,8 @@
     </div>
     <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 my-auto text-sm space-y-2 text-gray-300">
       <p>• ERGİN 3D Pro Yer Altı Görüntüleme</p>
-      <p>• Yazılım Sürümü: v3.0 GPS Pro</p>
-      <p>• Konum Takibi: Aktif (GPS Destekli)</p>
+      <p>• Yazılım Sürümü: v3.1 Pro GPS</p>
+      <p>• Bluetooth: JDY-33 / BLE Destekli</p>
     </div>
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
   </div>
@@ -205,7 +213,22 @@
   <script>
     let isLicensed = localStorage.getItem("ergin_licensed") === "true";
 
+    // Sayfa açıldığında doğrudan lisans kontrolü yap
+    window.onload = function() {
+      updateLicenseUI();
+      if (!isLicensed) {
+        showPage('pageLicence');
+      } else {
+        showPage('pageMenu');
+      }
+    };
+
     function showPage(pageId) {
+      if (pageId !== 'pageLicence' && !isLicensed) {
+        alert("⚠️ Lütfen önce lisans aktivasyonu yapın!");
+        pageId = 'pageLicence';
+      }
+
       const pages = ['pageMenu', 'pageScan', 'pageLicence', 'pageInfo', 'pageLrl', 'pageSimultaneous', 'pageOpenScan'];
       pages.forEach(p => {
         document.getElementById(p).classList.add('hidden');
@@ -220,57 +243,67 @@
       }
     }
 
-    function checkLicenseAndOpen(pageId) {
-      if (!isLicensed) {
-        alert("⚠️ Lütfen önce lisans aktivasyonu yapın!");
-        showPage('pageLicence');
-      } else {
-        showPage(pageId);
-      }
-    }
-
     function activateLicense() {
       let code = document.getElementById('licenseInput').value.trim();
-      // Örnek Lisans Şifren: "ERGIN2026" (İstediğin gibi değiştirebilirsin)
+      // Belirlediğin Lisans Kodu: "ERGIN2026"
       if (code === "ERGIN2026") {
         isLicensed = true;
         localStorage.setItem("ergin_licensed", "true");
         alert("🎉 Lisans başarıyla aktifleşti!");
         updateLicenseUI();
-        showPage('pageMenu');
       } else {
         alert("❌ Geçersiz Lisans Kodu!");
       }
     }
 
     function updateLicenseUI() {
-      let statusText = document.getElementById('licenseStatusText');
+      let badge = document.getElementById('licenseStatusBadge');
+      let actBox = document.getElementById('activationBox');
+      let btnGo = document.getElementById('btnGoMenu');
+
       if (isLicensed) {
-        statusText.innerText = "Durum: Lisans Aktif (Tam Sürüm)";
-        statusText.className = "text-emerald-400 font-bold";
+        badge.innerText = "Lisanslı / Aktif";
+        badge.className = "text-emerald-400 font-bold";
+        actBox.classList.add('hidden');
+        btnGo.classList.remove('hidden');
       } else {
-        statusText.innerText = "Durum: Lisans Bekleniyor";
-        statusText.className = "text-amber-400 font-bold";
+        badge.innerText = "Lisans Bekleniyor";
+        badge.className = "text-amber-400 font-bold";
+        actBox.classList.remove('hidden');
+        btnGo.classList.add('hidden');
       }
     }
 
-    // --- GPS ve Veri Kaydetme Mantığı ---
+    function proceedToMenu() {
+      if (isLicensed) {
+        showPage('pageMenu');
+      }
+    }
+
+    function goBackFromLicense() {
+      if (isLicensed) {
+        showPage('pageMenu');
+      } else {
+        alert("⚠️ Lisans aktif olmadan menüye geçemezsiniz!");
+      }
+    }
+
+    // --- GPS ve Kayıt Sistemleri ---
     let currentCoords = { lat: null, lon: null };
 
-    // Sayfa açıldığında GPS konumunu almaya çalış
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition(
         (position) => {
           currentCoords.lat = position.coords.latitude;
           currentCoords.lon = position.coords.longitude;
         },
-        (error) => { console.log("GPS Alınamadı: " + error.message); },
+        (error) => { console.log("GPS Alınamadı"); },
         { enableHighAccuracy: true }
       );
     }
 
     function saveCurrentScan() {
-      let scanName = prompt("Tarama için bir isim girin (Örn: Tepe Mezar Alanı):", "Tarama " + new Date().toLocaleDateString());
+      let scanName = prompt("Tarama için bir isim girin:", "Tarama " + new Date().toLocaleDateString());
       if (!scanName) return;
 
       let scanData = {
@@ -284,7 +317,7 @@
       let savedScans = JSON.parse(localStorage.getItem("ergin_scans") || "[]");
       savedScans.push(scanData);
       localStorage.setItem("ergin_scans", JSON.stringify(savedScans));
-      alert("✅ Tarama başarıyla kaydedildi! GPS Konumu eklendi.");
+      alert("✅ Tarama ve GPS Konumu Kaydedildi!");
     }
 
     function loadSavedScansList() {
@@ -330,7 +363,7 @@
     }
 
     function deleteScan(index) {
-      if (confirm("Bu taramayı silmek istediğinize emin misiniz?")) {
+      if (confirm("Silmek istediğinize emin misiniz?")) {
         let savedScans = JSON.parse(localStorage.getItem("ergin_scans") || "[]");
         savedScans.splice(index, 1);
         localStorage.setItem("ergin_scans", JSON.stringify(savedScans));
@@ -338,7 +371,7 @@
       }
     }
 
-    // --- 3D Grafik ve Bluetooth Mantığı ---
+    // --- 3D Grafik ve Bluetooth ---
     let GRID_SIZE = 10;
     let rawGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
     let displayGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
@@ -394,23 +427,4 @@
       document.getElementById('btnStart').classList.remove('opacity-50');
       document.getElementById('btnStart').disabled = false;
       document.getElementById('btnStop').classList.add('opacity-50');
-      document.getElementById('btnStop').disabled = true;
-    }
-
-    async function connectBluetooth() {
-      try {
-        document.getElementById('btStatus').innerText = "🔍 Aranıyor...";
-        bluetoothDevice = await navigator.bluetooth.requestDevice({
-          filters: [{ namePrefix: 'JDY' }, { namePrefix: 'jdy' }],
-          optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
-        });
-
-        const server = await bluetoothDevice.gatt.connect();
-        document.getElementById('btStatus').innerText = "🟢 Bağlandı";
-        document.getElementById('btStatus').className = "text-emerald-400 font-bold text-[11px]";
-
-        const service = await server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
-        const characteristic = await service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
-
-        await characteristic.startNotifications();
-        characteristic.addEventListener('char
+      document.getElementById('btn
