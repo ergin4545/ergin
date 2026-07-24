@@ -2,18 +2,17 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ERGİN 3D - Pro Scanner</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
   <style>
-    /* Alt menünün telefon tuşlarına takılmaması için özel alt boşluk */
     body {
-      padding-bottom: 90px !important;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
     }
   </style>
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col justify-between p-2 select-none">
+<body class="bg-black text-white h-screen flex flex-col justify-between p-2 select-none overflow-hidden">
 
   <!-- Üst Bilgi Barı -->
   <header class="flex justify-between items-center px-2 py-1.5 text-xs border-b border-gray-800 bg-gray-950 rounded-lg shrink-0">
@@ -26,14 +25,14 @@
     </div>
   </header>
 
-  <!-- 3D Grafik Alanı (Yüksekliği 38vh Yapılarak Küçültüldü) -->
-  <main id="mainContainer" class="relative w-full h-[38vh] bg-black my-2 rounded-xl border border-gray-800 overflow-hidden shrink-0">
+  <!-- 3D Grafik Alanı -->
+  <main id="mainContainer" class="relative w-full flex-1 bg-black my-1.5 rounded-xl border border-gray-800 overflow-hidden min-h-[220px]">
     <video id="cameraStream" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-60"></video>
     <div id="scanPlot" class="relative w-full h-full z-10"></div>
   </main>
 
-  <!-- Kontrol Paneli (Yukarı Çekildi ve Görünür Yapıldı) -->
-  <footer class="flex flex-col gap-1.5 bg-gray-950 p-2 rounded-xl border border-gray-800 shrink-0">
+  <!-- Kontrol Paneli -->
+  <footer class="flex flex-col gap-2 bg-gray-950 p-2.5 rounded-xl border border-gray-800 shrink-0 mb-6">
     
     <!-- Üst Satır: Filtre, Kamera ve Görünüm -->
     <div class="grid grid-cols-5 gap-1">
@@ -70,6 +69,16 @@
       </div>
     </div>
 
+    <!-- YENİ EKLENEN: Başlat ve Durdur Butonları -->
+    <div class="grid grid-cols-2 gap-1.5">
+      <button id="btnStart" onclick="startScanning()" class="bg-emerald-600 text-white font-bold text-xs rounded py-2 flex items-center justify-center gap-1 active:scale-95">
+        ▶️ BAŞLAT
+      </button>
+      <button id="btnStop" onclick="stopScanning()" class="bg-amber-600 text-white font-bold text-xs rounded py-2 flex items-center justify-center gap-1 active:scale-95 opacity-50" disabled>
+        ⏹️ DURDUR
+      </button>
+    </div>
+
     <!-- Alt Satır: İşlem Butonları -->
     <div class="grid grid-cols-3 gap-1.5">
       <button onclick="clearMap()" class="bg-rose-900 text-rose-100 border border-rose-700 font-bold text-xs rounded py-2 flex items-center justify-center active:scale-95">
@@ -95,6 +104,7 @@
     let thresholdValue = 0;
     let bluetoothDevice;
     let cameraStreamActive = false;
+    let isScanning = false; // Tarama durumu kontrolü
 
     function renderPlot(cameraEye) {
       if (typeof Plotly === 'undefined') return;
@@ -127,6 +137,23 @@
       Plotly.react('scanPlot', [trace], layout, { responsive: true, displayModeBar: false });
     }
 
+    // Tarama Başlat / Durdur Mantığı
+    function startScanning() {
+      isScanning = true;
+      document.getElementById('btnStart').classList.add('opacity-50');
+      document.getElementById('btnStart').disabled = true;
+      document.getElementById('btnStop').classList.remove('opacity-50');
+      document.getElementById('btnStop').disabled = false;
+    }
+
+    function stopScanning() {
+      isScanning = false;
+      document.getElementById('btnStart').classList.remove('opacity-50');
+      document.getElementById('btnStart').disabled = false;
+      document.getElementById('btnStop').classList.add('opacity-50');
+      document.getElementById('btnStop').disabled = true;
+    }
+
     // JDY-33 Bluetooth Bağlantısı
     async function connectBluetooth() {
       try {
@@ -154,8 +181,10 @@
       }
     }
 
-    // Gelen Veriyi İşleme
+    // Gelen Veriyi İşleme (Sadece Tarama Aktifken Çizer)
     function handleDataReceived(event) {
+      if (!isScanning) return; // Başlat'a basılmadıysa veriyi işleme
+
       let decoder = new TextDecoder('utf-8');
       let rawString = decoder.decode(event.target.value).trim();
       let values = rawString.split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
