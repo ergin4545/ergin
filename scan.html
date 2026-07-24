@@ -2,12 +2,12 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ERGİN 3D - Pro Ultimate Scanner</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 </head>
-<body class="bg-black text-white h-screen flex flex-col justify-between p-2 select-none overflow-hidden">
+<body class="bg-black text-white h-screen flex flex-col justify-between p-2 select-none overflow-hidden pb-12">
 
   <!-- Üst Bilgi Barı -->
   <header class="flex justify-between items-center px-2 py-1 text-xs border-b border-gray-800 bg-gray-950 rounded-lg">
@@ -20,30 +20,30 @@
     </div>
   </header>
 
-  <!-- 3D Grafik Alanı (Kamera / AR Arkasındaki Şeffaf Tuval) -->
-  <main id="mainContainer" class="relative w-full h-[50vh] bg-black my-1 rounded-xl border border-gray-800 overflow-hidden">
+  <!-- 3D Grafik Alanı (Mobilde Sıkışmaması İçin Boyut Ayarlandı) -->
+  <main id="mainContainer" class="relative w-full flex-1 bg-black my-1 rounded-xl border border-gray-800 overflow-hidden min-h-[35vh]">
     <video id="cameraStream" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-60"></video>
     <div id="scanPlot" class="relative w-full h-full z-10"></div>
   </main>
 
-  <!-- Kontrol Paneli (Hepsini Tek Yerde Toplayan Menü) -->
-  <footer class="flex flex-col gap-1.5 bg-gray-950 p-2 rounded-xl border border-gray-800">
+  <!-- Kontrol Paneli (Alta Ekran Tuşları İçin Boşluk Bırakıldı: pb-6) -->
+  <footer class="flex flex-col gap-1.5 bg-gray-950 p-2 rounded-xl border border-gray-800 mb-6">
     
     <!-- Üst Satır: Filtre, Kamera ve Görünüm -->
     <div class="grid grid-cols-5 gap-1">
-      <button onclick="toggleCamera()" class="bg-indigo-600 text-white rounded p-1.5 text-center font-bold text-[11px] flex flex-col items-center">
+      <button onclick="toggleCamera()" class="bg-indigo-600 text-white rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
         📷 <span>Kamera</span>
       </button>
-      <button onclick="setView('3d')" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[11px] flex flex-col items-center">
+      <button onclick="setView('3d')" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
         🧊 <span>3D Açı</span>
       </button>
-      <button onclick="setView('2d')" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[11px] flex flex-col items-center">
+      <button onclick="setView('2d')" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
         🗺️ <span>2D Kuş</span>
       </button>
-      <button onclick="toggleWireframe()" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[11px] flex flex-col items-center">
+      <button onclick="toggleWireframe()" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
         🕸️ <span>Tel Örgü</span>
       </button>
-      <button onclick="showDepth()" class="bg-emerald-600 text-white rounded p-1.5 text-center font-bold text-[11px] flex flex-col items-center">
+      <button onclick="showDepth()" class="bg-emerald-600 text-white rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
         📏 <span>Derinlik</span>
       </button>
     </div>
@@ -68,13 +68,13 @@
 
     <!-- Alt Satır: İşlem Butonları -->
     <div class="grid grid-cols-3 gap-1.5">
-      <button onclick="clearMap()" class="bg-rose-900 text-rose-100 border border-rose-700 font-bold text-xs rounded p-1.5 flex items-center justify-center">
+      <button onclick="clearMap()" class="bg-rose-900 text-rose-100 border border-rose-700 font-bold text-xs rounded py-2 flex items-center justify-center active:scale-95">
         🗑️ TEMİZLE
       </button>
-      <button onclick="connectBluetooth()" class="bg-amber-400 text-black font-bold text-xs rounded p-1.5 flex items-center justify-center">
+      <button onclick="connectBluetooth()" class="bg-amber-400 text-black font-bold text-xs rounded py-2 flex items-center justify-center active:scale-95">
         🔵 CİHAZA BAĞLAN
       </button>
-      <button onclick="window.location.href='index.html'" class="bg-gray-700 text-white font-bold text-xs rounded p-1.5 flex items-center justify-center">
+      <button onclick="window.location.href='index.html'" class="bg-gray-700 text-white font-bold text-xs rounded py-2 flex items-center justify-center active:scale-95">
         🏠 MENÜ
       </button>
     </div>
@@ -183,7 +183,6 @@
       for (let r = 0; r < GRID_SIZE; r++) {
         for (let c = 0; c < GRID_SIZE; c++) {
           let v = rawGrid[r][c];
-          // Eşik değerinin altındaki gürültüleri sıfırla (görseli netleştir)
           if (Math.abs(v) < Math.abs(thresholdValue)) {
             displayGrid[r][c] = 0;
           } else {
@@ -241,7 +240,7 @@
       let flat = rawGrid.flat();
       let minVal = Math.min(...flat);
       let maxVal = Math.max(...flat);
-      alert(`📊 ANELİZ RAPORU:\n\n• En Düşük Sinyal (Boşluk): ${minVal}\n• En Yüksek Sinyal (Metal): ${maxVal}\n• Tahmini Derinlik: ${(Math.abs(minVal) * 0.12).toFixed(2)} Metre`);
+      alert(`📊 ANALİZ RAPORU:\n\n• En Düşük Sinyal (Boşluk): ${minVal}\n• En Yüksek Sinyal (Metal): ${maxVal}\n• Tahmini Derinlik: ${(Math.abs(minVal) * 0.12).toFixed(2)} Metre`);
     }
 
     window.onload = () => {
