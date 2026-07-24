@@ -258,7 +258,6 @@
           maxZoom: 22 
         }).setView([38.712187, 27.915700], 18);
         
-        // Google Uydu Haritası (Türkiye'nin her yerinde net görünüm)
         L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
           maxZoom: 22,
           subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
@@ -300,23 +299,25 @@
 
           document.getElementById('coordDisplay').innerText = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
         } else {
-          alert("❌ Konum bulunamadı, lütfen başka bir yer yazın.");
+          window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
         }
       } catch (error) {
-        alert("Bağlantı hatası oluştu.");
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
       }
     }
 
     function startScan() {
       document.getElementById('signalDisplay').innerText = "SİNYAL: 85";
       document.getElementById('signalDisplay').className = "font-bold text-emerald-400";
-      alert("✅ Seçilen konumda yer analizi başlatıldı. Cihaz verileri işleniyor...");
+      
+      // 3D tarama grafik yüzeyini canlı başlat
+      renderActiveScanPlot();
     }
 
     function stopScan() {
       document.getElementById('signalDisplay').innerText = "SİNYAL: 0";
       document.getElementById('signalDisplay').className = "font-bold text-amber-400";
-      alert("⏸️ Tarama durduruldu.");
+      renderPlot();
     }
 
     function saveScan() {
@@ -325,8 +326,8 @@
 
     function clearScan() {
       document.getElementById('signalDisplay').innerText = "SİNYAL: 0";
+      document.getElementById('signalDisplay').className = "font-bold text-amber-400";
       renderPlot();
-      alert("🧹 Ekran temizlendi.");
     }
 
     function activateLicense() {
@@ -416,6 +417,39 @@
       };
       Plotly.react('scanPlot', data, layout, { responsive: true, displayModeBar: false });
     }
+
+    function renderActiveScanPlot() {
+      if (typeof Plotly === 'undefined') return;
+      let zValues = [];
+      for (let i = 0; i < 10; i++) {
+        let row = [];
+        for (let j = 0; j < 10; j++) {
+          row.push(Math.sin(i * 0.5) * Math.cos(j * 0.5) * 12 + Math.random() * 6);
+        }
+        zValues.push(row);
+      }
+
+      let data = [{ 
+        z: zValues, 
+        type: 'surface', 
+        colorscale: 'Jet', 
+        showscale: false,
+        opacity: 0.85 
+      }];
+      let layout = { 
+        autosize: true, 
+        margin: { l: 0, r: 0, b: 0, t: 0 }, 
+        paper_bgcolor: 'transparent', 
+        plot_bgcolor: 'transparent', 
+        scene: { 
+          xaxis: { visible: false }, 
+          yaxis: { visible: false }, 
+          zaxis: { visible: false } 
+        } 
+      };
+      Plotly.react('scanPlot', data, layout, { responsive: true, displayModeBar: false });
+    }
   </script>
 </body>
-</html>
+          </html>
+          
