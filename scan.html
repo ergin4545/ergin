@@ -3,62 +3,191 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ERGİN 3D - Zemin Taraması</title>
+  <title>ERGİN 3D - Ground Scan</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 </head>
-<body class="bg-[#0b0f17] text-white h-screen flex flex-col justify-between p-3 select-none">
+<body class="bg-black text-white h-screen flex flex-col justify-between p-2 select-none">
 
-  <!-- Üst Bar -->
-  <header class="flex justify-between items-center py-2 border-b border-cyan-900/40">
-    <button onclick="window.location.href='index.html'" class="text-cyan-400 text-sm font-semibold flex items-center gap-1">
-      ◀ Ana Menü
-    </button>
-    <h1 class="text-lg font-bold text-cyan-400 tracking-wider">ERGİN 3D RADAR</h1>
-    <div class="text-xs text-gray-400" id="scanStatus">Hazır</div>
+  <!-- Üst Bilgi Barı -->
+  <header class="flex justify-between items-center px-2 py-1 text-xs border-b border-gray-800">
+    <div class="font-bold text-red-600">
+      ERGİN 3D <span id="xyText" class="ml-2">X= 10:10 , Y= 10:10</span>
+    </div>
+    <div class="flex items-center gap-1 text-emerald-400 font-bold">
+      🔋 7.78 V
+    </div>
   </header>
 
-  <!-- 3D Grafik Alanı -->
-  <div class="relative w-full h-[55vh] bg-[#121824] rounded-2xl border border-[#232d3f] my-2 overflow-hidden">
+  <!-- 3D Grafiğin Yer Aldığı Küp Alanı -->
+  <main class="relative w-full h-[52vh] bg-black my-1">
     <div id="scanPlot" class="w-full h-full"></div>
+  </main>
+
+  <!-- Kontrol Paneli -->
+  <footer class="flex flex-col gap-1.5 bg-gray-950 p-2 rounded-xl border border-gray-800">
     
-    <!-- Anlık Değer Göstergesi -->
-    <div class="absolute top-3 left-3 bg-black/60 backdrop-blur border border-cyan-500/30 px-3 py-1.5 rounded-lg">
-      <span class="text-xs text-gray-400 block">Sinyal</span>
-      <span id="liveVal" class="text-lg font-bold text-cyan-400">0</span>
+    <!-- Üst Kontrol Satırı: Filter + Modlar -->
+    <div class="flex items-center gap-2">
+      <!-- Filtre Seçimi -->
+      <div class="flex flex-col text-xs font-bold text-gray-400">
+        <span>Filter Type</span>
+        <select id="filterSelect" onchange="changeFilter(this.value)" class="bg-gray-200 text-black px-2 py-1 rounded font-bold text-xs mt-0.5">
+          <option value="1">F. 1</option>
+          <option value="2">F. 2</option>
+          <option value="3">F. 3</option>
+        </select>
+      </div>
+
+      <!-- Görünüm Butonları -->
+      <div class="grid grid-cols-4 gap-1 flex-1">
+        <button onclick="setView('3d')" class="bg-gray-300 text-black rounded p-1 text-center font-bold text-xs flex flex-col items-center">
+          🧊 <span>3D</span>
+        </button>
+        <button onclick="setView('2d')" class="bg-gray-300 text-black rounded p-1 text-center font-bold text-xs flex flex-col items-center">
+          🗺️ <span>2D</span>
+        </button>
+        <button onclick="toggleWireframe()" class="bg-gray-300 text-black rounded p-1 text-center font-bold text-xs flex flex-col items-center">
+          🕸️ <span>Mesh</span>
+        </button>
+        <button onclick="alert('Derinlik: 1.85 Metre')" class="bg-gray-300 text-black rounded p-1 text-center font-bold text-xs flex flex-col items-center">
+          📏 <span>m</span>
+        </button>
+      </div>
     </div>
-  </div>
 
-  <!-- Filtre & Renk Kontrol Paneli -->
-  <div class="grid grid-cols-2 gap-2 my-1">
-    <div class="bg-[#161c28] border border-[#232d3f] p-2 rounded-xl flex justify-around items-center">
-      <span class="text-xs text-gray-400 font-bold">Filtre:</span>
-      <button onclick="setFilter('F1')" class="px-2.5 py-1 text-xs rounded-lg bg-cyan-600 font-bold">F1</button>
-      <button onclick="setFilter('F2')" class="px-2.5 py-1 text-xs rounded-lg bg-[#232d3f] text-gray-300">F2</button>
-      <button onclick="setFilter('F3')" class="px-2.5 py-1 text-xs rounded-lg bg-[#232d3f] text-gray-300">F3</button>
+    <!-- Renk Skalası ve Ayar Okları -->
+    <div class="flex gap-2 items-center">
+      
+      <!-- Spektrum Barı + THRES & GAIN -->
+      <div class="flex flex-col gap-1 w-28">
+        <!-- Rainbow Bar -->
+        <div class="h-3 rounded w-full" style="background: linear-gradient(to right, blue, cyan, green, yellow, red);"></div>
+        
+        <div class="grid grid-cols-2 gap-1 text-center">
+          <!-- THRES -->
+          <div class="bg-gray-300 text-black rounded p-1 flex flex-col justify-between items-center">
+            <span class="text-[9px] font-bold">THRES</span>
+            <button onclick="adjThres(1)" class="text-cyan-600 font-black text-sm">▲</button>
+            <span id="thresVal" class="font-bold text-xs">45</span>
+            <button onclick="adjThres(-1)" class="text-cyan-600 font-black text-sm">▼</button>
+          </div>
+          <!-- GAIN -->
+          <div class="bg-gray-300 text-black rounded p-1 flex flex-col justify-between items-center">
+            <span class="text-[9px] font-bold">GAIN</span>
+            <button onclick="adjGain(1)" class="text-cyan-600 font-black text-sm">▲</button>
+            <span id="gainVal" class="font-bold text-xs">7</span>
+            <button onclick="adjGain(-1)" class="text-cyan-600 font-black text-sm">▼</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kamera Açısı ve İşlem Butonları -->
+      <div class="flex-1 grid grid-cols-3 gap-1">
+        <!-- Angle -->
+        <div class="bg-gray-300 text-black rounded p-1 flex flex-col items-center justify-center col-span-1">
+          <span class="text-[9px] font-bold">ANGLE</span>
+          <span id="angleVal" class="text-emerald-700 font-bold text-xs">262°</span>
+        </div>
+
+        <button onclick="startDemoScan()" class="bg-emerald-200 text-emerald-950 border border-emerald-400 font-bold text-[10px] rounded p-1 leading-tight flex items-center justify-center text-center col-span-1">
+          NEW SCAN
+        </button>
+
+        <button onclick="alert('Veriler Çekiliyor...')" class="bg-amber-200 text-amber-950 border border-amber-400 font-bold text-[10px] rounded p-1 leading-tight flex items-center justify-center text-center col-span-1">
+          GET DATA
+        </button>
+
+        <button onclick="window.location.href='index.html'" class="bg-rose-500 text-white font-bold text-[10px] rounded p-2 leading-tight flex items-center justify-center text-center col-span-3">
+          MAIN MENU
+        </button>
+      </div>
+
     </div>
 
-    <div class="bg-[#161c28] border border-[#232d3f] p-2 rounded-xl flex justify-around items-center">
-      <span class="text-xs text-gray-400 font-bold">Mod:</span>
-      <button onclick="setColorScale('Jet')" class="px-2.5 py-1 text-xs rounded-lg bg-cyan-600 font-bold">RGB</button>
-      <button onclick="setColorScale('Greys')" class="px-2.5 py-1 text-xs rounded-lg bg-[#232d3f] text-gray-300">Gri</button>
-    </div>
-  </div>
+  </footer>
 
-  <!-- İşlem Butonları -->
-  <div class="grid grid-cols-3 gap-2 py-2 border-t border-cyan-900/40">
-    <button onclick="startScanning()" class="bg-emerald-600 active:bg-emerald-700 py-3 rounded-xl font-bold text-sm">
-      ▶ Başlat
-    </button>
-    <button onclick="resetCalibration()" class="bg-amber-600 active:bg-amber-700 py-3 rounded-xl font-bold text-sm">
-      🎯 Sıfırla
-    </button>
-    <button onclick="clearMap()" class="bg-rose-600 active:bg-rose-700 py-3 rounded-xl font-bold text-sm">
-      🗑️ Temizle
-    </button>
-  </div>
+  <script>
+    let baseGrid = [
+      [10, 10, 12, 15, 12, 10, 10, 10, 10, 10],
+      [10, 15, 20, 35, 20, 15, 10, 10, 10, 10],
+      [10, 20, 50, 90, 60, 20, 10, 10, 10, 10],
+      [10, 35, 90, 180, 110, 35, 15, 10, 10, 10],
+      [10, 20, 60, 120, 70, 25, 15, 10, 10, 10],
+      [10, 15, 25, 40, 30, 15, 10, 10, 10, 10],
+      [10, 10, 12, 15, 12, 10, 10, 10, 10, 10]
+    ];
 
-  <script src="Bluetooth.js"></script>
-  <script src="scan.js"></script>
+    let thres = 45;
+    let gain = 7;
+    let isWireframe = false;
+
+    function renderPlot(cameraEye) {
+      if (typeof Plotly === 'undefined') return;
+
+      let trace = {
+        z: baseGrid,
+        type: 'surface',
+        colorscale: 'Jet',
+        showscale: false,
+        hidesurface: isWireframe,
+        wireframe: {
+          x: { show: true, color: '#ffffff', width: 1 },
+          y: { show: true, color: '#ffffff', width: 1 }
+        }
+      };
+
+      let layout = {
+        autosize: true,
+        margin: { l: 0, r: 0, b: 0, t: 0 },
+        paper_bgcolor: '#000000',
+        plot_bgcolor: '#000000',
+        scene: {
+          xaxis: { title: '', color: '#ffffff', gridcolor: '#444' },
+          yaxis: { title: '', color: '#ffffff', gridcolor: '#444' },
+          zaxis: { title: '', color: '#ffffff', gridcolor: '#444' },
+          camera: cameraEye || { eye: { x: 1.4, y: 1.4, z: 1.4 } }
+        }
+      };
+
+      Plotly.react('scanPlot', [trace], layout, { responsive: true, displayModeBar: false });
+    }
+
+    function setView(mode) {
+      if (mode === '2d') {
+        renderPlot({ eye: { x: 0, y: 0, z: 2.2 } });
+      } else {
+        renderPlot({ eye: { x: 1.4, y: 1.4, z: 1.4 } });
+      }
+    }
+
+    function toggleWireframe() {
+      isWireframe = !isWireframe;
+      renderPlot();
+    }
+
+    function adjThres(v) {
+      thres += v;
+      document.getElementById('thresVal').innerText = thres;
+    }
+
+    function adjGain(v) {
+      gain += v;
+      document.getElementById('gainVal').innerText = gain;
+    }
+
+    function startDemoScan() {
+      for(let i=0; i<baseGrid.length; i++) {
+        for(let j=0; j<baseGrid[i].length; j++) {
+          baseGrid[i][j] = Math.floor(Math.random() * 150) + 10;
+        }
+      }
+      renderPlot();
+    }
+
+    window.onload = () => {
+      setTimeout(renderPlot, 200);
+    };
+  </script>
 </body>
 </html>
