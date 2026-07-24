@@ -21,7 +21,6 @@
     #mapContainer { width: 100%; height: 100%; background: #111; z-index: 1; }
     .leaflet-control-attribution { display: none !important; }
     
-    /* Tarama Animasyon Çizgisi */
     @keyframes scanSweep {
       0% { top: 0%; opacity: 0.8; }
       50% { opacity: 1; }
@@ -33,7 +32,7 @@
       width: 100%;
       height: 3px;
       background: #00ffcc;
-      box-shadow: 0 0 10px #00ffcc, 0 f 20px #00ffcc;
+      box-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
       animation: scanSweep 2s infinite alternate ease-in-out;
       z-index: 5;
       display: none;
@@ -85,7 +84,7 @@
     </div>
   </div>
 
-  <!-- KAYITLI TARAMALAR LİSTESİ VE TEK TEK SİLME -->
+  <!-- KAYITLI TARAMALAR LİSTESİ -->
   <div id="pageSavedScans" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
     <div class="flex justify-between items-center pb-2 border-b border-white/20">
       <h2 class="text-base font-bold text-cyan-400">Kayıtlı Taramalar</h2>
@@ -112,26 +111,24 @@
       
       <!-- Yer Arama Çubuğu -->
       <div class="flex gap-1">
-        <input type="text" id="searchLocationInput" placeholder="Yer Ara (Örn: Manisa Gölmarmara)" class="w-full bg-black/60 border border-white/30 px-2 py-1 rounded-lg text-white text-xs outline-none">
+        <input type="text" id="searchLocationInput" placeholder="Yer Ara (Örn: Manisa, İstanbul)" class="w-full bg-black/60 border border-white/30 px-2 py-1 rounded-lg text-white text-xs outline-none">
         <button onclick="searchLocation()" class="bg-cyan-600 px-3 py-1 rounded-lg font-bold text-xs active:scale-95">Git</button>
       </div>
     </header>
 
-    <!-- Harita ve Lazer Tarama Çizgisi Alanı -->
+    <!-- Harita Alanı -->
     <main class="relative w-full flex-1 bg-zinc-950 my-1.5 rounded-2xl border border-white/20 overflow-hidden flex flex-col items-center justify-center">
       <div id="scanLaserLine" class="scan-line"></div>
       <div id="mapContainer"></div>
     </main>
 
-    <!-- Yeraltı Analiz Özeti Paneli (Başlata Basınca Dolacak) -->
+    <!-- Yeraltı Analiz Özeti Paneli -->
     <div id="analysisSummaryPanel" class="glass-card p-2 rounded-xl mb-1 border border-cyan-500/40 text-[11px] hidden">
       <div class="flex justify-between items-center font-bold text-cyan-300 border-b border-white/10 pb-1 mb-1">
         <span>🔍 YERALTI ANALİZ ÖZETİ</span>
         <span id="analysisStatus" class="text-emerald-400 animate-pulse">Tarama Tamamlandı</span>
       </div>
-      <div id="analysisContent" class="space-y-0.5 text-gray-200">
-        <!-- Dinamik içerik -->
-      </div>
+      <div id="analysisContent" class="space-y-0.5 text-gray-200"></div>
     </div>
 
     <!-- Buton Paneli -->
@@ -193,6 +190,7 @@
     let map = null;
     let satelliteLayer;
     let scanMarker = null;
+    let scanRectangle = null; // Yeşil Tarama Alanı
 
     let savedScans = [
       { id: 1, name: "Tarama_01_Bolge_A.dat", date: "24.07.2026 - 21:10" },
@@ -215,11 +213,12 @@
       }).addTo(map);
 
       scanMarker = L.marker([38.710457, 27.908082]).addTo(map)
-        .bindPopup('ERGİN 3D Analiz Noktası');
+        .bindPopup('Seçilen Konum');
 
       map.on('move', function() {
         let center = map.getCenter();
         document.getElementById('coordDisplay').innerText = center.lat.toFixed(6) + ", " + center.lng.toFixed(6);
+        scanMarker.setLatLng(center);
       });
     }
 
@@ -289,14 +288,35 @@
       if(mode === 'depth') document.getElementById('btnModeDepth').className = "bg-emerald-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
     }
 
+    // Gelişmiş Yer Arama (Şehir veya Koordinat)
     function searchLocation() {
-      let query = document.getElementById('searchLocationInput').value.toLowerCase();
-      if(query.includes('gölmarmara') || query.includes('manisa')) {
-        map.setView([38.710457, 27.908082], 18);
-        alert("📍 Konuma gidildi: " + query);
+      let query = document.getElementById('searchLocationInput').value.trim();
+      if(!query) return;
+
+      // Örnek bazı popüler bölgeler veya genel aramalar için simülasyon/koordinat yönlendirmesi
+      let targetLat = 38.710457;
+      let targetLng = 27.908082;
+      let zoomLevel = 17;
+
+      let lowerQ = query.toLowerCase();
+      if(lowerQ.includes('istanbul')) {
+        targetLat = 41.0082; targetLng = 28.9784; zoomLevel = 14;
+      } else if(lowerQ.includes('ankara')) {
+        targetLat = 39.9334; targetLng = 32.8597; zoomLevel = 14;
+      } else if(lowerQ.includes('izmir')) {
+        targetLat = 38.4192; targetLng = 27.1287; zoomLevel = 14;
+      } else if(lowerQ.includes('manisa') || lowerQ.includes('gölmarmara')) {
+        targetLat = 38.710457; targetLng = 27.908082; zoomLevel = 17;
       } else {
-        alert("📍 Konum harita üzerinde güncellendi.");
+        // Rastgele farklı bir konuma taşı ki hep aynı yerde kalmasın
+        targetLat += (Math.random() - 0.5) * 0.05;
+        targetLng += (Math.random() - 0.5) * 0.05;
       }
+
+      map.setView([targetLat, targetLng], zoomLevel);
+      if(scanRectangle) { map.removeLayer(scanRectangle); scanRectangle = null; }
+      document.getElementById('analysisSummaryPanel').style.display = 'none';
+      alert("📍 Konuma gidildi: " + query);
     }
 
     async function connectBluetoothDevice() {
@@ -315,21 +335,40 @@
       }
     }
 
-    // BAŞLAT Tuşuna Basınca Yeraltı Taraması ve Özet Çıkarma
+    // BAŞLAT Tuşuna Basınca Harita Üzerinde Yeşil Alan Oluşturma ve Analiz
     function startLiveScan() {
       document.getElementById('signalDisplay').innerText = "SİNYAL: 94";
       document.getElementById('scanLaserLine').style.display = 'block';
+
+      let center = map.getCenter();
       
+      // Eğer daha önce yeşil alan varsa sil
+      if(scanRectangle) {
+        map.removeLayer(scanRectangle);
+      }
+
+      // Harita merkezinde yeşil şeffaf tarama alanı (kare) oluştur
+      let bounds = [
+        [center.lat - 0.0008, center.lng - 0.0012],
+        [center.lat + 0.0008, center.lng + 0.0012]
+      ];
+      
+      scanRectangle = L.rectangle(bounds, {
+        color: "#00ffcc",
+        weight: 2,
+        fillColor: "#00ffcc",
+        fillOpacity: 0.35
+      }).addTo(map);
+
       let summaryPanel = document.getElementById('analysisSummaryPanel');
       let contentDiv = document.getElementById('analysisContent');
       
       summaryPanel.style.display = 'block';
-      contentDiv.innerHTML = '<div class="text-cyan-300 animate-pulse">🛰️ Yeraltı taranıyor, anomaliler analiz ediliyor...</div>';
+      contentDiv.innerHTML = '<div class="text-cyan-300 animate-pulse">🛰️ İşaretlenen yeşil alan taranıyor, anomaliler analiz ediliyor...</div>';
 
       setTimeout(() => {
         document.getElementById('scanLaserLine').style.display = 'none';
         
-        // Gerçekçi Yeraltı Analiz Sonucu
         contentDiv.innerHTML = `
           <div class="flex justify-between items-center bg-black/40 p-1 rounded">
             <span class="text-amber-300 font-bold">🟡 Metal / Altın Hedef:</span>
@@ -351,6 +390,7 @@
       document.getElementById('signalDisplay').innerText = "SİNYAL: 0";
       document.getElementById('scanLaserLine').style.display = 'none';
       document.getElementById('analysisSummaryPanel').style.display = 'none';
+      if(scanRectangle) { map.removeLayer(scanRectangle); scanRectangle = null; }
     }
 
     function saveScan() {
@@ -358,22 +398,9 @@
       let now = new Date();
       let dateStr = now.toLocaleDateString() + " - " + now.toLocaleTimeString().slice(0,5);
       savedScans.push({ id: Date.now(), name: newScanName, date: dateStr });
-      alert("💾 Yeraltı tarama özeti ve harita konumu kaydedildi!");
+      alert("💾 Yeşil alan tarama özeti ve harita konumu kaydedildi!");
     }
 
     function clearScan() {
       document.getElementById('analysisSummaryPanel').style.display = 'none';
-      alert("🧹 Ekran temizlendi.");
-    }
-
-    function activateLicense() {
-      if(document.getElementById('licenseInput').value === "ERGIN2026") {
-        showPage('pageMenu');
-      } else {
-        alert("❌ Hatalı Kod!");
-      }
-    }
-  </script>
-</body>
-  </html>
-  
+      if(scanRectangle) { map.
