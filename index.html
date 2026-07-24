@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <!-- PWA ve Tam Ekran (Uygulama Modu) Ayarları -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#00a2ff">
+  <link rel="manifest" href="manifest.json">
   <title>ERGİN 3D Pro - Uydu Konum & Tarama</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-  <!-- Harita ve Arama (Leaflet) -->
+  <!-- Harita (Leaflet) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     .screen-page { display: none !important; }
     .screen-page.active { display: flex !important; }
-    body { background: #000; }
+    body { background: #0b0b0b; }
     .glass-card {
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -35,7 +35,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 1; /* Harita dokunulabilir en üst katman alındı */
+      z-index: 1;
     }
     #scanPlot {
       position: absolute;
@@ -44,7 +44,7 @@
       width: 100%;
       height: 100%;
       z-index: 2;
-      pointer-events: none; /* Haritanın kaydırılmasını engellememesi için dokunma geçişli yapıldı */
+      pointer-events: none;
     }
   </style>
 </head>
@@ -86,7 +86,7 @@
     <div class="grid grid-cols-2 gap-3.5 my-auto py-2">
       <button onclick="showPage('pageScan')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
         <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">🛰️</div>
-        <span class="text-xs font-semibold leading-tight">Uydu & 3D Zemin Taraması</span>
+        <span class="text-xs font-semibold leading-tight">Uydu & Yer Analizi</span>
       </button>
 
       <button onclick="showPage('pageLrl')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
@@ -115,12 +115,12 @@
       </button>
     </div>
 
-    <!-- Yükleme ve Bağlantı Butonları -->
-    <div class="space-y-2 pb-2">
-      <button id="installAppBtn" onclick="installApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs shadow-lg active:scale-95 hidden">
-        <span>📥 Uygulamayı Telefona Yükle</span>
-      </button>
+    <!-- Uygulama Kurulum Notu -->
+    <div class="glass-card p-3 rounded-2xl text-center space-y-1 mb-1">
+      <p class="text-[11px] text-gray-300">📱 Telefona yüklemek için sağ üstteki <strong class="text-cyan-400">3 noktaya (...)</strong> basıp <strong class="text-emerald-400">"Ana Ekrana Ekle"</strong> deyin.</p>
+    </div>
 
+    <div class="space-y-2 pb-1">
       <div class="grid grid-cols-2 gap-3">
         <button onclick="connectBluetooth()" class="glass-pill py-3 px-4 rounded-full flex items-center justify-center gap-2 font-medium text-xs active:scale-95">
           <span class="bg-blue-600 p-1.5 rounded-full text-xs text-white">📶</span>
@@ -135,7 +135,7 @@
     </div>
   </div>
 
-  <!-- UYDU + ARAMA + 3D TARAMA EKRANI -->
+  <!-- UYDU + YER ANALİZİ EKRANI -->
   <div id="pageScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-1">
     
     <header class="flex flex-col gap-1.5 px-3 py-2 text-xs border border-white/20 glass-card rounded-2xl z-10">
@@ -145,7 +145,7 @@
         <div id="btStatus" class="text-amber-400 font-bold">🔴 Bağlı Değil</div>
       </div>
       <div class="flex gap-1">
-        <input type="text" id="searchInput" placeholder="Yer Ara (Örn: Ankara Çankaya)" class="w-full bg-black/60 border border-white/30 px-2.5 py-1.5 rounded-xl text-white text-xs outline-none">
+        <input type="text" id="searchInput" placeholder="Yer Ara (Örn: Manisa Gölmarmara)" class="w-full bg-black/60 border border-white/30 px-2.5 py-1.5 rounded-xl text-white text-xs outline-none">
         <button onclick="searchLocation()" class="bg-cyan-600 font-bold px-3 py-1.5 rounded-xl text-xs">Git</button>
       </div>
     </header>
@@ -192,8 +192,8 @@
       <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
     </div>
     <div class="glass-card p-4 rounded-2xl my-auto text-xs space-y-2 text-gray-200">
-      <p>• ERGİN 3D Pro Uydu Harita & Tarama</p>
-      <p>• Yazılım Sürümü: v3.7 Final Fix</p>
+      <p>• ERGİN 3D Pro Yer & Uydu Analiz Sistemi</p>
+      <p>• Sürüm: v4.0 Ultimate Final</p>
     </div>
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
@@ -222,26 +222,6 @@
     let bluetoothServer = null;
     let map = null;
     let selectedMarker = null;
-    let deferredPrompt = null;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('installAppBtn').classList.remove('hidden');
-    });
-
-    async function installApp() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        let choiceResult = await deferredPrompt.userChoice;
-        if (choiceResult.outcome === 'accepted') {
-          document.getElementById('installAppBtn').classList.add('hidden');
-        }
-        deferredPrompt = null;
-      } else {
-        alert("Tarayıcı menüsünden (sağ üstteki 3 nokta) 'Ana Ekrana Ekle' veya 'Uygulamayı Yükle' seçeneğini kullanabilirsiniz.");
-      }
-    }
 
     window.onload = function() {
       updateLicenseUI();
@@ -276,12 +256,12 @@
           zoomControl: false, 
           attributionControl: false, 
           maxZoom: 22 
-        }).setView([39.9208, 32.8541], 18);
+        }).setView([38.712187, 27.915700], 18);
         
-        // Yüksek çözünürlüklü uydu katmanı (Taşları net gösteren maxZoom: 22)
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        // Google Uydu Haritası (Türkiye'nin her yerinde net görünüm)
+        L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
           maxZoom: 22,
-          maxNativeZoom: 19
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
         }).addTo(map);
 
         map.on('click', function(e) {
@@ -293,7 +273,7 @@
             map.removeLayer(selectedMarker);
           }
           selectedMarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map)
-            .bindPopup("Seçilen Tarama Alanı").openPopup();
+            .bindPopup("Seçilen Yer Analiz Noktası").openPopup();
         });
       } else {
         map.invalidateSize();
@@ -310,7 +290,7 @@
         if (data && data.length > 0) {
           let lat = parseFloat(data[0].lat);
           let lon = parseFloat(data[0].lon);
-          map.setView([lat, lon], 20);
+          map.setView([lat, lon], 19);
 
           if (selectedMarker) {
             map.removeLayer(selectedMarker);
@@ -330,7 +310,7 @@
     function startScan() {
       document.getElementById('signalDisplay').innerText = "SİNYAL: 85";
       document.getElementById('signalDisplay').className = "font-bold text-emerald-400";
-      alert("✅ Seçilen konumda tarama başlatıldı. Cihaz verileri işleniyor...");
+      alert("✅ Seçilen konumda yer analizi başlatıldı. Cihaz verileri işleniyor...");
     }
 
     function stopScan() {
@@ -340,7 +320,7 @@
     }
 
     function saveScan() {
-      alert("💾 Tarama ve konum verisi başarıyla kaydedildi.");
+      alert("💾 Yer analizi ve konum verisi başarıyla kaydedildi.");
     }
 
     function clearScan() {
