@@ -6,7 +6,6 @@
   <title>ERGİN 3D Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-  <link rel="manifest" href="manifest.json">
   <style>
     .screen-page { display: none !important; }
     .screen-page.active { display: flex !important; }
@@ -110,21 +109,35 @@
     </div>
   </div>
 
-  <!-- 3D TARAMA EKRANI -->
+  <!-- 3D TARAMA EKRANI (TAM KONTROL PANELİ İLE) -->
   <div id="pageScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-1">
     <header class="flex justify-between items-center px-3 py-2 text-xs border-b border-white/20 glass-card rounded-xl">
-      <div class="font-bold text-cyan-400">ERGİN 3D</div>
+      <div class="font-bold text-cyan-400">ERGİN 3D <span id="coordDisplay" class="text-gray-300 ml-1">X:1 Y:1</span></div>
+      <div id="signalDisplay" class="font-bold text-amber-400">SİNYAL: 0</div>
       <div id="btStatus" class="text-amber-400 font-bold">🔴 Bağlı Değil</div>
     </header>
 
-    <main class="relative w-full flex-1 bg-black/80 my-2 rounded-2xl border border-white/20 overflow-hidden min-h-[250px]">
+    <main class="relative w-full flex-1 bg-black/80 my-2 rounded-2xl border border-white/20 overflow-hidden min-h-[220px]">
       <div id="scanPlot" class="relative w-full h-full z-10"></div>
     </main>
 
-    <footer class="flex flex-col gap-2 glass-card p-2.5 rounded-2xl">
+    <footer class="flex flex-col gap-1.5 glass-card p-2 rounded-2xl">
+      <div class="grid grid-cols-5 gap-1 text-[10px]">
+        <button class="bg-purple-600 text-white font-bold py-1.5 rounded-lg">Kamera</button>
+        <button class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">3D Açı</button>
+        <button class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">2D Kuş</button>
+        <button class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">Tel Örgü</button>
+        <button class="bg-emerald-700 text-white font-bold py-1.5 rounded-lg">Derinlik</button>
+      </div>
       <div class="grid grid-cols-3 gap-1.5">
-        <button onclick="connectBluetooth()" class="bg-amber-500 text-black font-bold text-xs rounded-xl py-2 col-span-2">BLUETOOTH BAĞLAN</button>
-        <button onclick="showPage('pageMenu')" class="bg-gray-800 text-white font-bold text-xs rounded-xl py-2">MENÜ</button>
+        <button class="bg-emerald-600 text-white font-bold text-xs rounded-xl py-2 shadow">BAŞLAT</button>
+        <button class="bg-amber-800 text-white font-bold text-xs rounded-xl py-2 shadow">DURDUR</button>
+        <button class="bg-blue-600 text-white font-bold text-xs rounded-xl py-2 shadow">KAYDET</button>
+      </div>
+      <div class="grid grid-cols-3 gap-1.5">
+        <button class="bg-rose-800 text-white font-bold text-xs rounded-xl py-2 shadow">TEMİZLE</button>
+        <button onclick="connectBluetooth()" class="bg-amber-400 text-black font-bold text-xs rounded-xl py-2 shadow">BAĞLAN</button>
+        <button onclick="showPage('pageMenu')" class="bg-slate-700 text-white font-bold text-xs rounded-xl py-2 shadow">MENÜ</button>
       </div>
     </footer>
   </div>
@@ -237,7 +250,6 @@
       }
     }
 
-    // Tamamen saf Bluetooth bağlantı fonksiyonu (Uyarı mesajı içermez)
     async function connectBluetooth() {
       if (!navigator.bluetooth) {
         alert("⚠️ Tarayıcınız Bluetooth desteklemiyor. Lütfen Google Chrome kullanın.");
@@ -274,4 +286,5 @@
     }
   </script>
 </body>
-</html>
+          </html>
+        
