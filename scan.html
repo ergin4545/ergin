@@ -3,14 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ERGİN 3D - Pro Ultimate Scanner</title>
+  <title>ERGİN 3D - Pro Scanner</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <style>
+    /* Alt menünün telefon tuşlarına takılmaması için özel alt boşluk */
+    body {
+      padding-bottom: 90px !important;
+    }
+  </style>
 </head>
-<body class="bg-black text-white h-screen flex flex-col justify-between p-2 select-none overflow-hidden pb-12">
+<body class="bg-black text-white min-h-screen flex flex-col justify-between p-2 select-none">
 
   <!-- Üst Bilgi Barı -->
-  <header class="flex justify-between items-center px-2 py-1 text-xs border-b border-gray-800 bg-gray-950 rounded-lg">
+  <header class="flex justify-between items-center px-2 py-1.5 text-xs border-b border-gray-800 bg-gray-950 rounded-lg shrink-0">
     <div class="font-bold text-cyan-400">
       ERGİN 3D <span id="xyText" class="ml-1 text-white text-[10px]">X:1 Y:1</span>
     </div>
@@ -20,14 +26,14 @@
     </div>
   </header>
 
-  <!-- 3D Grafik Alanı (Mobilde Sıkışmaması İçin Boyut Ayarlandı) -->
-  <main id="mainContainer" class="relative w-full flex-1 bg-black my-1 rounded-xl border border-gray-800 overflow-hidden min-h-[35vh]">
+  <!-- 3D Grafik Alanı (Yüksekliği 38vh Yapılarak Küçültüldü) -->
+  <main id="mainContainer" class="relative w-full h-[38vh] bg-black my-2 rounded-xl border border-gray-800 overflow-hidden shrink-0">
     <video id="cameraStream" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-60"></video>
     <div id="scanPlot" class="relative w-full h-full z-10"></div>
   </main>
 
-  <!-- Kontrol Paneli (Alta Ekran Tuşları İçin Boşluk Bırakıldı: pb-6) -->
-  <footer class="flex flex-col gap-1.5 bg-gray-950 p-2 rounded-xl border border-gray-800 mb-6">
+  <!-- Kontrol Paneli (Yukarı Çekildi ve Görünür Yapıldı) -->
+  <footer class="flex flex-col gap-1.5 bg-gray-950 p-2 rounded-xl border border-gray-800 shrink-0">
     
     <!-- Üst Satır: Filtre, Kamera ve Görünüm -->
     <div class="grid grid-cols-5 gap-1">
@@ -50,20 +56,18 @@
 
     <!-- Orta Satır: Renk Skalası ve Eşik (Threshold) Ayarları -->
     <div class="flex gap-2 items-center bg-gray-900 p-1.5 rounded-lg border border-gray-800">
-      
       <div class="flex flex-col gap-1 w-1/2">
-        <div class="text-[8px] text-center font-bold text-gray-400">BOŞLUK (Mavi) ◄► METAL (Kırmızı)</div>
+        <div class="text-[8px] text-center font-bold text-gray-400">BOŞLUK ◄► METAL</div>
         <div class="h-2.5 rounded w-full border border-gray-700" style="background: linear-gradient(to right, blue, cyan, green, yellow, red);"></div>
       </div>
 
       <div class="flex flex-col w-1/2 text-[10px]">
         <div class="flex justify-between font-bold text-gray-300">
-          <span>Eşik (Filtre):</span>
+          <span>Eşik:</span>
           <span id="threshText" class="text-cyan-400">0</span>
         </div>
         <input type="range" id="threshSlider" min="-50" max="50" value="0" oninput="updateThreshold(this.value)" class="w-full accent-cyan-400 h-1 bg-gray-700 rounded cursor-pointer">
       </div>
-
     </div>
 
     <!-- Alt Satır: İşlem Butonları -->
