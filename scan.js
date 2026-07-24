@@ -1,138 +1,60 @@
-// ERGİN 3D - Advanced Ground Radar Engine
-let matrixRows = 10;
-let matrixCols = 10;
-let scanData = Array(matrixRows).fill(0).map(() => Array(matrixCols).fill(0));
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERGİN 3D - Zemin Taraması</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+</head>
+<body class="bg-[#0b0f17] text-white h-screen flex flex-col justify-between p-3 select-none">
 
-let currentFilter = 'F1'; // F1: Normal, F2: High Detail, F3: Ultra Smooth
-let currentColorScale = 'Jet'; // 'Jet' (RGB) or 'Greys' (Gray Scale)
-let viewMode = '3d'; // '3d' or '2d'
+  <header class="flex justify-between items-center py-2 border-b border-cyan-900/40">
+    <button onclick="window.location.href='index.html'" class="text-cyan-400 text-sm font-semibold flex items-center gap-1">
+      ◀ Ana Menü
+    </button>
+    <h1 class="text-lg font-bold text-cyan-400 tracking-wider">ERGİN 3D RADAR</h1>
+    <div class="text-xs text-gray-400" id="scanStatus">Hazır</div>
+  </header>
 
-// 9 Noktalı Otomatik Sıfırlama / Nötr Kalibrasyon Değeri
-let baseZeroValue = 0; 
-let isCalibrated = false;
+  <div class="relative w-full h-[55vh] bg-[#121824] rounded-2xl border border-[#232d3f] my-2 overflow-hidden">
+    <div id="scanPlot" class="w-full h-full"></div>
+    
+    <div class="absolute top-3 left-3 bg-black/60 backdrop-blur border border-cyan-500/30 px-3 py-1.5 rounded-lg">
+      <span class="text-xs text-gray-400 block">Sinyal</span>
+      <span id="liveVal" class="text-lg font-bold text-cyan-400">0</span>
+    </div>
+  </div>
 
-// Veri Yumuşatma Algoritması (Interpolation)
-function interpolateMatrix(data, factor = 3) {
-  let rows = data.length;
-  let cols = data[0].length;
-  let newRows = (rows - 1) * factor + 1;
-  let newCols = (cols - 1) * factor + 1;
+  <div class="grid grid-cols-2 gap-2 my-1">
+    <div class="bg-[#161c28] border border-[#232d3f] p-2 rounded-xl flex justify-around items-center">
+      <span class="text-xs text-gray-400 font-bold">Filtre:</span>
+      <button onclick="setFilter('F1')" class="px-2.5 py-1 text-xs rounded-lg bg-cyan-600 font-bold">F1</button>
+      <button onclick="setFilter('F2')" class="px-2.5 py-1 text-xs rounded-lg bg-[#232d3f] text-gray-300">F2</button>
+      <button onclick="setFilter('F3')" class="px-2.5 py-1 text-xs rounded-lg bg-[#232d3f] text-gray-300">F3</button>
+    </div>
+
+    <div class="bg-[#161c28] border border-[#232d3f] p-2 rounded-xl flex justify-around items-center">
+      <span class="text-xs text-gray-400 font-bold">Mod:</span>
+      <button onclick="setColorScale('Jet')" class="px-2.5 py-1 text-xs rounded-lg bg-cyan-600 font-bold">RGB</button>
+      <button onclick="setColorScale('Greys')" class="px-2.5 py-1 text-xs rounded-lg bg-[#232d3f] text-gray-300">Gri</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-2 py-2 border-t border-cyan-900/40">
+    <button onclick="startScanning()" class="bg-emerald-600 active:bg-emerald-700 py-3 rounded-xl font-bold text-sm">
+      ▶ Başlat
+    </button>
+    <button onclick="resetCalibration()" class="bg-amber-600 active:bg-amber-700 py-3 rounded-xl font-bold text-sm">
+      🎯 Sıfırla
+    </button>
+    <button onclick="clearMap()" class="bg-rose-600 active:bg-rose-700 py-3 rounded-xl font-bold text-sm">
+      🗑️ Temizle
+    </button>
+  </div>
+
+  <script src="Bluetooth.js"></script>
+  <script src="scan.js"></script>
+</body>
+</html>
   
-  let result = Array(newRows).fill(0).map(() => Array(newCols).fill(0));
-
-  for (let r = 0; r < newRows; r++) {
-    for (let c = 0; c < newCols; c++) {
-      let origR = r / factor;
-      let origC = c / factor;
-
-      let r1 = Math.floor(origR);
-      let r2 = Math.min(r1 + 1, rows - 1);
-      let c1 = Math.floor(origC);
-      let c2 = Math.min(c1 + 1, cols - 1);
-
-      let rf = origR - r1;
-      let cf = origC - c1;
-
-      let top = data[r1][c1] * (1 - cf) + data[r1][c2] * cf;
-      let bottom = data[r2][c1] * (1 - cf) + data[r2][c2] * cf;
-
-      result[r][c] = top * (1 - rf) + bottom * rf;
-    }
-  }
-  return result;
-}
-
-// Filtre Algoritmaları (F1, F2, F3)
-function applyFilter(data, filterType) {
-  if (filterType === 'F1') return data; // Ham/Hassas Veri
-
-  let rows = data.length;
-  let cols = data[0].length;
-  let filtered = JSON.parse(JSON.stringify(data));
-
-  let passCount = filterType === 'F2' ? 1 : 2; // F2 1 tur, F3 2 tur yumuşatır
-
-  for (let p = 0; p < passCount; p++) {
-    for (let r = 1; r < rows - 1; r++) {
-      for (let c = 1; c < cols - 1; c++) {
-        let sum = data[r-1][c] + data[r+1][c] + data[r][c-1] + data[r][c+1] + data[r][c]*2;
-        filtered[r][c] = sum / 6;
-      }
-    }
-  }
-  return filtered;
-}
-
-// Radar Grafiğini Çizdirme
-function renderRadarPlot() {
-  const plotDiv = document.getElementById("scanPlot");
-  if (!plotDiv || !window.Plotly) return;
-
-  // 1. Filtre Uygula
-  let processedData = applyFilter(scanData, currentFilter);
-
-  // 2. Yüksek Çözünürlük İçin Yumuşat (Interpolation)
-  let smoothData = interpolateMatrix(processedData, 3);
-
-  const is3D = (viewMode === '3d');
-
-  const trace = {
-    z: smoothData,
-    type: is3D ? 'surface' : 'heatmap',
-    colorscale: currentColorScale,
-    showscale: true,
-    colorbar: { thickness: 12, len: 0.8, tickfont: { color: '#ffffff', size: 10 } }
-  };
-
-  if (is3D) {
-    trace.contours = {
-      z: { show: true, usecolormap: true, highlightcolor: "#ffffff", project: { z: true } }
-    };
-  }
-
-  const layout = {
-    paper_bgcolor: "rgba(0,0,0,0)",
-    plot_bgcolor: "rgba(0,0,0,0)",
-    autosize: true,
-    margin: { l: 0, r: 0, b: 0, t: 0 },
-    scene: {
-      xaxis: { visible: false },
-      yaxis: { visible: false },
-      zaxis: { visible: true, gridcolor: '#334155', tickfont: { color: '#94a3b8' } },
-      camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } },
-      aspectratio: { x: 1, y: 1, z: 0.5 } // Derinlik/Yükseklik Oranı
-    }
-  };
-
-  Plotly.react("scanPlot", [trace], layout, { responsive: true, displayModeBar: false });
-}
-
-// Bluetooth'tan Gelen Anlık Veriyi İşleme
-function processIncomingData(val) {
-  let num = parseFloat(val);
-  if (isNaN(num)) return;
-
-  // Sıfırlama/Kalibrasyon Yapıldıysa Nötr Değeri Çıkar
-  let calibratedVal = isCalibrated ? (num - baseZeroValue) : num;
-
-  // Tarama Verisini Matrise Yazırma Mantığı (Sırayla)
-  // ...
-  renderRadarPlot();
-}
-
-// Filtre Değiştirme Fonksiyonları (Arayüz Butonları İçin)
-function setFilter(type) {
-  currentFilter = type; // 'F1', 'F2', 'F3'
-  renderRadarPlot();
-}
-
-function setColorScale(scale) {
-  currentColorScale = scale; // 'Jet' veya 'Greys'
-  renderRadarPlot();
-}
-
-function toggleViewMode(mode) {
-  viewMode = mode; // '3d' veya '2d'
-  renderRadarPlot();
-        }
-        
