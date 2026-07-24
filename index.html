@@ -261,17 +261,15 @@
       }
     }
 
-    // Doğrudan Bluetooth Tarayıcı Penceresini Açan Güncellenmiş Fonksiyon
+    // Doğrudan Bluetooth Tarama Ekranını Açan Fonksiyon (Aradaki Tamam Mesajı Kaldırıldı)
     async function connectBluetooth() {
       if (!navigator.bluetooth) {
         alert("⚠️ Bu tarayıcı Bluetooth desteklemiyor! Lütfen Google Chrome kullanın.");
         return;
       }
       try {
-        // Engeli kaldırmak için araya alert koymadan doğrudan tarama tetikleniyor
         bluetoothDevice = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb', '6e400001-b5a3-f393-e0a9-e50e24dcca9e']
+          acceptAllDevices: true
         });
         
         bluetoothServer = await bluetoothDevice.gatt.connect();
@@ -279,11 +277,10 @@
         document.getElementById('btStatus').innerText = "🟢 Bağlandı";
         document.getElementById('btStatus').className = "text-emerald-400 font-bold";
         document.getElementById('btMainBtnText').innerText = bluetoothDevice.name || "Cihaz Bağlı";
-        alert("✅ Başarıyla bağlandı: " + (bluetoothDevice.name || "Bilinmeyen Cihaz"));
 
         bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnected);
       } catch (error) {
-        console.log("Bluetooth bağlantı hatası: " + error);
+        console.log("Bluetooth bağlantı hatası veya iptal edildi: " + error);
       }
     }
 
@@ -291,7 +288,6 @@
       document.getElementById('btStatus').innerText = "🔴 Bağlı Değil";
       document.getElementById('btStatus').className = "text-amber-400 font-bold";
       document.getElementById('btMainBtnText').innerText = "Cihaza Bağlan";
-      alert("⚠️ Bluetooth bağlantısı kesildi!");
     }
 
     let rawGrid = Array(10).fill(0).map(() => Array(10).fill(0));
@@ -329,7 +325,6 @@
       if (!cameraActive) {
         try {
           let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-          videoElem.srcSource = stream;
           videoElem.srcObject = stream;
           videoElem.classList.remove('hidden');
           cameraActive = true;
