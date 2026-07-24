@@ -3,69 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ERGİN 3D - 3D PULSE SYSTEM</title>
+  <title>ERGİN 3D</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#0b0f17] text-white h-screen flex flex-col justify-between p-4 select-none">
+<body class="bg-black text-white h-screen flex flex-col justify-between p-3 select-none">
 
   <!-- Header -->
-  <header class="flex justify-between items-center pt-2 pb-4 border-b border-cyan-900/40">
-    <div>
-      <h1 class="text-2xl font-bold tracking-wider text-cyan-400">ERGİN 3D</h1>
-      <p class="text-xs text-gray-400 font-medium tracking-widest">3D PULSE SYSTEM</p>
+  <header class="flex justify-between items-center py-1 border-b border-gray-800">
+    <div class="flex items-center gap-2">
+      <h1 class="text-xl font-black text-cyan-400 tracking-wider">ERGİN 3D</h1>
     </div>
-    <button id="btnConnect" onclick="connectBT()" class="flex items-center gap-2 border border-cyan-500/50 text-cyan-300 px-4 py-2 rounded-full text-sm font-semibold hover:bg-cyan-950/30">
-      <span id="dot" class="w-3 h-3 rounded-full bg-red-500 inline-block animate-pulse"></span>
-      <span id="btnText">Bağlan</span>
-    </button>
+    <div class="text-2xl">🇹🇷</div>
   </header>
 
-  <!-- Grid Menu -->
-  <main class="grid grid-cols-2 gap-4 my-auto">
+  <!-- 6'lı Izgara Menü -->
+  <main class="grid grid-cols-2 gap-3 my-auto">
     
-    <!-- 1. Pointer -->
-    <div onclick="window.location.href='pointer.html'" class="bg-[#161c28] border border-[#232d3f] rounded-2xl p-5 flex flex-col items-center text-center cursor-pointer active:scale-95 transition">
-      <div class="text-4xl mb-3">🎯</div>
-      <h2 class="text-lg font-bold text-cyan-400">Pointer</h2>
-      <p class="text-xs text-gray-400 mt-1">Anlık Canlı Sinyal</p>
-    </div>
+    <!-- 1. 3D Zemin Taraması -->
+    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
+      <div class="text-3xl mb-1">🗺️</div>
+      <span class="font-bold text-sm leading-tight">3D Ground Scan</span>
+    </button>
 
-    <!-- 2. Zemin Taraması -->
-    <div onclick="window.location.href='scan.html'" class="bg-[#161c28] border border-[#232d3f] rounded-2xl p-5 flex flex-col items-center text-center cursor-pointer active:scale-95 transition">
-      <div class="text-4xl mb-3">🗺️</div>
-      <h2 class="text-lg font-bold text-cyan-400">Zemin Taraması</h2>
-      <p class="text-xs text-gray-400 mt-1">2D / 3D Canlı Harita</p>
-    </div>
+    <!-- 2. Alan Tarama (LRL) -->
+    <button onclick="alert('Alan Tarama henüz aktif değil.')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
+      <div class="text-3xl mb-1">📡</div>
+      <span class="font-bold text-sm leading-tight">Long Range Locator</span>
+    </button>
 
-    <!-- 3. Arşiv -->
-    <div onclick="window.location.href='archive.html'" class="bg-[#161c28] border border-[#232d3f] rounded-2xl p-5 flex flex-col items-center text-center cursor-pointer active:scale-95 transition">
-      <div class="text-4xl mb-3">📁</div>
-      <h2 class="text-lg font-bold text-cyan-400">Arşiv</h2>
-      <p class="text-xs text-gray-400 mt-1">Kayıtlı Taramalar</p>
-    </div>
+    <!-- 3. Anlık Sinyal -->
+    <button onclick="window.location.href='pointer.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
+      <div class="text-3xl mb-1">📈</div>
+      <span class="font-bold text-sm leading-tight">Simultaneous Data</span>
+    </button>
 
-    <!-- 4. Ayarlar -->
-    <div onclick="window.location.href='settings.html'" class="bg-[#161c28] border border-[#232d3f] rounded-2xl p-5 flex flex-col items-center text-center cursor-pointer active:scale-95 transition">
-      <div class="text-4xl mb-3">⚙️</div>
-      <h2 class="text-lg font-bold text-cyan-400">Ayarlar</h2>
-      <p class="text-xs text-gray-400 mt-1">Cihaz & Kalibrasyon</p>
-    </div>
+    <!-- 4. Kayıtlı Tarama Aç -->
+    <button onclick="window.location.href='archive.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
+      <div class="text-3xl mb-1">📁</div>
+      <span class="font-bold text-sm leading-tight">Open Scan</span>
+    </button>
+
+    <!-- 5. Lisans -->
+    <button onclick="alert('Lisans: Aktif (Ergin 3D - Pro)')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
+      <div class="text-3xl mb-1">🔑</div>
+      <span class="font-bold text-sm leading-tight">Licence</span>
+    </button>
+
+    <!-- 6. Bilgi -->
+    <button onclick="window.location.href='settings.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
+      <div class="text-3xl mb-1">ℹ️</div>
+      <span class="font-bold text-sm leading-tight">Information</span>
+    </button>
 
   </main>
 
-  <footer class="text-center py-2 text-xs text-gray-600">
-    ERGİN 3D v1.0 • Ground Radar Engine
+  <!-- Alt Durum Çubuğu -->
+  <footer class="bg-gray-900 border border-gray-800 rounded-xl p-2 flex justify-between items-center text-xs">
+    <button id="btnConnect" onclick="toggleConnect()" class="bg-gray-200 text-black px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 active:scale-95">
+      <span>🔵</span> Connect the Device
+    </button>
+
+    <div class="flex items-center gap-3">
+      <div class="text-left">
+        <div id="deviceName" class="text-gray-400 font-medium">ERGİN 3D-X</div>
+        <div id="voltText" class="text-emerald-400 font-bold">🔋 7.81 V</div>
+      </div>
+      <div class="text-emerald-400 font-bold flex items-center gap-1">
+        🔑 <span class="hidden sm:inline">Licence Active</span>
+      </div>
+    </div>
   </footer>
 
   <script>
-    function connectBT() {
-      const dot = document.getElementById('dot');
-      const text = document.getElementById('btnText');
-      text.innerText = "Aranıyor...";
-      setTimeout(() => {
-        dot.className = "w-3 h-3 rounded-full bg-green-500 inline-block";
-        text.innerText = "Bağlandı";
-      }, 1200);
+    let connected = false;
+    function toggleConnect() {
+      const btn = document.getElementById('btnConnect');
+      if(!connected) {
+        btn.innerHTML = "🟢 Connected";
+        btn.className = "bg-emerald-500 text-white px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5";
+        connected = true;
+      } else {
+        btn.innerHTML = "🔵 Connect the Device";
+        btn.className = "bg-gray-200 text-black px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5";
+        connected = false;
+      }
     }
   </script>
 </body>
