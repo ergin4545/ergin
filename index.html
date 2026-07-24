@@ -6,7 +6,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#00a2ff">
-  <link rel="manifest" href="manifest.json">
   <title>ERGİN 3D Pro - Uydu Konum & Tarama</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
@@ -44,7 +43,11 @@
       width: 100%;
       height: 100%;
       z-index: 2;
-      /* pointer-events serbest bırakıldı, böylece parmakla döndürülebilir */
+      pointer-events: none;
+    }
+    /* Sadece grafik aktifken dokunulabilir olsun */
+    #scanPlot.interactive {
+      pointer-events: auto;
     }
   </style>
 </head>
@@ -196,7 +199,7 @@
     </div>
     <div class="glass-card p-4 rounded-2xl my-auto text-xs space-y-2 text-gray-200">
       <p>• ERGİN 3D Pro Yer & Uydu Analiz Sistemi</p>
-      <p>• Sürüm: v4.2 Ultimate 3D Orbit</p>
+      <p>• Sürüm: v4.3 Stable Safe</p>
     </div>
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
@@ -405,5 +408,4 @@
         document.getElementById('signalDisplay').innerText = found.signal;
         document.getElementById('signalDisplay').className = "font-bold text-emerald-400";
         showPage('pageScan');
-        alert("📂 Kayıtlı tarama yüklendi.");
-     
+        alert("📂 Kayıtlı tarama yükl
