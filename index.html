@@ -6,159 +6,206 @@
   <title>ERGİN 3D Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <link rel="manifest" href="manifest.json">
   <style>
     .screen-page { display: none !important; }
     .screen-page.active { display: flex !important; }
+    /* Dedsis Tarzı Yıldızlı Arka Plan */
+    body {
+      background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), 
+                  url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1000&auto=format&fit=crop') center/cover no-repeat fixed;
+    }
+    /* Buzlu Cam Buton Kartları */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .glass-pill {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
   </style>
 </head>
-<body class="bg-black text-white h-screen w-screen select-none m-0 p-3 overflow-hidden flex flex-col justify-between">
+<body class="text-white h-screen w-screen select-none m-0 p-4 overflow-hidden flex flex-col justify-between">
 
   <!-- ==================== 1. EKRAN: LİSANS KONTROL ==================== -->
   <div id="pageLicence" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
-    <div class="flex justify-between items-center pb-2 border-b border-gray-800">
-      <h2 class="text-base font-bold text-cyan-400">Lisans Bilgileri</h2>
-      <span class="bg-gray-800 text-xs px-2.5 py-1 rounded text-gray-400">Kilitli</span>
+    <div class="flex justify-between items-center pb-2 border-b border-white/20">
+      <h2 class="text-lg font-bold text-cyan-400">Lisans Bilgileri</h2>
+      <span class="bg-black/50 text-xs px-2.5 py-1 rounded text-gray-300">Kilitli</span>
     </div>
 
-    <div class="my-auto space-y-3 py-4">
-      <div class="bg-gray-900 p-3.5 rounded-xl border border-gray-800 text-xs space-y-1.5">
-        <p><strong class="text-gray-400">Lisans Sahibi:</strong> ERGİN 3D Kullanıcısı</p>
-        <p><strong class="text-gray-400">Cihaz Kimliği:</strong> ERGIN-3D-8842</p>
-        <p><strong class="text-gray-400">Durum:</strong> <span id="licenseStatusBadge" class="text-amber-400 font-bold">Lisans Bekleniyor</span></p>
+    <div class="my-auto space-y-4 py-4 w-full">
+      <div class="glass-card p-4 rounded-2xl text-xs space-y-2">
+        <p><strong class="text-gray-300">Cihaz Kimliği:</strong> ERGIN-3D-8842</p>
+        <p><strong class="text-gray-300">Durum:</strong> <span id="licenseStatusBadge" class="text-amber-400 font-bold">Lisans Bekleniyor</span></p>
       </div>
 
-      <div id="activationBox" class="bg-gray-950 p-3.5 rounded-xl border border-gray-800 space-y-2.5">
-        <p class="text-[11px] text-gray-300 text-center">Devam etmek için aktivasyon kodunu girin.</p>
-        <input type="text" id="licenseInput" placeholder="ERGIN2026" class="w-full bg-black border border-gray-700 p-2.5 rounded-lg text-white text-center text-sm outline-none">
-        <button onclick="activateLicense()" class="w-full bg-emerald-600 font-bold p-3 rounded-lg text-white text-sm">LİSANSI AKTİFLEŞTİR</button>
+      <div id="activationBox" class="glass-card p-4 rounded-2xl space-y-3">
+        <p class="text-xs text-gray-200 text-center">Aktivasyon kodunu girin (ERGIN2026)</p>
+        <input type="text" id="licenseInput" placeholder="ERGIN2026" class="w-full bg-black/60 border border-white/30 p-3 rounded-xl text-white text-center text-sm outline-none">
+        <button onclick="activateLicense()" class="w-full bg-emerald-600 active:bg-emerald-700 font-bold p-3 rounded-xl text-white text-sm shadow-lg">LİSANSI AKTİFLEŞTİR</button>
       </div>
     </div>
 
-    <button onclick="proceedToMenu()" id="btnGoMenu" class="bg-cyan-600 font-bold p-3 rounded-xl w-full hidden text-sm">Ana Menüye Git</button>
+    <button onclick="proceedToMenu()" id="btnGoMenu" class="bg-cyan-600 font-bold p-3.5 rounded-2xl w-full hidden text-sm shadow-lg">Ana Menüye Git</button>
   </div>
 
-  <!-- ==================== 2. EKRAN: ANA MENÜ ==================== -->
-  <div id="pageMenu" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
-    <div class="flex justify-between items-center pb-2 border-b border-gray-800">
-      <h1 class="text-lg font-black text-cyan-400 tracking-wider">ERGİN 3D</h1>
-      <span class="text-lg">🇹🇷</span>
-    </div>
-
-    <div class="grid grid-cols-2 gap-2.5 my-auto">
-      <button onclick="showPage('pageScan')" class="bg-gray-200 text-black p-3.5 rounded-xl flex flex-col items-center justify-center font-bold text-xs shadow-lg active:scale-95">
-        <span class="text-xl mb-1">🗺️</span>
-        <span>3D Ground Scan</span>
-      </button>
-      <button onclick="showPage('pageLrl')" class="bg-gray-200 text-black p-3.5 rounded-xl flex flex-col items-center justify-center font-bold text-xs shadow-lg active:scale-95">
-        <span class="text-xl mb-1">📡</span>
-        <span>Long Range Locator</span>
-      </button>
-      <button onclick="showPage('pageSimultaneous')" class="bg-gray-200 text-black p-3.5 rounded-xl flex flex-col items-center justify-center font-bold text-xs shadow-lg active:scale-95">
-        <span class="text-xl mb-1">📈</span>
-        <span>Simultaneous Data</span>
-      </button>
-      <button onclick="loadSavedScansList(); showPage('pageOpenScan')" class="bg-gray-200 text-black p-3.5 rounded-xl flex flex-col items-center justify-center font-bold text-xs shadow-lg active:scale-95">
-        <span class="text-xl mb-1">📁</span>
-        <span>Open Scan</span>
-      </button>
-      <button onclick="showPage('pageLicence')" class="bg-gray-200 text-black p-3.5 rounded-xl flex flex-col items-center justify-center font-bold text-xs shadow-lg active:scale-95">
-        <span class="text-xl mb-1">🔑</span>
-        <span>Licence</span>
-      </button>
-      <button onclick="showPage('pageInfo')" class="bg-gray-200 text-black p-3.5 rounded-xl flex flex-col items-center justify-center font-bold text-xs shadow-lg active:scale-95">
-        <span class="text-xl mb-1">ℹ️</span>
-        <span>Information</span>
-      </button>
-    </div>
-
-    <div class="flex justify-between items-center bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-[11px]">
-      <div class="flex items-center gap-2 text-yellow-400 font-bold">
-        <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
-        <span>Bluetooth Bekleniyor</span>
+  <!-- ==================== 2. EKRAN: DEDSIS STİLİ ANA MENÜ ==================== -->
+  <div id="pageMenu" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto">
+    <!-- Üst Bar: Başlık ve Pil -->
+    <div class="flex justify-between items-center pt-1 px-1">
+      <h1 class="text-2xl font-black text-white tracking-wider">ERGİN 3D</h1>
+      <div class="flex items-center gap-1 bg-black/40 px-2 py-1 rounded-lg border border-white/10 text-xs">
+        <span class="text-emerald-400 font-bold">7.8V</span>
+        <span>🔋</span>
       </div>
-      <div class="text-right text-gray-400">
-        <div class="font-bold text-white">ERGİN 3D-X</div>
-        <div class="text-emerald-400 font-bold">🔋 7.81 V</div>
+    </div>
+
+    <!-- 6'lı Izgara Menü Kartları (Dedsis Birebir Görünüm) -->
+    <div class="grid grid-cols-2 gap-3.5 my-auto py-2">
+      
+      <!-- 1. 3D Zemin Taraması -->
+      <button onclick="showPage('pageScan')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
+        <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">📐</div>
+        <span class="text-xs font-semibold leading-tight">3D Zemin Taraması</span>
+      </button>
+
+      <!-- 2. LRL-ION Taraması -->
+      <button onclick="showPage('pageLrl')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
+        <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">📡</div>
+        <span class="text-xs font-semibold leading-tight">LRL-ION Taraması</span>
+      </button>
+
+      <!-- 3. Gerçek Zamanlı Tarama -->
+      <button onclick="showPage('pageSimultaneous')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
+        <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">📈</div>
+        <span class="text-xs font-semibold leading-tight">Gerçek Zamanlı Tarama</span>
+      </button>
+
+      <!-- 4. Tarama Aç -->
+      <button onclick="loadSavedScansList(); showPage('pageOpenScan')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
+        <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">📁</div>
+        <span class="text-xs font-semibold leading-tight">Tarama Aç</span>
+      </button>
+
+      <!-- 5. Lisans -->
+      <button onclick="showPage('pageLicence')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
+        <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">🔑</div>
+        <span class="text-xs font-semibold leading-tight">Lisans</span>
+      </button>
+
+      <!-- 6. Bilgi -->
+      <button onclick="showPage('pageInfo')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
+        <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">ℹ️</div>
+        <span class="text-xs font-semibold leading-tight">Bilgi</span>
+      </button>
+
+    </div>
+
+    <!-- Alt Butonlar ve Kısayollar -->
+    <div class="space-y-3 pb-2">
+      <!-- Cihaza Bağlan & Çıkış Hap Butonları -->
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="connectBluetooth()" class="glass-pill py-3 px-4 rounded-full flex items-center justify-center gap-2 font-medium text-xs active:scale-95">
+          <span class="bg-blue-600 p-1.5 rounded-full text-xs">📶</span>
+          <span class="italic text-gray-100">Cihaza Bağlan</span>
+        </button>
+
+        <button onclick="exitApp()" class="glass-pill py-3 px-4 rounded-full flex items-center justify-center gap-2 font-medium text-xs active:scale-95">
+          <span class="bg-gray-700 p-1.5 rounded-full text-xs">🚪</span>
+          <span class="italic text-gray-100">Çıkış</span>
+        </button>
+      </div>
+
+      <!-- En Alt Küçük Simgeler Barı -->
+      <div class="flex justify-between items-center px-4 pt-1">
+        <button onclick="connectBluetooth()" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-sm border border-white/20">📶</button>
+        <button onclick="showPage('pageLicence')" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-sm border border-white/20">🔑</button>
+        <span class="text-xl">🇹🇷</span>
+        <button onclick="showPage('pageInfo')" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-sm border border-white/20">📘</button>
       </div>
     </div>
   </div>
 
   <!-- ==================== 3. EKRAN: 3D TARAMA ==================== -->
   <div id="pageScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-1">
-    <header class="flex justify-between items-center px-2 py-1 text-[11px] border-b border-gray-800 bg-gray-950 rounded-lg">
+    <header class="flex justify-between items-center px-3 py-2 text-xs border-b border-white/20 glass-card rounded-xl">
       <div class="font-bold text-cyan-400">ERGİN 3D <span id="xyText" class="text-white text-[10px]">X:1 Y:1</span></div>
       <div id="signalVal" class="font-black text-yellow-400">SİNYAL: 0</div>
       <div id="btStatus" class="text-amber-400 font-bold">🔴 Bağlı Değil</div>
     </header>
 
-    <main class="relative w-full flex-1 bg-black my-1.5 rounded-xl border border-gray-800 overflow-hidden min-h-[220px]">
-      <!-- Canlı Arka Kamera Akışı -->
+    <main class="relative w-full flex-1 bg-black/80 my-2 rounded-2xl border border-white/20 overflow-hidden min-h-[250px]">
       <video id="cameraStream" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-50 z-0"></video>
-      <!-- 3D Grafik Alanı -->
       <div id="scanPlot" class="relative w-full h-full z-10"></div>
     </main>
 
-    <footer class="flex flex-col gap-1.5 bg-gray-950 p-2 rounded-xl border border-gray-800">
+    <footer class="flex flex-col gap-2 glass-card p-2.5 rounded-2xl">
       <div class="grid grid-cols-5 gap-1">
-        <button onclick="toggleCamera()" class="bg-indigo-600 text-white rounded p-1 text-[9px] font-bold">Kamera</button>
-        <button onclick="setView('3d')" class="bg-gray-200 text-black rounded p-1 text-[9px] font-bold">3D Açı</button>
-        <button onclick="setView('2d')" class="bg-gray-200 text-black rounded p-1 text-[9px] font-bold">2D Kuş</button>
-        <button onclick="toggleWireframe()" class="bg-gray-200 text-black rounded p-1 text-[9px] font-bold">Tel Örgü</button>
-        <button onclick="showDepth()" class="bg-emerald-600 text-white rounded p-1 text-[9px] font-bold">Derinlik</button>
+        <button onclick="toggleCamera()" class="bg-indigo-600 text-white rounded-lg p-1.5 text-[10px] font-bold">Kamera</button>
+        <button onclick="setView('3d')" class="bg-white/20 text-white rounded-lg p-1.5 text-[10px] font-bold">3D Açı</button>
+        <button onclick="setView('2d')" class="bg-white/20 text-white rounded-lg p-1.5 text-[10px] font-bold">2D Kuş</button>
+        <button onclick="toggleWireframe()" class="bg-white/20 text-white rounded-lg p-1.5 text-[10px] font-bold">Tel Örgü</button>
+        <button onclick="showDepth()" class="bg-emerald-600 text-white rounded-lg p-1.5 text-[10px] font-bold">Derinlik</button>
       </div>
 
-      <div class="grid grid-cols-3 gap-1">
-        <button id="btnStart" onclick="startScanning()" class="bg-emerald-600 text-white font-bold text-xs rounded py-1.5">BAŞLAT</button>
-        <button id="btnStop" onclick="stopScanning()" class="bg-amber-600 text-white font-bold text-xs rounded py-1.5 opacity-50" disabled>DURDUR</button>
-        <button onclick="saveCurrentScan()" class="bg-blue-600 text-white font-bold text-xs rounded py-1.5">KAYDET</button>
+      <div class="grid grid-cols-3 gap-1.5">
+        <button id="btnStart" onclick="startScanning()" class="bg-emerald-600 text-white font-bold text-xs rounded-xl py-2">BAŞLAT</button>
+        <button id="btnStop" onclick="stopScanning()" class="bg-amber-600 text-white font-bold text-xs rounded-xl py-2 opacity-50" disabled>DURDUR</button>
+        <button onclick="saveCurrentScan()" class="bg-blue-600 text-white font-bold text-xs rounded-xl py-2">KAYDET</button>
       </div>
 
-      <div class="grid grid-cols-3 gap-1">
-        <button onclick="clearMap()" class="bg-rose-900 text-white font-bold text-xs rounded py-1.5">TEMİZLE</button>
-        <button onclick="connectBluetooth()" class="bg-amber-400 text-black font-bold text-xs rounded py-1.5">BAĞLAN</button>
-        <button onclick="showPage('pageMenu')" class="bg-gray-700 text-white font-bold text-xs rounded py-1.5">MENÜ</button>
+      <div class="grid grid-cols-3 gap-1.5">
+        <button onclick="clearMap()" class="bg-rose-900 text-white font-bold text-xs rounded-xl py-2">TEMİZLE</button>
+        <button onclick="connectBluetooth()" class="bg-amber-500 text-black font-bold text-xs rounded-xl py-2">BAĞLAN</button>
+        <button onclick="showPage('pageMenu')" class="bg-gray-800 text-white font-bold text-xs rounded-xl py-2">MENÜ</button>
       </div>
     </footer>
   </div>
 
   <!-- ==================== DİĞER SAYFALAR ==================== -->
   <div id="pageOpenScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
-    <div class="flex justify-between items-center pb-2 border-b border-gray-800">
+    <div class="flex justify-between items-center pb-2 border-b border-white/20">
       <h2 class="text-base font-bold text-cyan-400">Kayıtlı Taramalar</h2>
-      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-2.5 py-1 rounded">← Geri</button>
+      <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
     </div>
     <div id="savedScansContainer" class="flex-1 overflow-y-auto my-2 space-y-2 text-xs"></div>
-    <button onclick="showPage('pageMenu')" class="bg-gray-700 font-bold p-2.5 rounded-xl w-full text-xs">Ana Menüye Dön</button>
+    <button onclick="showPage('pageMenu')" class="bg-gray-800 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
 
   <div id="pageInfo" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
-    <div class="flex justify-between items-center pb-2 border-b border-gray-800">
+    <div class="flex justify-between items-center pb-2 border-b border-white/20">
       <h2 class="text-base font-bold text-cyan-400">Cihaz Bilgisi</h2>
-      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-2.5 py-1 rounded">← Geri</button>
+      <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
     </div>
-    <div class="bg-gray-900 p-3.5 rounded-xl border border-gray-800 my-auto text-xs space-y-1.5 text-gray-300">
-      <p>• ERGİN 3D Pro Yer Altı Görüntüleme</p>
+    <div class="glass-card p-4 rounded-2xl my-auto text-xs space-y-2 text-gray-200">
+      <p>• ERGİN 3D Pro Yeraltı Görüntüleme</p>
       <p>• Yazılım Sürümü: v3.1 Pro GPS</p>
     </div>
-    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-2.5 rounded-xl w-full text-xs">Ana Menüye Dön</button>
+    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
 
   <div id="pageLrl" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
-    <div class="flex justify-between items-center pb-2 border-b border-gray-800">
-      <h2 class="text-base font-bold text-cyan-400">Long Range Locator</h2>
-      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-2.5 py-1 rounded">← Geri</button>
+    <div class="flex justify-between items-center pb-2 border-b border-white/20">
+      <h2 class="text-base font-bold text-cyan-400">LRL-ION Taraması</h2>
+      <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
     </div>
-    <div class="text-center my-auto text-gray-400 text-xs">Alan Taraması Modülü Hazırlanıyor...</div>
-    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-2.5 rounded-xl w-full text-xs">Ana Menüye Dön</button>
+    <div class="text-center my-auto text-gray-300 text-xs">Alan Taraması Modülü Hazırlanıyor...</div>
+    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
 
   <div id="pageSimultaneous" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
-    <div class="flex justify-between items-center pb-2 border-b border-gray-800">
-      <h2 class="text-base font-bold text-cyan-400">Simultaneous Data</h2>
-      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-2.5 py-1 rounded">← Geri</button>
+    <div class="flex justify-between items-center pb-2 border-b border-white/20">
+      <h2 class="text-base font-bold text-cyan-400">Gerçek Zamanlı Tarama</h2>
+      <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
     </div>
-    <div class="text-center my-auto text-gray-400 text-xs">Canlı Veri Akış Modu...</div>
-    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-2.5 rounded-xl w-full text-xs">Ana Menüye Dön</button>
+    <div class="text-center my-auto text-gray-300 text-xs">Canlı Veri Akış Modu...</div>
+    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
 
   <!-- ==================== JAVASCRIPT ==================== -->
@@ -221,50 +268,13 @@
       if (isLicensed) showPage('pageMenu');
     }
 
-    let currentCoords = { lat: null, lon: null };
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(pos => {
-        currentCoords.lat = pos.coords.latitude;
-        currentCoords.lon = pos.coords.longitude;
-      }, err => {}, { enableHighAccuracy: true });
-    }
-
-    function saveCurrentScan() {
-      let scanName = prompt("Tarama için bir isim girin:", "Tarama " + new Date().toLocaleDateString());
-      if (!scanName) return;
-      let savedScans = JSON.parse(localStorage.getItem("ergin_scans") || "[]");
-      savedScans.push({ name: scanName, date: new Date().toLocaleString(), grid: rawGrid, lat: currentCoords.lat, lon: currentCoords.lon });
-      localStorage.setItem("ergin_scans", JSON.stringify(savedScans));
-      alert("✅ Kaydedildi!");
-    }
-
-    function loadSavedScansList() {
-      let container = document.getElementById('savedScansContainer');
-      container.innerHTML = "";
-      let savedScans = JSON.parse(localStorage.getItem("ergin_scans") || "[]");
-      if (savedScans.length === 0) {
-        container.innerHTML = `<div class="text-center text-gray-500 my-10">Kayıtlı tarama yok.</div>`;
-        return;
-      }
-      savedScans.forEach((scan, index) => {
-        let div = document.createElement('div');
-        div.className = "bg-gray-900 border border-gray-800 p-2.5 rounded-xl flex justify-between items-center";
-        div.innerHTML = `<span class="text-cyan-400 font-bold">${scan.name}</span>
-                         <button onclick="loadScanToScreen(${index})" class="bg-emerald-600 px-2.5 py-1 rounded text-xs font-bold">Yükle</button>`;
-        container.appendChild(div);
-      });
-    }
-
-    function loadScanToScreen(index) {
-      let savedScans = JSON.parse(localStorage.getItem("ergin_scans") || "[]");
-      if (savedScans[index]) {
-        rawGrid = savedScans[index].grid;
-        renderPlot();
-        showPage('pageScan');
+    function exitApp() {
+      if (confirm("Uygulamadan çıkmak istiyor musunuz?")) {
+        window.close();
       }
     }
 
-    let GRID_SIZE = 10, rawGrid = Array(10).fill(0).map(() => Array(10).fill(0));
+    let rawGrid = Array(10).fill(0).map(() => Array(10).fill(0));
     let isWireframe = false, isScanning = false, cameraActive = false;
 
     function renderPlot(cameraEye) {
@@ -284,7 +294,7 @@
           videoElem.classList.remove('hidden');
           cameraActive = true;
         } catch (e) {
-          alert("Kamera izni alınamadı! Lütfen tarayıcı ayarlarından kamera izni verin.");
+          alert("Kamera izni alınamadı!");
         }
       } else {
         let stream = videoElem.srcObject;
@@ -301,7 +311,7 @@
     function setView(mode) { renderPlot(mode === '2d' ? { eye: { x: 0, y: 0, z: 2.2 } } : { eye: { x: 1.3, y: 1.3, z: 1.3 } }); }
     function toggleWireframe() { isWireframe = !isWireframe; renderPlot(); }
     function showDepth() { alert("Tahmini Derinlik Hesaplandı."); }
-    async function connectBluetooth() { alert("Bluetooth Arama Başlatıldı"); }
+    async function connectBluetooth() { alert("Bluetooth cihaz araması başlatıldı..."); }
   </script>
 </body>
 </html>
