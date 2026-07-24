@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#00a2ff">
+  <meta name="theme-color" content="#0b0b0b">
   <title>ERGİN 3D Pro - Pulse System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Leaflet Harita Kütüphanesi -->
@@ -12,9 +12,9 @@
   <style>
     .screen-page { display: none !important; }
     .screen-page.active { display: flex !important; }
-    body { background: #0b0b0b; }
+    body { background: #0b0b0b; touch-action: manipulation; margin: 0; padding: 0; height: 100vh; overflow: hidden; }
     .glass-card {
-      background: rgba(0, 0, 0, 0.88);
+      background: rgba(0, 0, 0, 0.9);
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
@@ -36,10 +36,12 @@
       animation: scanSweep 2s infinite alternate ease-in-out;
       z-index: 5;
       display: none;
+      pointer-events: none;
     }
+    button, input { position: relative; z-index: 50; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   </style>
 </head>
-<body class="text-white h-screen w-screen select-none m-0 p-2 overflow-hidden flex flex-col justify-between">
+<body class="text-white h-screen w-screen select-none flex flex-col justify-between p-2">
 
   <!-- ANA MENÜ -->
   <div id="pageMenu" class="screen-page active flex-col justify-between h-full w-full max-w-md mx-auto">
@@ -98,7 +100,7 @@
 
   <!-- GERÇEK HARİTA VE YERALTI ANALİZ EKRANI -->
   <div id="pageScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-1">
-    <header class="flex flex-col gap-1 px-2.5 py-1.5 text-xs border border-white/20 glass-card rounded-2xl z-10">
+    <header class="flex flex-col gap-1 px-2.5 py-1.5 text-xs border border-white/20 glass-card rounded-2xl z-50">
       <div class="flex justify-between items-center">
         <div class="flex items-center gap-2">
           <button onclick="showPage('pageMenu')" class="bg-white/20 hover:bg-white/30 text-white px-2 py-0.5 rounded text-[10px] font-bold">← Geri</button>
@@ -112,7 +114,7 @@
       <!-- Yer Arama Çubuğu -->
       <div class="flex gap-1">
         <input type="text" id="searchLocationInput" placeholder="Yer Ara (Örn: Manisa, İstanbul)" class="w-full bg-black/60 border border-white/30 px-2 py-1 rounded-lg text-white text-xs outline-none">
-        <button onclick="searchLocation()" class="bg-cyan-600 px-3 py-1 rounded-lg font-bold text-xs active:scale-95">Git</button>
+        <button onclick="searchLocation()" class="bg-cyan-600 px-3 py-1 rounded-lg font-bold text-xs">Git</button>
       </div>
     </header>
 
@@ -123,7 +125,7 @@
     </main>
 
     <!-- Yeraltı Analiz Özeti Paneli -->
-    <div id="analysisSummaryPanel" class="glass-card p-2 rounded-xl mb-1 border border-cyan-500/40 text-[11px] hidden">
+    <div id="analysisSummaryPanel" class="glass-card p-2 rounded-xl mb-1 border border-cyan-500/40 text-[11px] hidden z-50">
       <div class="flex justify-between items-center font-bold text-cyan-300 border-b border-white/10 pb-1 mb-1">
         <span>🔍 YERALTI ANALİZ ÖZETİ</span>
         <span id="analysisStatus" class="text-emerald-400 animate-pulse">Tarama Tamamlandı</span>
@@ -132,23 +134,23 @@
     </div>
 
     <!-- Buton Paneli -->
-    <footer class="flex flex-col gap-1 glass-card p-2 rounded-2xl z-10">
+    <footer class="flex flex-col gap-1 glass-card p-2 rounded-2xl z-50">
       <div class="grid grid-cols-5 gap-1 text-[10px]">
-        <button onclick="setPlotMode('surface')" id="btnModeUydu" class="bg-purple-600 text-white font-bold py-1.5 rounded-lg active:scale-95">Uydu</button>
-        <button onclick="setPlotMode('3d')" id="btnMode3D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg active:scale-95">3D Açı</button>
-        <button onclick="setPlotMode('2d')" id="btnMode2D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg active:scale-95">2D Kuş</button>
-        <button onclick="setPlotMode('wireframe')" id="btnModeWire" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg active:scale-95">Tel Örgü</button>
-        <button onclick="setPlotMode('depth')" id="btnModeDepth" class="bg-emerald-700 text-white font-bold py-1.5 rounded-lg active:scale-95">Derinlik</button>
+        <button onclick="setPlotMode('surface')" id="btnModeUydu" class="bg-purple-600 text-white font-bold py-1.5 rounded-lg">Uydu</button>
+        <button onclick="setPlotMode('3d')" id="btnMode3D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">3D Açı</button>
+        <button onclick="setPlotMode('2d')" id="btnMode2D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">2D Kuş</button>
+        <button onclick="setPlotMode('wireframe')" id="btnModeWire" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">Tel Örgü</button>
+        <button onclick="setPlotMode('depth')" id="btnModeDepth" class="bg-emerald-700 text-white font-bold py-1.5 rounded-lg">Derinlik</button>
       </div>
       <div class="grid grid-cols-3 gap-1.5">
-        <button onclick="startLiveScan()" class="bg-emerald-600 text-white font-bold text-xs rounded-xl py-2 shadow active:scale-95">BAŞLAT</button>
-        <button onclick="stopScan()" class="bg-amber-800 text-white font-bold text-xs rounded-xl py-2 shadow active:scale-95">DURDUR</button>
-        <button onclick="saveScan()" class="bg-blue-600 text-white font-bold text-xs rounded-xl py-2 shadow active:scale-95">KAYDET</button>
+        <button onclick="startLiveScan()" class="bg-emerald-600 text-white font-bold text-xs rounded-xl py-2.5 shadow">BAŞLAT</button>
+        <button onclick="stopScan()" class="bg-amber-800 text-white font-bold text-xs rounded-xl py-2.5 shadow">DURDUR</button>
+        <button onclick="saveScan()" class="bg-blue-600 text-white font-bold text-xs rounded-xl py-2.5 shadow">KAYDET</button>
       </div>
       <div class="grid grid-cols-3 gap-1.5">
-        <button onclick="clearScan()" class="bg-rose-800 text-white font-bold text-xs rounded-xl py-2 shadow active:scale-95">TEMİZLE</button>
-        <button onclick="connectBluetoothDevice()" class="bg-amber-400 text-black font-bold text-xs rounded-xl py-2 shadow active:scale-95">BAĞLAN</button>
-        <button onclick="showPage('pageMenu')" class="bg-slate-700 text-white font-bold text-xs rounded-xl py-2 shadow active:scale-95">MENÜ</button>
+        <button onclick="clearScan()" class="bg-rose-800 text-white font-bold text-xs rounded-xl py-2.5 shadow">TEMİZLE</button>
+        <button onclick="connectBluetoothDevice()" class="bg-amber-400 text-black font-bold text-xs rounded-xl py-2.5 shadow">BAĞLAN</button>
+        <button onclick="showPage('pageMenu')" class="bg-slate-700 text-white font-bold text-xs rounded-xl py-2.5 shadow">MENÜ</button>
       </div>
     </footer>
   </div>
@@ -190,7 +192,7 @@
     let map = null;
     let satelliteLayer;
     let scanMarker = null;
-    let scanRectangle = null; // Yeşil Tarama Alanı
+    let scanRectangle = null;
 
     let savedScans = [
       { id: 1, name: "Tarama_01_Bolge_A.dat", date: "24.07.2026 - 21:10" },
@@ -256,8 +258,8 @@
             <div class="text-[10px] text-gray-400">${scan.date}</div>
           </div>
           <div class="flex gap-1.5">
-            <button onclick="loadScan(${scan.id})" class="bg-blue-600 px-2.5 py-1.5 rounded-lg font-bold active:scale-95">Aç</button>
-            <button onclick="deleteSingleScan(${scan.id})" class="bg-rose-700 px-2.5 py-1.5 rounded-lg font-bold active:scale-95">Sil</button>
+            <button onclick="loadScan(${scan.id})" class="bg-blue-600 px-2.5 py-1.5 rounded-lg font-bold">Aç</button>
+            <button onclick="deleteSingleScan(${scan.id})" class="bg-rose-700 px-2.5 py-1.5 rounded-lg font-bold">Sil</button>
           </div>
         `;
         container.appendChild(item);
@@ -288,12 +290,10 @@
       if(mode === 'depth') document.getElementById('btnModeDepth').className = "bg-emerald-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
     }
 
-    // Gelişmiş Yer Arama (Şehir veya Koordinat)
     function searchLocation() {
       let query = document.getElementById('searchLocationInput').value.trim();
       if(!query) return;
 
-      // Örnek bazı popüler bölgeler veya genel aramalar için simülasyon/koordinat yönlendirmesi
       let targetLat = 38.710457;
       let targetLng = 27.908082;
       let zoomLevel = 17;
@@ -308,7 +308,6 @@
       } else if(lowerQ.includes('manisa') || lowerQ.includes('gölmarmara')) {
         targetLat = 38.710457; targetLng = 27.908082; zoomLevel = 17;
       } else {
-        // Rastgele farklı bir konuma taşı ki hep aynı yerde kalmasın
         targetLat += (Math.random() - 0.5) * 0.05;
         targetLng += (Math.random() - 0.5) * 0.05;
       }
@@ -335,19 +334,16 @@
       }
     }
 
-    // BAŞLAT Tuşuna Basınca Harita Üzerinde Yeşil Alan Oluşturma ve Analiz
     function startLiveScan() {
       document.getElementById('signalDisplay').innerText = "SİNYAL: 94";
       document.getElementById('scanLaserLine').style.display = 'block';
 
       let center = map.getCenter();
       
-      // Eğer daha önce yeşil alan varsa sil
       if(scanRectangle) {
         map.removeLayer(scanRectangle);
       }
 
-      // Harita merkezinde yeşil şeffaf tarama alanı (kare) oluştur
       let bounds = [
         [center.lat - 0.0008, center.lng - 0.0012],
         [center.lat + 0.0008, center.lng + 0.0012]
@@ -403,4 +399,17 @@
 
     function clearScan() {
       document.getElementById('analysisSummaryPanel').style.display = 'none';
-      if(scanRectangle) { map.
+      if(scanRectangle) { map.removeLayer(scanRectangle); scanRectangle = null; }
+      alert("🧹 Ekran ve tarama alanı temizlendi.");
+    }
+
+    function activateLicense() {
+      if(document.getElementById('licenseInput').value === "ERGIN2026") {
+        showPage('pageMenu');
+      } else {
+        alert("❌ Hatalı Kod!");
+      }
+    }
+  </script>
+</body>
+</html>
