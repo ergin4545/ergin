@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#00a2ff">
-  <title>ERGİN 3D Pro - 3D Görselleştirme</title>
+  <title>ERGİN 3D Pro - Pulse System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Plotly 3D Kütüphanesi -->
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
@@ -35,7 +35,7 @@
 
     <div class="my-auto space-y-4 py-4 w-full">
       <div class="glass-card p-4 rounded-2xl text-xs space-y-2">
-        <p><strong class="text-gray-300">Cihaz Kimliği:</strong> ERGIN-3D-8842</p>
+        <p><strong class="text-gray-300">Cihaz Kimliği:</strong> ERGIN-PULSE-3D</p>
         <p><strong class="text-gray-300">Durum:</strong> <span id="licenseStatusBadge" class="text-amber-400 font-bold">Lisans Bekleniyor</span></p>
       </div>
 
@@ -54,30 +54,20 @@
     <div class="flex justify-between items-center pt-1 px-1">
       <h1 class="text-2xl font-black text-white tracking-wider">ERGİN 3D</h1>
       <div class="flex items-center gap-1 bg-black/40 px-2 py-1 rounded-lg border border-white/10 text-xs">
-        <span class="text-emerald-400 font-bold">7.8V</span>
-        <span>🔋</span>
+        <span class="text-emerald-400 font-bold">PULSE</span>
+        <span>⚡</span>
       </div>
     </div>
 
     <div class="grid grid-cols-2 gap-3.5 my-auto py-2">
       <button onclick="showPage('pageScan')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
         <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">🛰️</div>
-        <span class="text-xs font-semibold leading-tight">Uydu & Yer Analizi</span>
-      </button>
-
-      <button onclick="showPage('pageLrl')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
-        <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">📡</div>
-        <span class="text-xs font-semibold leading-tight">LRL-ION Taraması</span>
-      </button>
-
-      <button onclick="showPage('pageSimultaneous')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
-        <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">📈</div>
-        <span class="text-xs font-semibold leading-tight">Gerçek Zamanlı Tarama</span>
+        <span class="text-xs font-semibold leading-tight">Canlı 3D Tarama Ekranı</span>
       </button>
 
       <button onclick="openSavedScansPage()" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
         <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">📁</div>
-        <span class="text-xs font-semibold leading-tight">Tarama Aç</span>
+        <span class="text-xs font-semibold leading-tight">Kayıtlı Taramalar</span>
       </button>
 
       <button onclick="showPage('pageLicence')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
@@ -93,7 +83,7 @@
 
     <div class="space-y-2 pb-1">
       <div class="grid grid-cols-2 gap-3">
-        <button onclick="connectBluetooth()" class="glass-pill py-3 px-4 rounded-full flex items-center justify-center gap-2 font-medium text-xs active:scale-95">
+        <button onclick="connectBluetoothDevice()" class="glass-pill py-3 px-4 rounded-full flex items-center justify-center gap-2 font-medium text-xs active:scale-95">
           <span class="bg-blue-600 p-1.5 rounded-full text-xs text-white">📶</span>
           <span class="italic text-gray-100" id="btMainBtnText">Cihaza Bağlan</span>
         </button>
@@ -106,11 +96,11 @@
     </div>
   </div>
 
-  <!-- UYDU + YER ANALİZİ EKRANI -->
+  <!-- 3D TARAMA EKRANI -->
   <div id="pageScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-1">
     <header class="flex flex-col gap-1.5 px-3 py-2 text-xs border border-white/20 glass-card rounded-2xl">
       <div class="flex justify-between items-center">
-        <div class="font-bold text-cyan-400">ERGİN 3D <span id="coordDisplay" class="text-gray-300 ml-1">38.7121, 27.9157</span></div>
+        <div class="font-bold text-cyan-400">PULSE 3D <span id="coordDisplay" class="text-gray-300 ml-1">GPS: Bekleniyor...</span></div>
         <div id="signalDisplay" class="font-bold text-amber-400">SİNYAL: 0</div>
         <div id="btStatus" class="text-amber-400 font-bold">🔴 Bağlı Değil</div>
       </div>
@@ -123,26 +113,26 @@
 
     <footer class="flex flex-col gap-1.5 glass-card p-2 rounded-2xl">
       <div class="grid grid-cols-5 gap-1 text-[10px]">
-        <button onclick="setPlotMode('surface')" id="btnModeUydu" class="bg-purple-600 text-white font-bold py-1.5 rounded-lg active:scale-95">Uydu</button>
+        <button onclick="setPlotMode('surface')" id="btnModeUydu" class="bg-purple-600 text-white font-bold py-1.5 rounded-lg active:scale-95">Yüzey</button>
         <button onclick="setPlotMode('3d')" id="btnMode3D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg active:scale-95">3D Açı</button>
         <button onclick="setPlotMode('2d')" id="btnMode2D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg active:scale-95">2D Kuş</button>
         <button onclick="setPlotMode('wireframe')" id="btnModeWire" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg active:scale-95">Tel Örgü</button>
         <button onclick="setPlotMode('depth')" id="btnModeDepth" class="bg-emerald-700 text-white font-bold py-1.5 rounded-lg active:scale-95">Derinlik</button>
       </div>
       <div class="grid grid-cols-3 gap-1.5">
-        <button onclick="startScan()" class="bg-emerald-600 text-white font-bold text-xs rounded-xl py-2 shadow">BAŞLAT</button>
+        <button onclick="startLiveScan()" class="bg-emerald-600 text-white font-bold text-xs rounded-xl py-2 shadow">VERİ AL</button>
         <button onclick="stopScan()" class="bg-amber-800 text-white font-bold text-xs rounded-xl py-2 shadow">DURDUR</button>
         <button onclick="saveScan()" class="bg-blue-600 text-white font-bold text-xs rounded-xl py-2 shadow">KAYDET</button>
       </div>
       <div class="grid grid-cols-3 gap-1.5">
         <button onclick="clearScan()" class="bg-rose-800 text-white font-bold text-xs rounded-xl py-2 shadow">TEMİZLE</button>
-        <button onclick="connectBluetooth()" class="bg-amber-400 text-black font-bold text-xs rounded-xl py-2 shadow">BAĞLAN</button>
+        <button onclick="connectBluetoothDevice()" class="bg-amber-400 text-black font-bold text-xs rounded-xl py-2 shadow">BAĞLAN</button>
         <button onclick="showPage('pageMenu')" class="bg-slate-700 text-white font-bold text-xs rounded-xl py-2 shadow">MENÜ</button>
       </div>
     </footer>
   </div>
 
-  <!-- TARAMA AÇ EKRANI -->
+  <!-- KAYITLI TARAMALAR EKRANI -->
   <div id="pageOpenScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
     <div class="flex justify-between items-center pb-2 border-b border-white/20">
       <h2 class="text-base font-bold text-cyan-400">Kayıtlı Taramalar</h2>
@@ -162,35 +152,18 @@
       <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
     </div>
     <div class="glass-card p-4 rounded-2xl my-auto text-xs space-y-2 text-gray-200">
-      <p>• ERGİN 3D Pro 3D Görselleştirme Sürümü</p>
-      <p>• Sürüm: v4.7 Map Fix</p>
+      <p>• ERGİN 3D Pulse System Bağlantı Yazılımı</p>
+      <p>• Donanım: Bluetooth BLE / Seri Veri Entegrasyonu</p>
     </div>
-    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
-  </div>
-
-  <div id="pageLrl" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
-    <div class="flex justify-between items-center pb-2 border-b border-white/20">
-      <h2 class="text-base font-bold text-cyan-400">LRL-ION Taraması</h2>
-      <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
-    </div>
-    <div class="text-center my-auto text-gray-300 text-xs">Modül Hazırlanıyor...</div>
-    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
-  </div>
-
-  <div id="pageSimultaneous" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
-    <div class="flex justify-between items-center pb-2 border-b border-white/20">
-      <h2 class="text-base font-bold text-cyan-400">Gerçek Zamanlı Tarama</h2>
-      <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
-    </div>
-    <div class="text-center my-auto text-gray-300 text-xs">Canlı Veri Modu...</div>
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
 
   <script>
     let isLicensed = localStorage.getItem("ergin_licensed") === "true";
     let bluetoothDevice = null;
+    let bluetoothCharacteristic = null;
     let currentPlotMode = 'surface';
-    let currentZValues = null;
+    let currentZValues = Array(10).fill(0).map(() => Array(10).fill(0));
 
     window.onload = function() {
       if (!isLicensed) {
@@ -198,7 +171,20 @@
       } else {
         showPage('pageMenu');
       }
+      initGPS();
     };
+
+    function initGPS() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          let lat = position.coords.latitude.toFixed(4);
+          let lon = position.coords.longitude.toFixed(4);
+          document.getElementById('coordDisplay').innerText = `${lat}, ${lon}`;
+        }, () => {
+          document.getElementById('coordDisplay').innerText = "Konum Alınamadı";
+        });
+      }
+    }
 
     function showPage(pageId) {
       if (pageId !== 'pageLicence' && !isLicensed) {
@@ -211,7 +197,7 @@
       if (pageId === 'pageScan') {
         setTimeout(() => {
           renderPlot();
-          if (typeof Plotly !== 'undefined' && document.getElementById('scanPlot').data) {
+          if (typeof Plotly !== 'undefined') {
             Plotly.Plots.resize('scanPlot');
           }
         }, 200);
@@ -221,7 +207,6 @@
     function renderPlot() {
       if (typeof Plotly === 'undefined') return;
 
-      let zData = currentZValues || Array(10).fill(0).map(() => Array(10).fill(0));
       let plotType = 'surface';
       let colorscale = 'Jet';
       let showScale = false;
@@ -235,7 +220,7 @@
       }
 
       let data = [{
-        z: zData,
+        z: currentZValues,
         type: plotType,
         colorscale: colorscale,
         showscale: showScale
@@ -253,7 +238,7 @@
         }
       };
 
-      Plotly.react('scanPlot', data, layout, { responsive: true, displayModeBar: false });
+      Plotly.react('scanPlot', data, layout, { responsive: true, displayModeBar: false, scrollZoom: true });
     }
 
     function setPlotMode(mode) {
@@ -272,20 +257,51 @@
       setTimeout(() => { Plotly.Plots.resize('scanPlot'); }, 50);
     }
 
-    function startScan() {
-      document.getElementById('signalDisplay').innerText = "SİNYAL: 85";
-      document.getElementById('signalDisplay').className = "font-bold text-emerald-400";
-      
-      currentZValues = [];
-      for (let i = 0; i < 10; i++) {
-        let row = [];
-        for (let j = 0; j < 10; j++) {
-          row.push(Math.sin(i * 0.6) * Math.cos(j * 0.6) * 15 + Math.random() * 5);
-        }
-        currentZValues.push(row);
+    // BLUETOOTH BAĞLANTI VE GERÇEK VERİ OKUMA
+    async function connectBluetoothDevice() {
+      if (!navigator.bluetooth) {
+        alert("⚠️ Tarayıcınız Bluetooth desteklemiyor!");
+        return;
       }
+      try {
+        bluetoothDevice = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: [/* Cihazının servis UUID'si varsa buraya eklenebilir */]
+        });
+
+        const server = await bluetoothDevice.gatt.connect();
+        document.getElementById('btStatus').innerText = "🟢 Bağlandı";
+        document.getElementById('btStatus').className = "text-emerald-400 font-bold";
+        document.getElementById('btMainBtnText').innerText = bluetoothDevice.name || "Cihaz Bağlı";
+        alert("✅ Pulse cihazı başarıyla bağlandı!");
+
+      } catch (error) {
+        console.log("Bluetooth bağlantı hatası: ", error);
+        alert("Bluetooth bağlantısı kurulamadı.");
+      }
+    }
+
+    // Cihazdan veri gelmeye başladığında matrisi güncelleyen fonksiyon
+    function handleIncomingData(rawPulseValue) {
+      // Gelen ham veriyi 10x10 matrise kaydırarak ekrana yansıt
+      for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 9; j++) {
+          currentZValues[i][j] = currentZValues[i][j + 1];
+        }
+      }
+      currentZValues[9][9] = rawPulseValue;
+      document.getElementById('signalDisplay').innerText = `SİNYAL: ${Math.round(rawPulseValue)}`;
       renderPlot();
-      setTimeout(() => { Plotly.Plots.resize('scanPlot'); }, 50);
+    }
+
+    function startLiveScan() {
+      if (!bluetoothDevice || !bluetoothDevice.gatt.connected) {
+        alert("⚠️ Önce 'BAĞLAN' butonuna basarak Pulse cihazınızı eşleştirin!");
+        return;
+      }
+      document.getElementById('signalDisplay').innerText = "SİNYAL: Aktif";
+      document.getElementById('signalDisplay').className = "font-bold text-emerald-400";
+      alert("📡 Cihazdan canlı veri akışı bekleniyor...");
     }
 
     function stopScan() {
@@ -294,20 +310,16 @@
     }
 
     function saveScan() {
-      if (!currentZValues) {
-        alert("⚠️ Kaydedilecek aktif tarama verisi bulunamadı!");
-        return;
-      }
-      let scans = JSON.parse(localStorage.getItem("ergin_saved_scans") || "[]");
-      scans.push({ id: Date.now(), date: new Date().toLocaleString('tr-TR'), signal: "SİNYAL: 85", zValues: currentZValues });
-      localStorage.setItem("ergin_saved_scans", JSON.stringify(scans));
-      alert("💾 Başarıyla kaydedildi!");
+      let scans = JSON.parse(localStorage.getItem("ergin_pulse_scans") || "[]");
+      scans.push({ id: Date.now(), date: new Date().toLocaleString('tr-TR'), zValues: currentZValues });
+      localStorage.setItem("ergin_pulse_scans", JSON.stringify(scans));
+      alert("💾 Tarama başarıyla kaydedildi!");
     }
 
     function openSavedScansPage() {
       showPage('pageOpenScan');
       let container = document.getElementById('savedScansList');
-      let scans = JSON.parse(localStorage.getItem("ergin_saved_scans") || "[]");
+      let scans = JSON.parse(localStorage.getItem("ergin_pulse_scans") || "[]");
       if (scans.length === 0) {
         container.innerHTML = `<div class="text-center text-gray-400 my-auto">Kayıtlı tarama bulunmuyor.</div>`;
         return;
@@ -322,12 +334,10 @@
     }
 
     function loadScan(id) {
-      let scans = JSON.parse(localStorage.getItem("ergin_saved_scans") || "[]");
+      let scans = JSON.parse(localStorage.getItem("ergin_pulse_scans") || "[]");
       let found = scans.find(s => s.id === id);
       if (found) {
-        currentZValues = found.zValues || [[1,2],[3,4]];
-        document.getElementById('signalDisplay').innerText = found.signal || "SİNYAL: 85";
-        document.getElementById('signalDisplay').className = "font-bold text-emerald-400";
+        currentZValues = found.zValues;
         showPage('pageScan');
       } else {
         alert("⚠️ Kayıt bulunamadı!");
@@ -335,11 +345,10 @@
     }
 
     function clearScan() {
-      currentZValues = null;
+      currentZValues = Array(10).fill(0).map(() => Array(10).fill(0));
       document.getElementById('signalDisplay').innerText = "SİNYAL: 0";
       document.getElementById('signalDisplay').className = "font-bold text-amber-400";
       renderPlot();
-      setTimeout(() => { Plotly.Plots.resize('scanPlot'); }, 50);
     }
 
     function activateLicense() {
@@ -356,21 +365,6 @@
 
     function exitApp() {
       if (confirm("Çıkmak istiyor musunuz?")) window.close();
-    }
-
-    async function connectBluetooth() {
-      if (!navigator.bluetooth) {
-        alert("⚠️ Tarayıcınız Bluetooth desteklemiyor.");
-        return;
-      }
-      try {
-        bluetoothDevice = await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
-        document.getElementById('btStatus').innerText = "🟢 Bağlandı";
-        document.getElementById('btStatus').className = "text-emerald-400 font-bold";
-        document.getElementById('btMainBtnText').innerText = bluetoothDevice.name || "Cihaz Bağlı";
-      } catch (error) {
-        console.log(error);
-      }
     }
   </script>
 </body>
