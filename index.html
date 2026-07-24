@@ -2,68 +2,398 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ERGİN 3D</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>ERGİN 3D Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <style>
+    body {
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+  </style>
 </head>
-<body class="bg-black text-white h-screen flex flex-col justify-between p-3 select-none">
+<body class="bg-black text-white h-screen select-none overflow-hidden font-sans">
 
-  <!-- Header -->
-  <header class="flex justify-between items-center py-1 border-b border-gray-800">
-    <div class="flex items-center gap-2">
+  <!-- ==================== 1. EKRAN: ANA MENÜ ==================== -->
+  <div id="pageMenu" class="h-full flex flex-col justify-between p-4">
+    <!-- Üst Bar -->
+    <div class="flex justify-between items-center py-2 border-b border-gray-800">
       <h1 class="text-xl font-black text-cyan-400 tracking-wider">ERGİN 3D</h1>
-    </div>
-    <div class="text-2xl">🇹🇷</div>
-  </header>
-
-  <!-- 6'lı Izgara Menü -->
-  <main class="grid grid-cols-2 gap-3 my-auto">
-    
-    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
-      <div class="text-3xl mb-1">🗺️</div>
-      <span class="font-bold text-sm leading-tight">3D Ground Scan</span>
-    </button>
-
-    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
-      <div class="text-3xl mb-1">📡</div>
-      <span class="font-bold text-sm leading-tight">Long Range Locator</span>
-    </button>
-
-    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
-      <div class="text-3xl mb-1">📈</div>
-      <span class="font-bold text-sm leading-tight">Simultaneous Data</span>
-    </button>
-
-    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
-      <div class="text-3xl mb-1">📁</div>
-      <span class="font-bold text-sm leading-tight">Open Scan</span>
-    </button>
-
-    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
-      <div class="text-3xl mb-1">🔑</div>
-      <span class="font-bold text-sm leading-tight">Licence</span>
-    </button>
-
-    <button onclick="window.location.href='scan.html'" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition border border-gray-300">
-      <div class="text-3xl mb-1">ℹ️</div>
-      <span class="font-bold text-sm leading-tight">Information</span>
-    </button>
-
-  </main>
-
-  <!-- Alt Durum Çubuğu -->
-  <footer class="bg-gray-900 border border-gray-800 rounded-xl p-2 flex justify-between items-center text-xs">
-    <div class="bg-gray-800 text-amber-400 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 border border-gray-700">
-      🔵 Bluetooth Bekleniyor
+      <span class="text-xl">🇹🇷</span>
     </div>
 
-    <div class="flex items-center gap-3">
-      <div class="text-left">
-        <div class="text-gray-400 font-medium">ERGİN 3D-X</div>
+    <!-- Menü Butonları Izgarası -->
+    <div class="grid grid-cols-2 gap-3 my-auto">
+      <button onclick="showPage('pageScan')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
+        <span class="text-2xl mb-1">🗺️</span>
+        <span>3D Ground Scan</span>
+      </button>
+
+      <button onclick="showPage('pageLrl')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
+        <span class="text-2xl mb-1">📡</span>
+        <span>Long Range Locator</span>
+      </button>
+
+      <button onclick="showPage('pageSimultaneous')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
+        <span class="text-2xl mb-1">📈</span>
+        <span>Simultaneous Data</span>
+      </button>
+
+      <button onclick="showPage('pageOpenScan')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
+        <span class="text-2xl mb-1">📁</span>
+        <span>Open Scan</span>
+      </button>
+
+      <button onclick="showPage('pageLicence')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
+        <span class="text-2xl mb-1">🔑</span>
+        <span>Licence</span>
+      </button>
+
+      <button onclick="showPage('pageInfo')" class="bg-gradient-to-b from-gray-200 to-gray-400 text-black p-4 rounded-xl flex flex-col items-center justify-center font-bold text-sm shadow-lg active:scale-95 transition">
+        <span class="text-2xl mb-1">ℹ️</span>
+        <span>Information</span>
+      </button>
+    </div>
+
+    <!-- Alt Bilgi Barı -->
+    <div class="flex justify-between items-center bg-gray-950 p-3 rounded-xl border border-gray-800 text-xs">
+      <div class="flex items-center gap-2 text-yellow-400 font-bold">
+        <span class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></span>
+        <span>Bluetooth Bekleniyor</span>
+      </div>
+      <div class="text-right text-gray-400">
+        <div class="font-bold text-white">ERGİN 3D-X</div>
         <div class="text-emerald-400 font-bold">🔋 7.81 V</div>
       </div>
     </div>
-  </footer>
+  </div>
 
+  <!-- ==================== 2. EKRAN: 3D TARAMA ==================== -->
+  <div id="pageScan" class="h-full flex flex-col justify-between p-2 hidden">
+    <!-- Üst Bilgi Barı -->
+    <header class="flex justify-between items-center px-2 py-1.5 text-xs border-b border-gray-800 bg-gray-950 rounded-lg shrink-0">
+      <div class="font-bold text-cyan-400">
+        ERGİN 3D <span id="xyText" class="ml-1 text-white text-[10px]">X:1 Y:1</span>
+      </div>
+      <div id="signalVal" class="font-black text-yellow-400 text-xs">SİNYAL: 0</div>
+      <div id="btStatus" class="flex items-center gap-1 text-amber-400 font-bold text-[11px]">
+        🔴 Bağlı Değil
+      </div>
+    </header>
+
+    <!-- 3D Grafik Alanı -->
+    <main class="relative w-full flex-1 bg-black my-1.5 rounded-xl border border-gray-800 overflow-hidden min-h-[200px]">
+      <video id="cameraStream" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-60"></video>
+      <div id="scanPlot" class="relative w-full h-full z-10"></div>
+    </main>
+
+    <!-- Kontrol Paneli -->
+    <footer class="flex flex-col gap-2 bg-gray-950 p-2 rounded-xl border border-gray-800 shrink-0 mb-4">
+      
+      <!-- Üst Araçlar -->
+      <div class="grid grid-cols-5 gap-1">
+        <button onclick="toggleCamera()" class="bg-indigo-600 text-white rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
+          📷 <span>Kamera</span>
+        </button>
+        <button onclick="setView('3d')" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
+          🧊 <span>3D Açı</span>
+        </button>
+        <button onclick="setView('2d')" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
+          🗺️ <span>2D Kuş</span>
+        </button>
+        <button onclick="toggleWireframe()" class="bg-gray-200 text-black rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
+          🕸️ <span>Tel Örgü</span>
+        </button>
+        <button onclick="showDepth()" class="bg-emerald-600 text-white rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
+          📏 <span>Derinlik</span>
+        </button>
+      </div>
+
+      <!-- Eşik Ayarı -->
+      <div class="flex gap-2 items-center bg-gray-900 p-1.5 rounded-lg border border-gray-800">
+        <div class="flex flex-col gap-1 w-1/2">
+          <div class="text-[8px] text-center font-bold text-gray-400">BOŞLUK ◄► METAL</div>
+          <div class="h-2 rounded w-full border border-gray-700" style="background: linear-gradient(to right, blue, cyan, green, yellow, red);"></div>
+        </div>
+        <div class="flex flex-col w-1/2 text-[10px]">
+          <div class="flex justify-between font-bold text-gray-300">
+            <span>Eşik:</span>
+            <span id="threshText" class="text-cyan-400">0</span>
+          </div>
+          <input type="range" id="threshSlider" min="-50" max="50" value="0" oninput="updateThreshold(this.value)" class="w-full accent-cyan-400 h-1 bg-gray-700 rounded cursor-pointer">
+        </div>
+      </div>
+
+      <!-- BAŞLAT VE DURDUR BUTONLARI -->
+      <div class="grid grid-cols-2 gap-1.5">
+        <button id="btnStart" onclick="startScanning()" class="bg-emerald-600 text-white font-bold text-xs rounded py-2 flex items-center justify-center gap-1 active:scale-95">
+          ▶️ BAŞLAT
+        </button>
+        <button id="btnStop" onclick="stopScanning()" class="bg-amber-600 text-white font-bold text-xs rounded py-2 flex items-center justify-center gap-1 active:scale-95 opacity-50" disabled>
+          ⏹️ DURDUR
+        </button>
+      </div>
+
+      <!-- Alt Ana İşlem Butonları -->
+      <div class="grid grid-cols-3 gap-1.5">
+        <button onclick="clearMap()" class="bg-rose-900 text-rose-100 border border-rose-700 font-bold text-xs rounded py-2 flex items-center justify-center active:scale-95">
+          🗑️ TEMİZLE
+        </button>
+        <button onclick="connectBluetooth()" class="bg-amber-400 text-black font-bold text-xs rounded py-2 flex items-center justify-center active:scale-95">
+          🔵 CİHAZA BAĞLAN
+        </button>
+        <button onclick="showPage('pageMenu')" class="bg-gray-700 text-white font-bold text-xs rounded py-2 flex items-center justify-center active:scale-95">
+          🏠 MENÜ
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ==================== 3. EKRAN: LİSANS ==================== -->
+  <div id="pageLicence" class="h-full flex flex-col justify-between p-4 hidden">
+    <div class="flex justify-between items-center py-2 border-b border-gray-800">
+      <h2 class="text-lg font-bold text-cyan-400">Lisans Bilgileri</h2>
+      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
+    </div>
+    <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 my-auto text-sm space-y-2">
+      <p><strong class="text-gray-400">Lisans Sahibi:</strong> ERGİN 3D Kullanıcısı</p>
+      <p><strong class="text-gray-400">Cihaz Kimliği:</strong> ERGIN-3D-8842</p>
+      <p><strong class="text-gray-400">Durum:</strong> <span class="text-emerald-400 font-bold">Lisanslı / Aktif</span></p>
+    </div>
+    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
+  </div>
+
+  <!-- ==================== 4. EKRAN: BİLGİ / DİĞER ==================== -->
+  <div id="pageInfo" class="h-full flex flex-col justify-between p-4 hidden">
+    <div class="flex justify-between items-center py-2 border-b border-gray-800">
+      <h2 class="text-lg font-bold text-cyan-400">Cihaz Bilgisi</h2>
+      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
+    </div>
+    <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 my-auto text-sm space-y-2 text-gray-300">
+      <p>• ERGİN 3D Pro Yer Altı Görüntüleme Sistemi</p>
+      <p>• Yazılım Sürümü: v2.4 Pro</p>
+      <p>• Bluetooth Bağlantısı: JDY-33 Destekli</p>
+    </div>
+    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
+  </div>
+
+  <div id="pageLrl" class="h-full flex flex-col justify-between p-4 hidden">
+    <div class="flex justify-between items-center py-2 border-b border-gray-800">
+      <h2 class="text-lg font-bold text-cyan-400">Long Range Locator</h2>
+      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
+    </div>
+    <div class="text-center my-auto text-gray-400">Alan Taraması Modı Hazırlanıyor...</div>
+    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
+  </div>
+
+  <div id="pageSimultaneous" class="h-full flex flex-col justify-between p-4 hidden">
+    <div class="flex justify-between items-center py-2 border-b border-gray-800">
+      <h2 class="text-lg font-bold text-cyan-400">Simultaneous Data</h2>
+      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
+    </div>
+    <div class="text-center my-auto text-gray-400">Canlı Veri Akış Modu...</div>
+    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
+  </div>
+
+  <div id="pageOpenScan" class="h-full flex flex-col justify-between p-4 hidden">
+    <div class="flex justify-between items-center py-2 border-b border-gray-800">
+      <h2 class="text-lg font-bold text-cyan-400">Open Scan</h2>
+      <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
+    </div>
+    <div class="text-center my-auto text-gray-400">Kayıtlı Taramalar Klasörü Boş.</div>
+    <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
+  </div>
+
+
+  <!-- ==================== JAVASCRIPT MANTIĞI ==================== -->
+  <script>
+    // Sayfa Değiştirme Fonksiyonu
+    function showPage(pageId) {
+      const pages = ['pageMenu', 'pageScan', 'pageLicence', 'pageInfo', 'pageLrl', 'pageSimultaneous', 'pageOpenScan'];
+      pages.forEach(p => {
+        document.getElementById(p).classList.add('hidden');
+      });
+      document.getElementById(pageId).classList.remove('hidden');
+
+      if (pageId === 'pageScan') {
+        setTimeout(renderPlot, 100);
+      }
+    }
+
+    // --- 3D Grafik ve Bluetooth Kodları ---
+    let GRID_SIZE = 10;
+    let rawGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
+    let displayGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
+    let currentRow = 0;
+    let currentCol = 0;
+    let isWireframe = false;
+    let thresholdValue = 0;
+    let bluetoothDevice;
+    let cameraStreamActive = false;
+    let isScanning = false;
+
+    function renderPlot(cameraEye) {
+      if (typeof Plotly === 'undefined') return;
+
+      let trace = {
+        z: displayGrid,
+        type: 'surface',
+        colorscale: 'Jet',
+        showscale: false,
+        hidesurface: isWireframe,
+        wireframe: {
+          x: { show: true, color: '#444444', width: 1 },
+          y: { show: true, color: '#444444', width: 1 }
+        }
+      };
+
+      let layout = {
+        autosize: true,
+        margin: { l: 0, r: 0, b: 0, t: 0 },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        scene: {
+          xaxis: { title: '', color: '#ffffff', gridcolor: '#333' },
+          yaxis: { title: '', color: '#ffffff', gridcolor: '#333' },
+          zaxis: { title: '', color: '#ffffff', gridcolor: '#333' },
+          camera: cameraEye || { eye: { x: 1.3, y: 1.3, z: 1.3 } }
+        }
+      };
+
+      Plotly.react('scanPlot', [trace], layout, { responsive: true, displayModeBar: false });
+    }
+
+    function startScanning() {
+      isScanning = true;
+      document.getElementById('btnStart').classList.add('opacity-50');
+      document.getElementById('btnStart').disabled = true;
+      document.getElementById('btnStop').classList.remove('opacity-50');
+      document.getElementById('btnStop').disabled = false;
+    }
+
+    function stopScanning() {
+      isScanning = false;
+      document.getElementById('btnStart').classList.remove('opacity-50');
+      document.getElementById('btnStart').disabled = false;
+      document.getElementById('btnStop').classList.add('opacity-50');
+      document.getElementById('btnStop').disabled = true;
+    }
+
+    async function connectBluetooth() {
+      try {
+        document.getElementById('btStatus').innerText = "🔍 Aranıyor...";
+        bluetoothDevice = await navigator.bluetooth.requestDevice({
+          filters: [{ namePrefix: 'JDY' }, { namePrefix: 'jdy' }],
+          optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+        });
+
+        const server = await bluetoothDevice.gatt.connect();
+        document.getElementById('btStatus').innerText = "🟢 Bağlandı";
+        document.getElementById('btStatus').className = "text-emerald-400 font-bold text-[11px]";
+
+        const service = await server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
+        const characteristic = await service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
+
+        await characteristic.startNotifications();
+        characteristic.addEventListener('characteristicvaluechanged', handleDataReceived);
+      } catch (error) {
+        document.getElementById('btStatus').innerText = "🔴 Hata";
+        alert("Bağlantı Hatası: " + error.message);
+      }
+    }
+
+    function handleDataReceived(event) {
+      if (!isScanning) return;
+
+      let decoder = new TextDecoder('utf-8');
+      let rawString = decoder.decode(event.target.value).trim();
+      let values = rawString.split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
+
+      if (values.length > 0) {
+        for (let val of values) {
+          rawGrid[currentRow][currentCol] = val;
+          document.getElementById('signalVal').innerText = "SİNYAL: " + val;
+          document.getElementById('xyText').innerText = `X:${currentCol + 1} Y:${currentRow + 1}`;
+
+          currentCol++;
+          if (currentCol >= GRID_SIZE) {
+            currentCol = 0;
+            currentRow = (currentRow + 1) % GRID_SIZE;
+          }
+        }
+        applyFilterAndRender();
+      }
+    }
+
+    function updateThreshold(val) {
+      thresholdValue = parseInt(val);
+      document.getElementById('threshText').innerText = thresholdValue;
+      applyFilterAndRender();
+    }
+
+    function applyFilterAndRender() {
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          let v = rawGrid[r][c];
+          if (Math.abs(v) < Math.abs(thresholdValue)) {
+            displayGrid[r][c] = 0;
+          } else {
+            displayGrid[r][c] = v;
+          }
+        }
+      }
+      renderPlot();
+    }
+
+    async function toggleCamera() {
+      let videoElem = document.getElementById('cameraStream');
+      if (!cameraStreamActive) {
+        try {
+          let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+          videoElem.srcObject = stream;
+          videoElem.classList.remove('hidden');
+          cameraStreamActive = true;
+        } catch (e) {
+          alert("Kamera izni verilemedi: " + e.message);
+        }
+      } else {
+        let stream = videoElem.srcObject;
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        videoElem.classList.add('hidden');
+        cameraStreamActive = false;
+      }
+    }
+
+    function clearMap() {
+      rawGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
+      displayGrid = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
+      currentRow = 0;
+      currentCol = 0;
+      document.getElementById('xyText').innerText = "X:1 Y:1";
+      document.getElementById('signalVal').innerText = "SİNYAL: 0";
+      renderPlot();
+    }
+
+    function setView(mode) {
+      if (mode === '2d') {
+        renderPlot({ eye: { x: 0, y: 0, z: 2.2 } });
+      } else {
+        renderPlot({ eye: { x: 1.3, y: 1.3, z: 1.3 } });
+      }
+    }
+
+    function toggleWireframe() {
+      isWireframe = !isWireframe;
+      renderPlot();
+    }
+
+    function showDepth() {
+      let flat = rawGrid.flat();
+      let minVal = Math.min(...flat);
+      let maxVal = Math.max(...flat);
+      alert(`📊 ANALİZ RAPORU:\n\n• En Düşük Sinyal (Boşluk): ${minVal}\n• En Yüksek Sinyal (Metal): ${maxVal}\n• Tahmini Derinlik: ${(Math.abs(minVal) * 0.12).toFixed(2)} Metre`);
+    }
+  </script>
 </body>
-</html>
+          </html>
+  
