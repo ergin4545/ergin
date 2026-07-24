@@ -12,17 +12,17 @@
     }
   </style>
 </head>
-<body class="bg-black text-white h-screen select-none overflow-hidden font-sans">
+<body class="bg-black text-white min-h-screen select-none font-sans">
 
   <!-- ==================== 1. EKRAN: LİSANS KONTROL (İLK AÇILIŞ) ==================== -->
-  <div id="pageLicence" class="h-full flex flex-col justify-between p-4">
+  <div id="pageLicence" class="min-h-screen flex flex-col justify-between p-4 box-border">
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
       <h2 class="text-lg font-bold text-cyan-400">Lisans Bilgileri</h2>
       <button onclick="goBackFromLicense()" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
     </div>
 
-    <div class="my-auto space-y-4">
-      <!-- Lisans Bilgi Kutusu (İlk Resimdeki Gibi) -->
+    <div class="my-auto py-4 space-y-4">
+      <!-- Lisans Bilgi Kutusu -->
       <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 text-sm space-y-2 shadow-lg">
         <p><strong class="text-gray-400">Lisans Sahibi:</strong> ERGİN 3D Kullanıcısı</p>
         <p><strong class="text-gray-400">Cihaz Kimliği:</strong> ERGIN-3D-8842</p>
@@ -32,16 +32,16 @@
       <!-- Aktivasyon Alanı -->
       <div id="activationBox" class="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-3">
         <p class="text-xs text-gray-300 text-center">Uygulamayı başlatmak için lisans anahtarınızı giriniz.</p>
-        <input type="password" id="licenseInput" placeholder="Aktivasyon Kodunu Girin" class="w-full bg-black border border-gray-700 p-2.5 rounded text-white text-center text-sm">
-        <button onclick="activateLicense()" class="w-full bg-emerald-600 font-bold p-2.5 rounded text-white text-sm active:scale-95">LİSANSI AKTİFLEŞTİR</button>
+        <input type="text" id="licenseInput" placeholder="Aktivasyon Kodunu Girin" class="w-full bg-black border border-gray-700 p-3 rounded-lg text-white text-center text-base outline-none focus:border-cyan-400">
+        <button onclick="activateLicense()" class="w-full bg-emerald-600 font-bold p-3.5 rounded-lg text-white text-base active:scale-95 shadow-md">LİSANSI AKTİFLEŞTİR</button>
       </div>
     </div>
 
-    <button onclick="proceedToMenu()" id="btnGoMenu" class="bg-cyan-600 font-bold p-3 rounded-xl w-full hidden active:scale-95">Ana Menüye Git</button>
+    <button onclick="proceedToMenu()" id="btnGoMenu" class="bg-cyan-600 font-bold p-3.5 rounded-xl w-full hidden active:scale-95 shadow-md">Ana Menüye Git</button>
   </div>
 
   <!-- ==================== 2. EKRAN: ANA MENÜ ==================== -->
-  <div id="pageMenu" class="h-full flex flex-col justify-between p-4 hidden">
+  <div id="pageMenu" class="h-screen flex flex-col justify-between p-4 hidden">
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
       <h1 class="text-xl font-black text-cyan-400 tracking-wider">ERGİN 3D</h1>
       <span class="text-xl">🇹🇷</span>
@@ -92,7 +92,7 @@
   </div>
 
   <!-- ==================== 3. EKRAN: 3D TARAMA ==================== -->
-  <div id="pageScan" class="h-full flex flex-col justify-between p-2 hidden">
+  <div id="pageScan" class="h-screen flex flex-col justify-between p-2 hidden">
     <header class="flex justify-between items-center px-2 py-1.5 text-xs border-b border-gray-800 bg-gray-950 rounded-lg shrink-0">
       <div class="font-bold text-cyan-400">
         ERGİN 3D <span id="xyText" class="ml-1 text-white text-[10px]">X:1 Y:1</span>
@@ -108,7 +108,7 @@
       <div id="scanPlot" class="relative w-full h-full z-10"></div>
     </main>
 
-    <footer class="flex flex-col gap-2 bg-gray-950 p-2 rounded-xl border border-gray-800 shrink-0 mb-4">
+    <footer class="flex flex-col gap-2 bg-gray-950 p-2 rounded-xl border border-gray-800 shrink-0 mb-2">
       <div class="grid grid-cols-5 gap-1">
         <button onclick="toggleCamera()" class="bg-indigo-600 text-white rounded p-1.5 text-center font-bold text-[10px] flex flex-col items-center active:scale-95">
           📷 <span>Kamera</span>
@@ -167,8 +167,8 @@
     </footer>
   </div>
 
-  <!-- ==================== 4. EKRAN: KAYITLI TARAMALAR (OPEN SCAN) ==================== -->
-  <div id="pageOpenScan" class="h-full flex flex-col justify-between p-4 hidden">
+  <!-- ==================== 4. EKRAN: KAYITLI TARAMALAR ==================== -->
+  <div id="pageOpenScan" class="h-screen flex flex-col justify-between p-4 hidden">
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
       <h2 class="text-lg font-bold text-cyan-400">Kayıtlı Taramalar</h2>
       <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
@@ -178,7 +178,7 @@
   </div>
 
   <!-- ==================== DİĞER SAYFALAR ==================== -->
-  <div id="pageInfo" class="h-full flex flex-col justify-between p-4 hidden">
+  <div id="pageInfo" class="h-screen flex flex-col justify-between p-4 hidden">
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
       <h2 class="text-lg font-bold text-cyan-400">Cihaz Bilgisi</h2>
       <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
@@ -191,7 +191,7 @@
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
   </div>
 
-  <div id="pageLrl" class="h-full flex flex-col justify-between p-4 hidden">
+  <div id="pageLrl" class="h-screen flex flex-col justify-between p-4 hidden">
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
       <h2 class="text-lg font-bold text-cyan-400">Long Range Locator</h2>
       <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
@@ -200,7 +200,7 @@
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-xl w-full">Ana Menüye Dön</button>
   </div>
 
-  <div id="pageSimultaneous" class="h-full flex flex-col justify-between p-4 hidden">
+  <div id="pageSimultaneous" class="h-screen flex flex-col justify-between p-4 hidden">
     <div class="flex justify-between items-center py-2 border-b border-gray-800">
       <h2 class="text-lg font-bold text-cyan-400">Simultaneous Data</h2>
       <button onclick="showPage('pageMenu')" class="bg-gray-800 text-xs px-3 py-1 rounded">← Geri</button>
@@ -213,7 +213,6 @@
   <script>
     let isLicensed = localStorage.getItem("ergin_licensed") === "true";
 
-    // Sayfa açıldığında doğrudan lisans kontrolü yap
     window.onload = function() {
       updateLicenseUI();
       if (!isLicensed) {
@@ -245,7 +244,7 @@
 
     function activateLicense() {
       let code = document.getElementById('licenseInput').value.trim();
-      // Belirlediğin Lisans Kodu: "ERGIN2026"
+      // Aktivasyon Şifresi: ERGIN2026
       if (code === "ERGIN2026") {
         isLicensed = true;
         localStorage.setItem("ergin_licensed", "true");
@@ -427,4 +426,4 @@
       document.getElementById('btnStart').classList.remove('opacity-50');
       document.getElementById('btnStart').disabled = false;
       document.getElementById('btnStop').classList.add('opacity-50');
-      document.getElementById('btn
+      document.getElementById('btnStop').disab
