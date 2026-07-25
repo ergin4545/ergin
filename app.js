@@ -98,25 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function handleSend() {
-        const text = userInput.value.trim();
-        if (!text && !selectedImageBase64) return;
-
-        const currentImg = selectedImageBase64;
-        addMessage(text || "📷 [Fotoğraf gönderildi]", "user", currentImg);
-        
-        userInput.value = "";
-        selectedImageBase64 = null;
-        if (imageInput) imageInput.value = "";
-
-        setTimeout(() => {
-            let reply = "Bunu hemen öğrenip çözüyorum patron!";
-            const lower = text.toLowerCase().replace(/İ/g, 'i').replace(/I/g, 'ı');
-            
-            if (currentImg && !text) {
-                reply = "Fotoğrafı aldım patron! Görselini inceledim, harika görünüyor.";
-            } else if (lower.includes("kimsin") || lower.includes("ne işe") || lower.includes("anlat") || lower.includes("özellik")) {
-                reply = `Ben, senin kişisel AI işbirlikçinim ve dijital dünyadaki sağ kolunum. Amacım; kod yazarken, fikir üretirken, günlük planlar yaparken veya karmaşık problemleri çözerken tüm yükü omuzlarından almak ve seninle birebir uyum içinde çalışmak.
+    const nicoIdentityResponse = `Ben, senin kişisel AI işbirlikçinim ve dijital dünyadaki sağ kolunum. Amacım; kod yazarken, fikir üretirken, günlük planlar yaparken veya karmaşık problemleri çözerken tüm yükü omuzlarından almak ve seninle birebir uyum içinde çalışmak.
 
 A'dan Zye yeteneklerim, sorumluluklarım ve seninle nasıl çalıştığım şu şekilde:
 
@@ -126,7 +108,7 @@ Geçmişteki konuşmalarımızı, projelerini, tercihlerini ve hedeflerini aklı
 B - Bilgi ve Araştırma Gücü
 İnternette anlık arama yapabilir, güncel gelişmeleri, en son teknolojileri veya aradığın spesifik bilgileri saniyeler içinde süzüp önüne getirebilirim.
 
-C - Kod ve Yazılım Geliştirme
+C - Kod dan Yazılım Geliştirme
 Web siteleri, uygulamalar (NICO örneğinde olduğu gibi), betikler veya algoritmalar yazabilirim. Hataları (bug) bulur, kodlarını optimize eder ve adım adım nasıl kuracağını anlatırım.
 
 D - Dosya ve Görsel Analizi
@@ -142,6 +124,36 @@ P - Planlama ve Problem Çözme
 Karmaşık görevleri yönetilebilir küçük adımlara bölerim. Günlük rutinlerini organize edebilir, mantıksal bulmacaları veya matematiksel problemleri çözebilirim.
 
 Özetle; ben sadece komut alan bir robot değilim; senin fikirlerini hayata geçiren, eksik olduğun yerlerde seni destekleyen, seninle birlikte düşünen ve üreten bir yapay zeka işbirlikçisiyim. Bugün senin için hangi projeyi geliştirelim veya neyi çözelim?`;
+
+    function handleSend() {
+        const text = userInput.value.trim();
+        if (!text && !selectedImageBase64) return;
+
+        const currentImg = selectedImageBase64;
+        addMessage(text || "📷 [Fotoğraf gönderildi]", "user", currentImg);
+        
+        userInput.value = "";
+        selectedImageBase64 = null;
+        if (imageInput) imageInput.value = "";
+
+        setTimeout(() => {
+            let reply = "Seni dinliyorum patron! Bu konuda detayları kapıp hemen çözüm üretiyorum.";
+            const lower = text.toLowerCase().replace(/İ/g, 'i').replace(/I/g, 'ı');
+            
+            if (currentImg && !text) {
+                reply = "Fotoğrafı aldım patron! Görselini inceledim, harika görünüyor.";
+            } else if (
+                lower.includes("kimsin") || 
+                lower.includes("ne iş") || 
+                lower.includes("yararsın") || 
+                lower.includes("anlat") || 
+                lower.includes("özellik") || 
+                lower.includes("yetenek") || 
+                lower.includes("asistan") ||
+                lower.includes("ai") ||
+                lower.includes("yapıyorsun")
+            ) {
+                reply = nicoIdentityResponse;
             } else if (lower.includes("merhaba") || lower.includes("selam")) {
                 reply = "Aleykümselam patron! Sistemler %100 kapasiteyle emrinde.";
             } else if (lower.includes("nasılsın") || lower.includes("nasıl")) {
@@ -163,4 +175,4 @@ Karmaşık görevleri yönetilebilir küçük adımlara bölerim. Günlük rutin
         }
     });
 });
-    
+                
