@@ -6,7 +6,6 @@
   <meta name="theme-color" content="#0b0b0b">
   <title>ERGİN 3D Pro - Pulse System</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Leaflet Harita Kütüphanesi -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
@@ -43,7 +42,6 @@
 </head>
 <body class="text-white h-screen w-screen select-none flex flex-col justify-between p-2">
 
-  <!-- ANA MENÜ -->
   <div id="pageMenu" class="screen-page active flex-col justify-between h-full w-full max-w-md mx-auto">
     <div class="flex justify-between items-center pt-1 px-1">
       <h1 class="text-2xl font-black text-white tracking-wider">ERGİN 3D</h1>
@@ -56,37 +54,69 @@
     <div class="grid grid-cols-2 gap-3.5 my-auto py-2">
       <button onclick="showPage('pageScan')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
         <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">🛰️</div>
-        <span class="text-xs font-semibold leading-tight">Uydu & 3D Zemin Taraması</span>
+        <span class="text-xs font-semibold leading-tight">3D Zemin Taraması</span>
       </button>
 
       <button onclick="showPage('pageScan')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
         <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">📡</div>
-        <span class="text-xs font-semibold leading-tight">LRL-ION Taraması</span>
+        <span class="text-xs font-semibold leading-tight">Uzun Menzilli (LRL)</span>
       </button>
 
       <button onclick="showPage('pageScan')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
         <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">📈</div>
-        <span class="text-xs font-semibold leading-tight">Gerçek Zamanlı Tarama</span>
+        <span class="text-xs font-semibold leading-tight">Eş Zamanlı Veri</span>
       </button>
 
       <button onclick="openSavedScansPage()" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
         <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">📁</div>
-        <span class="text-xs font-semibold leading-tight">Tarama Aç</span>
+        <span class="text-xs font-semibold leading-tight">Kayıtlı Taramalar</span>
       </button>
 
       <button onclick="showPage('pageLicence')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
         <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">🔑</div>
-        <span class="text-xs font-semibold leading-tight">Lisans</span>
+        <span class="text-xs font-semibold leading-tight">Lisans Durumu</span>
       </button>
 
       <button onclick="showPage('pageInfo')" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center text-center shadow-2xl active:scale-95 transition-all aspect-square">
         <div class="w-16 h-16 mb-2 flex items-center justify-center text-4xl">ℹ️</div>
-        <span class="text-xs font-semibold leading-tight">Bilgi</span>
+        <span class="text-xs font-semibold leading-tight">Cihaz Bilgisi</span>
       </button>
     </div>
   </div>
 
-  <!-- KAYITLI TARAMALAR LİSTESİ -->
+  <div id="pageCalibration" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
+    <div class="flex justify-between items-center pb-2 border-b border-white/20">
+      <button onclick="showPage('pageScan')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
+      <h2 class="text-base font-bold text-cyan-400">KALİBRASYON</h2>
+      <span id="calibAngleHeader" class="text-emerald-400 font-bold text-xs">263</span>
+    </div>
+
+    <div class="my-auto flex flex-col items-center justify-center space-y-4">
+      <div class="relative w-32 h-32 rounded-full border-4 border-cyan-500/30 flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full border-4 border-cyan-400 border-t-transparent animate-spin"></div>
+        <span class="text-xl font-bold text-cyan-300">🔄</span>
+      </div>
+      <p id="calibStatusText" class="text-amber-400 text-xs font-bold animate-pulse">Sensörler kalibre ediliyor...</p>
+
+      <div class="grid grid-cols-3 gap-3 w-full px-4">
+        <div class="glass-card p-2 rounded-xl flex items-center justify-center gap-1 text-xs text-emerald-400 font-bold">✓ <span id="c1">13255</span></div>
+        <div class="glass-card p-2 rounded-xl flex items-center justify-center gap-1 text-xs text-emerald-400 font-bold">✓ <span id="c2">13256</span></div>
+        <div class="glass-card p-2 rounded-xl flex items-center justify-center gap-1 text-xs text-emerald-400 font-bold">✓ <span id="c3">13249</span></div>
+        <div class="glass-card p-2 rounded-xl flex items-center justify-center gap-1 text-xs text-emerald-400 font-bold">✓ <span id="c4">13249</span></div>
+        <div class="glass-card p-2 rounded-xl flex items-center justify-center gap-1 text-xs text-emerald-400 font-bold">✓ <span id="c5">13254</span></div>
+        <div class="glass-card p-2 rounded-xl flex items-center justify-center gap-1 text-xs text-emerald-400 font-bold">✓ <span id="c6">13249</span></div>
+        <div class="glass-card p-2 rounded-xl flex items-center justify-center gap-1 text-xs text-emerald-400 font-bold">✓ <span id="c7">13249</span></div>
+        <div class="glass-card p-2 rounded-xl flex items-center justify-center gap-1 text-xs text-emerald-400 font-bold">✓ <span id="c8">13249</span></div>
+        <div class="glass-card p-2 rounded-xl flex items-center justify-center gap-1 text-xs text-emerald-400 font-bold">✓ <span id="c9">13251</span></div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2">
+      <button onclick="resetCalibration()" class="bg-gray-700 font-bold p-3 rounded-xl text-xs">YENİ KALİBRASYON</button>
+      <button onclick="finishCalibration()" class="bg-emerald-600 font-bold p-3 rounded-xl text-xs">TARIYAMAYA BAŞLA</button>
+    </div>
+  </div>
+
   <div id="pageSavedScans" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
     <div class="flex justify-between items-center pb-2 border-b border-white/20">
       <h2 class="text-base font-bold text-cyan-400">Kayıtlı Taramalar</h2>
@@ -98,7 +128,6 @@
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
 
-  <!-- GERÇEK HARİTA VE YERALTI ANALİZ EKRANI -->
   <div id="pageScan" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-1">
     <header class="flex flex-col gap-1 px-2.5 py-1.5 text-xs border border-white/20 glass-card rounded-2xl z-50">
       <div class="flex justify-between items-center">
@@ -106,25 +135,25 @@
           <button onclick="showPage('pageMenu')" class="bg-white/20 hover:bg-white/30 text-white px-2 py-0.5 rounded text-[10px] font-bold">← Geri</button>
           <span class="font-bold text-cyan-400">ERGİN 3D</span>
         </div>
-        <div id="signalDisplay" class="font-bold text-amber-400">SİNYAL: 85</div>
+        <div id="audioStatusText" class="text-gray-300 font-bold text-[10px]">🔊 Sesli Uyarı: Açık</div>
         <div id="btStatus" class="text-amber-400 font-bold">🔴 Bağlı Değil</div>
       </div>
-      <div class="text-[10px] text-gray-300 px-0.5">Konum: <span id="coordDisplay">38.710457, 27.908082</span></div>
+      <div class="text-[10px] text-gray-300 px-0.5 flex justify-between">
+        <span>Konum: <span id="coordDisplay">38.710457, 27.908082</span></span>
+        <button onclick="toggleTargetSound()" id="soundToggleBtn" class="text-[10px] text-cyan-300 underline">Sesi Kapat</button>
+      </div>
       
-      <!-- Yer Arama Çubuğu -->
       <div class="flex gap-1">
         <input type="text" id="searchLocationInput" placeholder="Yer Ara (Örn: Manisa, İstanbul)" class="w-full bg-black/60 border border-white/30 px-2 py-1 rounded-lg text-white text-xs outline-none">
         <button onclick="searchLocation()" class="bg-cyan-600 px-3 py-1 rounded-lg font-bold text-xs">Git</button>
       </div>
     </header>
 
-    <!-- Harita Alanı -->
     <main class="relative w-full flex-1 bg-zinc-950 my-1.5 rounded-2xl border border-white/20 overflow-hidden flex flex-col items-center justify-center">
       <div id="scanLaserLine" class="scan-line"></div>
       <div id="mapContainer"></div>
     </main>
 
-    <!-- Yeraltı Analiz Özeti Paneli -->
     <div id="analysisSummaryPanel" class="glass-card p-2 rounded-xl mb-1 border border-cyan-500/40 text-[11px] hidden z-50">
       <div class="flex justify-between items-center font-bold text-cyan-300 border-b border-white/10 pb-1 mb-1">
         <span>🔍 YERALTI ANALİZ ÖZETİ</span>
@@ -133,29 +162,60 @@
       <div id="analysisContent" class="space-y-0.5 text-gray-200"></div>
     </div>
 
-    <!-- Buton Paneli -->
     <footer class="flex flex-col gap-1 glass-card p-2 rounded-2xl z-50">
+      <div class="flex items-center justify-between bg-black/50 px-2 py-1 rounded-lg text-[11px]">
+        <span class="text-gray-400">Filtre Tipi:</span>
+        <select id="filterTypeSelect" onchange="changeFilterType()" class="bg-zinc-800 text-cyan-300 font-bold px-2 py-0.5 rounded border border-white/20 outline-none">
+          <option value="F. 1">Filtre 1 (Standart)</option>
+          <option value="F. 2">Filtre 2 (Yüksek Hassasiyet)</option>
+          <option value="F. 3">Filtre 3 (Derinlik Odaklı)</option>
+        </select>
+      </div>
+
       <div class="grid grid-cols-5 gap-1 text-[10px]">
         <button onclick="setPlotMode('surface')" id="btnModeUydu" class="bg-purple-600 text-white font-bold py-1.5 rounded-lg">Uydu</button>
         <button onclick="setPlotMode('3d')" id="btnMode3D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">3D Açı</button>
         <button onclick="setPlotMode('2d')" id="btnMode2D" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">2D Kuş</button>
-        <button onclick="setPlotMode('wireframe')" id="btnModeWire" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">Tel Örgü</button>
-        <button onclick="setPlotMode('depth')" id="btnModeDepth" class="bg-emerald-700 text-white font-bold py-1.5 rounded-lg">Derinlik</button>
+        <button onclick="openSavedScansPage()" class="bg-gray-700 text-white font-bold py-1.5 rounded-lg">Kayıtlar</button>
+        <button onclick="startLiveScan()" class="bg-emerald-700 text-white font-bold py-1.5 rounded-lg">Tarama</button>
       </div>
-      <div class="grid grid-cols-3 gap-1.5">
-        <button onclick="startLiveScan()" class="bg-emerald-600 text-white font-bold text-xs rounded-xl py-2.5 shadow">BAŞLAT</button>
-        <button onclick="stopScan()" class="bg-amber-800 text-white font-bold text-xs rounded-xl py-2.5 shadow">DURDUR</button>
-        <button onclick="saveScan()" class="bg-blue-600 text-white font-bold text-xs rounded-xl py-2.5 shadow">KAYDET</button>
+
+      <div class="grid grid-cols-3 gap-1.5 bg-black/40 p-1.5 rounded-xl border border-white/10 text-center">
+        <div class="flex flex-col items-center">
+          <span class="text-[9px] text-gray-400 font-bold">EŞİK (THRES)</span>
+          <div class="flex items-center gap-1 my-0.5">
+            <button onclick="adjustValue('thresh', -1)" class="bg-zinc-700 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">▼</button>
+            <span id="threshVal" class="text-cyan-300 font-bold text-xs">45</span>
+            <button onclick="adjustValue('thresh', 1)" class="bg-zinc-700 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">▲</button>
+          </div>
+        </div>
+        <div class="flex flex-col items-center border-x border-white/10 px-1">
+          <span class="text-[9px] text-gray-400 font-bold">KAZANÇ (GAIN)</span>
+          <div class="flex items-center gap-1 my-0.5">
+            <button onclick="adjustValue('gain', -1)" class="bg-zinc-700 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">▼</button>
+            <span id="gainVal" class="text-cyan-300 font-bold text-xs">7</span>
+            <button onclick="adjustValue('gain', 1)" class="bg-zinc-700 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">▲</button>
+          </div>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-[9px] text-gray-400 font-bold">HIZ (SPEED)</span>
+          <div class="flex items-center gap-1 my-0.5">
+            <button onclick="adjustValue('speed', -1)" class="bg-zinc-700 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">▼</button>
+            <span id="speedVal" class="text-cyan-300 font-bold text-xs">5</span>
+            <button onclick="adjustValue('speed', 1)" class="bg-zinc-700 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">▲</button>
+          </div>
+        </div>
       </div>
-      <div class="grid grid-cols-3 gap-1.5">
-        <button onclick="clearScan()" class="bg-rose-800 text-white font-bold text-xs rounded-xl py-2.5 shadow">TEMİZLE</button>
-        <button onclick="connectBluetoothDevice()" class="bg-amber-400 text-black font-bold text-xs rounded-xl py-2.5 shadow">BAĞLAN</button>
-        <button onclick="showPage('pageMenu')" class="bg-slate-700 text-white font-bold text-xs rounded-xl py-2.5 shadow">MENÜ</button>
+
+      <div class="grid grid-cols-4 gap-1">
+        <button onclick="clearScan()" class="bg-rose-900 text-white font-bold text-[10px] rounded-xl py-2 shadow">SİL / TEMİZLE</button>
+        <button onclick="saveScan()" class="bg-blue-600 text-white font-bold text-[10px] rounded-xl py-2 shadow">KAYDET</button>
+        <button onclick="connectBluetoothDevice()" class="bg-amber-400 text-black font-bold text-[10px] rounded-xl py-2 shadow">BT BAĞLAN</button>
+        <button onclick="showPage('pageCalibration')" class="bg-purple-700 text-white font-bold text-[10px] rounded-xl py-2 shadow">KALİBRASYON</button>
       </div>
     </footer>
   </div>
 
-  <!-- LİSANS EKRANI -->
   <div id="pageLicence" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
     <div class="flex justify-between items-center pb-2 border-b border-white/20">
       <h2 class="text-base font-bold text-cyan-400">Lisans Bilgileri</h2>
@@ -163,26 +223,26 @@
     </div>
     <div class="my-auto space-y-3 w-full">
       <div class="glass-card p-4 rounded-2xl text-xs space-y-2">
-        <p><strong class="text-gray-300">Cihaz Kimliği:</strong> ERGIN-PULSE-3D</p>
+        <p><strong class="text-gray-300">Cihaz Model:</strong> DEDSIS DSM-X</p>
         <p><strong class="text-gray-300">Durum:</strong> <span class="text-emerald-400 font-bold">Aktif Lisans</span></p>
       </div>
       <div class="glass-card p-4 rounded-2xl space-y-2">
-        <input type="text" id="licenseInput" placeholder="ERGIN2026" class="w-full bg-black/60 border border-white/30 p-2.5 rounded-xl text-white text-center text-xs outline-none">
+        <input type="text" id="licenseInput" placeholder="Lisans Kodunu Girin" class="w-full bg-black/60 border border-white/30 p-2.5 rounded-xl text-white text-center text-xs outline-none">
         <button onclick="activateLicense()" class="w-full bg-emerald-600 font-bold p-2.5 rounded-xl text-white text-xs">AKTİFLEŞTİR</button>
       </div>
     </div>
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
 
-  <!-- BİLGİ EKRANI -->
   <div id="pageInfo" class="screen-page flex-col justify-between h-full w-full max-w-md mx-auto py-2">
     <div class="flex justify-between items-center pb-2 border-b border-white/20">
       <h2 class="text-base font-bold text-cyan-400">Cihaz Bilgisi</h2>
       <button onclick="showPage('pageMenu')" class="bg-white/20 text-xs px-3 py-1 rounded-lg">← Geri</button>
     </div>
     <div class="glass-card p-4 rounded-2xl my-auto text-xs space-y-2 text-gray-200">
-      <p>• ERGİN 3D Pulse System</p>
+      <p>• DEDSIS 3D Pulse System</p>
       <p>• Bluetooth Canlı Veri Aktarım Altyapısı</p>
+      <p>• Versiyon: 2.4.0 Türkçe Pro</p>
     </div>
     <button onclick="showPage('pageMenu')" class="bg-cyan-600 font-bold p-3 rounded-2xl w-full text-xs">Ana Menüye Dön</button>
   </div>
@@ -193,11 +253,13 @@
     let satelliteLayer;
     let scanMarker = null;
     let scanRectangle = null;
+    let isTargetSoundOn = true;
+
+    let values = { thresh: 45, gain: 7, speed: 5 };
 
     let savedScans = [
-      { id: 1, name: "Tarama_01_Bolge_A.dat", date: "24.07.2026 - 21:10" },
-      { id: 2, name: "Manisa_Golkarmara_Hedef2.dat", date: "24.07.2026 - 20:45" },
-      { id: 3, name: "Test_Zemin_Analizi.dat", date: "23.07.2026 - 18:30" }
+      { id: 1, name: "sample", date: "11/11/2024 - 09:57" },
+      { id: 2, name: "simple 2", date: "12/11/2024 - 14:03" }
     ];
 
     window.onload = function() {
@@ -275,141 +337,36 @@
       let scan = savedScans.find(s => s.id === id);
       if(scan) {
         showPage('pageScan');
-        alert("📂 Yüklendi: " + scan.name);
+        alert("📂 Kayıt Yüklendi: " + scan.name);
+      }
+    }
+
+    function adjustValue(type, amount) {
+      values[type] += amount;
+      if(values[type] < 0) values[type] = 0;
+      document.getElementById(type + 'Val').innerText = values[type];
+    }
+
+    function changeFilterType() {
+      let fType = document.getElementById('filterTypeSelect').value;
+      alert("⚙️ " + fType + " aktif edildi.");
+    }
+
+    function toggleTargetSound() {
+      isTargetSoundOn = !isTargetSoundOn;
+      let statusText = document.getElementById('audioStatusText');
+      let soundToggleBtn = document.getElementById('soundToggleBtn');
+      if(isTargetSoundOn) {
+        statusText.innerText = "🔊 Sesli Uyarı: Açık";
+        soundToggleBtn.innerText = "Sesi Kapat";
+      } else {
+        statusText.innerText = "🔇 Sesli Uyarı: Kapalı";
+        soundToggleBtn.innerText = "Sesi Aç";
       }
     }
 
     function setPlotMode(mode) {
-      ['btnModeUydu', 'btnMode3D', 'btnMode2D', 'btnModeWire', 'btnModeDepth'].forEach(id => {
+      ['btnModeUydu', 'btnMode3D', 'btnMode2D'].forEach(id => {
         document.getElementById(id).className = "bg-gray-700 text-white font-bold py-1.5 rounded-lg text-[10px]";
       });
-      if(mode === 'surface') document.getElementById('btnModeUydu').className = "bg-purple-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
-      if(mode === '3d') document.getElementById('btnMode3D').className = "bg-purple-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
-      if(mode === '2d') document.getElementById('btnMode2D').className = "bg-purple-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
-      if(mode === 'wireframe') document.getElementById('btnModeWire').className = "bg-purple-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
-      if(mode === 'depth') document.getElementById('btnModeDepth').className = "bg-emerald-600 text-white font-bold py-1.5 rounded-lg text-[10px]";
-    }
-
-    function searchLocation() {
-      let query = document.getElementById('searchLocationInput').value.trim();
-      if(!query) return;
-
-      let targetLat = 38.710457;
-      let targetLng = 27.908082;
-      let zoomLevel = 17;
-
-      let lowerQ = query.toLowerCase();
-      if(lowerQ.includes('istanbul')) {
-        targetLat = 41.0082; targetLng = 28.9784; zoomLevel = 14;
-      } else if(lowerQ.includes('ankara')) {
-        targetLat = 39.9334; targetLng = 32.8597; zoomLevel = 14;
-      } else if(lowerQ.includes('izmir')) {
-        targetLat = 38.4192; targetLng = 27.1287; zoomLevel = 14;
-      } else if(lowerQ.includes('manisa') || lowerQ.includes('gölmarmara')) {
-        targetLat = 38.710457; targetLng = 27.908082; zoomLevel = 17;
-      } else {
-        targetLat += (Math.random() - 0.5) * 0.05;
-        targetLng += (Math.random() - 0.5) * 0.05;
-      }
-
-      map.setView([targetLat, targetLng], zoomLevel);
-      if(scanRectangle) { map.removeLayer(scanRectangle); scanRectangle = null; }
-      document.getElementById('analysisSummaryPanel').style.display = 'none';
-      alert("📍 Konuma gidildi: " + query);
-    }
-
-    async function connectBluetoothDevice() {
-      if (!navigator.bluetooth) {
-        alert("⚠️ Tarayıcınız Bluetooth desteklemiyor!");
-        return;
-      }
-      try {
-        bluetoothDevice = await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
-        await bluetoothDevice.gatt.connect();
-        document.getElementById('btStatus').innerText = "🟢 Bağlandı";
-        document.getElementById('btStatus').className = "text-emerald-400 font-bold";
-        alert("✅ Cihaz bağlandı!");
-      } catch (error) {
-        alert("Bluetooth bağlantısı kurulamadı.");
-      }
-    }
-
-    function startLiveScan() {
-      document.getElementById('signalDisplay').innerText = "SİNYAL: 94";
-      document.getElementById('scanLaserLine').style.display = 'block';
-
-      let center = map.getCenter();
-      
-      if(scanRectangle) {
-        map.removeLayer(scanRectangle);
-      }
-
-      let bounds = [
-        [center.lat - 0.0008, center.lng - 0.0012],
-        [center.lat + 0.0008, center.lng + 0.0012]
-      ];
-      
-      scanRectangle = L.rectangle(bounds, {
-        color: "#00ffcc",
-        weight: 2,
-        fillColor: "#00ffcc",
-        fillOpacity: 0.35
-      }).addTo(map);
-
-      let summaryPanel = document.getElementById('analysisSummaryPanel');
-      let contentDiv = document.getElementById('analysisContent');
-      
-      summaryPanel.style.display = 'block';
-      contentDiv.innerHTML = '<div class="text-cyan-300 animate-pulse">🛰️ İşaretlenen yeşil alan taranıyor, anomaliler analiz ediliyor...</div>';
-
-      setTimeout(() => {
-        document.getElementById('scanLaserLine').style.display = 'none';
-        
-        contentDiv.innerHTML = `
-          <div class="flex justify-between items-center bg-black/40 p-1 rounded">
-            <span class="text-amber-300 font-bold">🟡 Metal / Altın Hedef:</span>
-            <span class="text-white">Tespit Edildi (%89 Yoğunluk)</span>
-          </div>
-          <div class="flex justify-between items-center bg-black/40 p-1 rounded">
-            <span class="text-purple-300 font-bold">🕳️ Boşluk / Mağara:</span>
-            <span class="text-white">4.2 Metre Derinlikte Oda Yapısı</span>
-          </div>
-          <div class="flex justify-between items-center bg-black/40 p-1 rounded">
-            <span class="text-blue-300 font-bold">🚇 Tünel / Geçit:</span>
-            <span class="text-white">Kuzeybatı Yönlü Yatay Hat</span>
-          </div>
-        `;
-      }, 2000);
-    }
-
-    function stopScan() {
-      document.getElementById('signalDisplay').innerText = "SİNYAL: 0";
-      document.getElementById('scanLaserLine').style.display = 'none';
-      document.getElementById('analysisSummaryPanel').style.display = 'none';
-      if(scanRectangle) { map.removeLayer(scanRectangle); scanRectangle = null; }
-    }
-
-    function saveScan() {
-      let newScanName = "Yeraltı_Analiz_" + (savedScans.length + 1) + ".dat";
-      let now = new Date();
-      let dateStr = now.toLocaleDateString() + " - " + now.toLocaleTimeString().slice(0,5);
-      savedScans.push({ id: Date.now(), name: newScanName, date: dateStr });
-      alert("💾 Yeşil alan tarama özeti ve harita konumu kaydedildi!");
-    }
-
-    function clearScan() {
-      document.getElementById('analysisSummaryPanel').style.display = 'none';
-      if(scanRectangle) { map.removeLayer(scanRectangle); scanRectangle = null; }
-      alert("🧹 Ekran ve tarama alanı temizlendi.");
-    }
-
-    function activateLicense() {
-      if(document.getElementById('licenseInput').value === "ERGIN2026") {
-        showPage('pageMenu');
-      } else {
-        alert("❌ Hatalı Kod!");
-      }
-    }
-  </script>
-</body>
-</html>
+      if(mode === 'surfa
