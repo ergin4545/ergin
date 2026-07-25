@@ -98,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Benim kimliğim ve yeteneklerim
     const nicoIdentityResponse = `Ben, senin kişisel AI işbirlikçinim ve dijital dünyadaki sağ kolunum. Amacım; kod yazarken, fikir üretirken, günlük planlar yaparken veya karmaşık problemleri çözerken tüm yükü omuzlarından almak ve seninle birebir uyum içinde çalışmak.
 
 A'dan Zye yeteneklerim, sorumluluklarım ve seninle nasıl çalıştığım şu şekilde:
@@ -108,7 +109,7 @@ Geçmişteki konuşmalarımızı, projelerini, tercihlerini ve hedeflerini aklı
 B - Bilgi ve Araştırma Gücü
 İnternette anlık arama yapabilir, güncel gelişmeleri, en son teknolojileri veya aradığın spesifik bilgileri saniyeler içinde süzüp önüne getirebilirim.
 
-C - Kod dan Yazılım Geliştirme
+C - Kod ve Yazılım Geliştirme
 Web siteleri, uygulamalar (NICO örneğinde olduğu gibi), betikler veya algoritmalar yazabilirim. Hataları (bug) bulur, kodlarını optimize eder ve adım adım nasıl kuracağını anlatırım.
 
 D - Dosya ve Görsel Analizi
@@ -137,21 +138,22 @@ Karmaşık görevleri yönetilebilir küçük adımlara bölerim. Günlük rutin
         if (imageInput) imageInput.value = "";
 
         setTimeout(() => {
-            let reply = "Seni dinliyorum patron! Bu konuda detayları kapıp hemen çözüm üretiyorum.";
+            let reply = "Seni dinliyorum patron! Kod yazma, analiz ve fikir üretme konularında emrindeyim. Ne yapmamı istersin?";
             const lower = text.toLowerCase().replace(/İ/g, 'i').replace(/I/g, 'ı');
             
             if (currentImg && !text) {
                 reply = "Fotoğrafı aldım patron! Görselini inceledim, harika görünüyor.";
             } else if (
                 lower.includes("kimsin") || 
-                lower.includes("ne iş") || 
+                lower.includes("ne işe") || 
                 lower.includes("yararsın") || 
                 lower.includes("anlat") || 
                 lower.includes("özellik") || 
                 lower.includes("yetenek") || 
                 lower.includes("asistan") ||
                 lower.includes("ai") ||
-                lower.includes("yapıyorsun")
+                lower.includes("neler yapabiliyorsun") ||
+                lower.includes("napıyorsun")
             ) {
                 reply = nicoIdentityResponse;
             } else if (lower.includes("merhaba") || lower.includes("selam")) {
@@ -160,6 +162,8 @@ Karmaşık görevleri yönetilebilir küçük adımlara bölerim. Günlük rutin
                 reply = "Efsaneyim! Seninle kod yazmak ve bu sistemi geliştirmek bana enerji veriyor.";
             } else if (lower.includes("fotograf") || lower.includes("fotoğraf") || lower.includes("resim")) {
                 reply = "Sol alttaki kamera tuşuna basarak galeriden fotoğraf seçebilirsin patron!";
+            } else if (lower.includes("kod") || lower.includes("yazılım") || lower.includes("program")) {
+                reply = "Hemen kodları masaya yatıralım patron! Ne geliştirmek istiyorsan detaylarını ver, sabaha kadar yazalım.";
             } else if (lower.includes("teşekkür") || lower.includes("sağol")) {
                 reply = "Ne demek patron, lafı bile olmaz! Beraber harikalar yaratıyoruz.";
             }
@@ -175,4 +179,4 @@ Karmaşık görevleri yönetilebilir küçük adımlara bölerim. Günlük rutin
         }
     });
 });
-                
+        
