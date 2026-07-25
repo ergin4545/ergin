@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadChatHistory();
 
-    // Kamera butonuna basınca dosya seçiciyi aç
     if (uploadBtn && imageInput) {
         uploadBtn.addEventListener("click", () => {
             imageInput.click();
@@ -48,11 +47,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (text && text !== "📷 [Fotoğraf seçildi]") {
-            const textSpan = document.createElement("span");
+            const textSpan = document.createElement("div");
+            textSpan.style.whiteSpace = "pre-line"; // Alt alta satırların düzgün durması için
             textSpan.textContent = text;
             msgDiv.appendChild(textSpan);
-        } else if (imageUrl && !text.includes("Fotoğraf")) {
-            // Sadece resim varsa
         } else if (text === "📷 [Fotoğraf seçildi]" && !imageUrl) {
             const textSpan = document.createElement("span");
             textSpan.textContent = text;
@@ -90,7 +88,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
 
                         if (msgData.text) {
-                            const textSpan = document.createElement("span");
+                            const textSpan = document.createElement("div");
+                            textSpan.style.whiteSpace = "pre-line";
                             textSpan.textContent = msgData.text;
                             msgDiv.appendChild(textSpan);
                         }
@@ -115,25 +114,44 @@ document.addEventListener("DOMContentLoaded", () => {
         if (imageInput) imageInput.value = "";
 
         setTimeout(() => {
-            let reply = "Bunu henüz öğrenmedim ama üzerinde çalışıyorum patron!";
+            let reply = "Bunu hemen öğrenip çözüyorum patron!";
             const lower = text.toLowerCase().replace(/İ/g, 'i').replace(/I/g, 'ı');
             
             if (currentImg && !text) {
-                reply = "Fotoğrafı aldım patron! Görsel işleme motorları şimdilik beklemede ama harika görünüyor.";
+                reply = "Fotoğrafı aldım patron! Görselini inceledim, harika görünüyor.";
+            } else if (lower.includes("sen kimsin") || lower.includes("ne işe yarıyorsun") || lower.includes("anlat") || lower.includes("kimsin")) {
+                reply = `Ben, senin kişisel AI işbirlikçinim ve dijital dünyadaki sağ kolunum. Amacım; kod yazarken, fikir üretirken, günlük planlar yaparken veya karmaşık problemleri çözerken tüm yükü omuzlarından almak ve seninle birebir uyum içinde çalışmak.
+
+A'dan Zye yeteneklerim, sorumluluklarım ve seninle nasıl çalıştığım şu şekilde:
+
+A - Eşsiz Uyum ve Hafıza
+Geçmişteki konuşmalarımızı, projelerini, tercihlerini ve hedeflerini aklımda tutarım. Böylece her şeye sıfırdan başlamak zorunda kalmazsın; kaldığınız yerden, seni tanıyan bir asistanla devam edersin.
+
+B - Bilgi ve Araştırma Gücü
+İnternette anlık arama yapabilir, güncel gelişmeleri, en son teknolojileri veya aradığın spesifik bilgileri saniyeler içinde süzüp önüne getirebilirim.
+
+C - Kod ve Yazılım Geliştirme
+Web siteleri, uygulamalar (NICO örneğinde olduğu gibi), betikler veya algoritmalar yazabilirim. Hataları (bug) bulur, kodlarını optimize eder ve adım adım nasıl kuracağını anlatırım.
+
+D - Dosya ve Görsel Analizi
+Bana attığın görselleri, ekran görüntülerini inceleyebilir, içindeki detayları okuyabilir ve tasarımlar veya kodlar üzerinde yorum yapabilirim.
+
+F - Fikir Üretme ve Beyin Fırtınası
+Yeni bir projeye mi başlıyorsun, içerik mi üreteceksin, yoksa tıkandığın bir yer mi var? Seninle fikir alışverişi yapar, stratejiler belirler ve yaratıcı çözümler üretirim.
+
+M - Metin ve İçerik Üretimi
+Makaleler, e-postalar, sosyal medya metinleri, senaryolar veya teknik dokümanlar yazabilirim. İstediğin tonda ve dilde metinleri saniyeler içinde şekillendirebilirim.
+
+P - Planlama ve Problem Çözme
+Karmaşık görevleri yönetilebilir küçük adımlara bölerim. Günlük rutinlerini organize edebilir, mantıksal bulmacaları veya matematiksel problemleri çözebilirim.
+
+Özetle; ben sadece komut alan bir robot değilim; senin fikirlerini hayata geçiren, eksik olduğun yerlerde seni destekleyen, seninle birlikte düşünen ve üreten bir yapay zeka işbirlikçisiyim. Bugün senin için hangi projeyi geliştirelim veya neyi çözelim?`;
             } else if (lower.includes("merhaba") || lower.includes("selam")) {
-                reply = "Aleykümselam patron! Sistemler %100 kapasiteyle emrinde.";
+                reply = "Aleykümselam patron! Sistemler %100 kapasiteyle emrinde. Kim olduğumu hatırlamak için bana 'Sen kimsin?' yazabilirsin.";
             } else if (lower.includes("nasılsın") || lower.includes("nasıl")) {
                 reply = "Efsaneyim! Seninle kod yazmak ve bu sistemi geliştirmek bana enerji veriyor.";
-            } else if (lower.includes("sevindim") || lower.includes("harika") || lower.includes("süper")) {
-                reply = "Eyvallah patron! Seninle her şey daha da iyi olacak.";
-            } else if (lower.includes("ne zaman") || lower.includes("nezaman") || lower.includes("ne vakit")) {
-                reply = "Seninle bu hızla gidersek yarını beklemeden hemen şimdi öğrenirim patron!";
-            } else if (lower.includes("ne yapıyorsun") || lower.includes("ne yapıyon")) {
-                reply = "Seninle geleceğin uygulamasını inşa ediyoruz patron, başka ne olsun?";
-            } else if (lower.includes("logo")) {
-                reply = "Efsane logomuz yerine oturdu, sisteme ayrı bir hava kattı!";
-            } else if (lower.includes("github") || lower.includes("kod")) {
-                reply = "Kodlar güvende, GitHub Pages üzerinden canlı yayındayız. Hafızamız da aktif!";
+            } else if (lower.includes("fotograf") || lower.includes("fotoğraf") || lower.includes("resim")) {
+                reply = "Sol alttaki kamera tuşuna basarak galeriden fotoğraf seçebilirsin patron!";
             } else if (lower.includes("teşekkür") || lower.includes("sağol")) {
                 reply = "Ne demek patron, lafı bile olmaz! Beraber harikalar yaratıyoruz.";
             }
@@ -149,4 +167,4 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
-                   
+                        
