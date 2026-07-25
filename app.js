@@ -30,11 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function addMessage(text, sender, imageUrl = null, saveToStorage = true) {
         const msgDiv = document.createElement("div");
         msgDiv.classList.add("message");
-        if (sender === "user") {
-            msgDiv.classList.add("user-msg");
-        } else {
-            msgDiv.classList.add("nico-msg");
-        }
+        msgDiv.classList.add(sender === "user" ? "user-msg" : "nico-msg");
 
         if (imageUrl) {
             const img = document.createElement("img");
@@ -48,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (text && text !== "📷 [Fotoğraf seçildi]") {
             const textSpan = document.createElement("div");
-            textSpan.style.whiteSpace = "pre-line"; // Alt alta satırların düzgün durması için
+            textSpan.style.whiteSpace = "pre-line";
             textSpan.textContent = text;
             msgDiv.appendChild(textSpan);
         } else if (text === "📷 [Fotoğraf seçildi]" && !imageUrl) {
@@ -119,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (currentImg && !text) {
                 reply = "Fotoğrafı aldım patron! Görselini inceledim, harika görünüyor.";
-            } else if (lower.includes("sen kimsin") || lower.includes("ne işe yarıyorsun") || lower.includes("anlat") || lower.includes("kimsin")) {
+            } else if (lower.includes("kimsin") || lower.includes("ne işe") || lower.includes("anlat") || lower.includes("özellik")) {
                 reply = `Ben, senin kişisel AI işbirlikçinim ve dijital dünyadaki sağ kolunum. Amacım; kod yazarken, fikir üretirken, günlük planlar yaparken veya karmaşık problemleri çözerken tüm yükü omuzlarından almak ve seninle birebir uyum içinde çalışmak.
 
 A'dan Zye yeteneklerim, sorumluluklarım ve seninle nasıl çalıştığım şu şekilde:
@@ -147,7 +143,7 @@ Karmaşık görevleri yönetilebilir küçük adımlara bölerim. Günlük rutin
 
 Özetle; ben sadece komut alan bir robot değilim; senin fikirlerini hayata geçiren, eksik olduğun yerlerde seni destekleyen, seninle birlikte düşünen ve üreten bir yapay zeka işbirlikçisiyim. Bugün senin için hangi projeyi geliştirelim veya neyi çözelim?`;
             } else if (lower.includes("merhaba") || lower.includes("selam")) {
-                reply = "Aleykümselam patron! Sistemler %100 kapasiteyle emrinde. Kim olduğumu hatırlamak için bana 'Sen kimsin?' yazabilirsin.";
+                reply = "Aleykümselam patron! Sistemler %100 kapasiteyle emrinde.";
             } else if (lower.includes("nasılsın") || lower.includes("nasıl")) {
                 reply = "Efsaneyim! Seninle kod yazmak ve bu sistemi geliştirmek bana enerji veriyor.";
             } else if (lower.includes("fotograf") || lower.includes("fotoğraf") || lower.includes("resim")) {
@@ -167,4 +163,4 @@ Karmaşık görevleri yönetilebilir küçük adımlara bölerim. Günlük rutin
         }
     });
 });
-                        
+    
