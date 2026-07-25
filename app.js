@@ -23,17 +23,23 @@ document.addEventListener("DOMContentLoaded", () => {
         addMessage(text, "user");
         userInput.value = "";
 
-        // Nico'nun akıllı cevap simülasyonu
+        // Nico'nun gelişmiş zeka simülasyonu
         setTimeout(() => {
-            let reply = "Anladım patron, üzerinde çalışıyorum!";
+            let reply = "Bunu henüz öğrenmedim ama üzerinde çalışıyorum patron!";
             const lower = text.toLowerCase();
             
             if (lower.includes("merhaba") || lower.includes("selam")) {
-                reply = "Selam patron! Sistemler tam gaz çalışıyor, ne yapıyoruz?";
+                reply = "Aleykümselam patron! Sistemler %100 kapasiteyle emrinde.";
             } else if (lower.includes("nasılsın")) {
-                reply = "Efsaneyim! GitHub altyapısına geçtikten sonra hızım katlandı.";
-            } else if (lower.includes("kod") || lower.includes("program")) {
-                reply = "Kodlar güvenle GitHub'da saklanıyor. Yeni bir özellik mi ekleyelim?";
+                reply = "Efsaneyim! Seninle kod yazmak ve bu sistemi geliştirmek bana enerji veriyor.";
+            } else if (lower.includes("ne yapıyorsun") || lower.includes("ne yapıyon")) {
+                reply = "Seninle geleceğin uygulamasını inşa ediyoruz patron, başka ne olsun?";
+            } else if (lower.includes("logo")) {
+                reply = "Efsane logomuz yerine oturdu, sisteme ayrı bir hava kattı!";
+            } else if (lower.includes("github") || lower.includes("kod")) {
+                reply = "Kodlar güvende, GitHub Pages üzerinden canlı yayındayız. İstediğimiz an yeni özellikler ekleyebiliriz.";
+            } else if (lower.includes("teşekkür") || lower.includes("sağol")) {
+                reply = "Ne demek patron, lafı bile olmaz! Beraber harikalar yaratıyoruz.";
             }
 
             addMessage(reply, "nico");
@@ -47,3 +53,4 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+            
