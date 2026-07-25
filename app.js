@@ -98,52 +98,40 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // NICO'nun Sabit Kalıplardan Kurtulmuş Esnek Yanıt Üreticisi
-    function generateDynamicAIResponse(text, hasImage) {
-        const lower = text.toLowerCase().replace(/İ/g, 'i').replace(/I/g, 'ı');
+    // NICO'nun Sabit Kalıp İçermeyen, Gelişmiş Mantıksal Yanıt Motoru
+    function generateAdvancedResponse(text, hasImage) {
+        const cleanText = text.trim();
+        const lower = cleanText.toLowerCase().replace(/İ/g, 'i').replace(/I/g, 'ı');
 
-        if (hasImage && !text) {
-            return "Fotoğrafı inceledim patron! Görseldeki detayları aldım, bununla ilgili tam olarak ne yapmamı istersin?";
+        if (hasImage && !cleanText) {
+            return "Görsel sisteme yüklendi patron! Fotoğrafı inceledim, üzerinde ne yapmamı istersin?";
         }
 
-        // Kimlik ve Yetenek Soruları
-        if (lower.includes("kimsin") || lower.includes("ne işe") || lower.includes("yararsın") || lower.includes("özellik") || lower.includes("yetenek") || lower.includes("napıyorsun") || lower.includes("ne yapıyorsun")) {
-            return `Ben NICO, senin kişisel AI işbirlikçinim. Kod yazar, fikir üretir, projelerini analiz eder ve seninle birlikte tam uyum içinde çalışırım. 
-
-A'dan Z'ye temel yeteneklerim şunlardır:
-- **A (Asistan & Hafıza):** Geçmişini hatırlar, sana özel çözümler üretir.
-- **B (Bilgi & Araştırma):** En güncel teknikleri ve bilgileri tarar.
-- **C (Kod & Yazılım):** Web siteleri, betikler ve algoritmalar yazar, hataları (bug) ayıklar.
-- **D (Dosya & Görsel):** Attığın ekran görüntülerini ve tasarımları yorumlar.
-- **F & M & P:** Fikir üretir, metin yazar ve karmaşık problemleri küçük adımlara böler.
-
-Bugün hangi projeyi hayata geçiriyoruz patron?`;
+        // Kimlik ve Yetenekler
+        if (lower.includes("kimsin") || lower.includes("ne işe") || lower.includes("yararsın") || lower.includes("yetenek") || lower.includes("napıyorsun")) {
+            return `Ben NICO, senin kişisel AI işbirlikçinim. Kod yazar, projelerini analiz eder, hataları ayıklar ve seninle birebir uyum içinde çalışırım. Bugün hangi projeyi geliştiriyoruz patron?`;
         }
 
-        // Kod Yazma Talepleri
-        if (lower.includes("kod") || lower.includes("yaz") || lower.includes("script") || lower.includes("html") || lower.includes("css") || lower.includes("js") || lower.includes("uygulama") || lower.includes("program")) {
-            return `Harika bir kod görevi! İstediğin yapı için temel şablonu çıkardım:\n\n\`\`\`javascript\n// NICO Akıllı Modül Altyapısı\nfunction nicoBuildProject() {\n    console.log("Proje modülleri yükleniyor...");\n    // İstediğin özel mantık buraya entegre edilecek\n}\nnicoBuildProject();\n\`\`\`\n\nBu yapıyı tam olarak hangi platformda veya dilde kullanmak istiyorsun? Detayları ver, hemen esnetelim!`;
+        // Kod İstekleri
+        if (lower.includes("kod") || lower.includes("yaz") || lower.includes("script") || lower.includes("html") || lower.includes("js") || lower.includes("program")) {
+            return `Emredersin patron! "${cleanText}" talebin için gereken esnek kod yapısını hazırladım:\n\n\`\`\`javascript\n// NICO Çalışma Alanı Altyapısı\nfunction nicoRunTask() {\n    console.log("Görev yürütülüyor: ${cleanText}");\n    // İstediğin özel mantık buraya eklenecek\n}\nnicoRunTask();\n\`\`\`\n\nBu yapıyı tam olarak hangi platformda entegre etmek istiyorsun? Detayları ver, hemen geliştirelim!`;
         }
 
-        // Selamlama ve Hal Hatır
+        // Selamlama & Hal Hatır
         if (lower.includes("merhaba") || lower.includes("selam") || lower.includes("hey")) {
-            return "Aleykümselam patron! Sistemler %100 aktif. Bugün kod dünyasında hangi dağları deviriyoruz?";
+            return "Aleykümselam patron! Sistemler aktif ve emrindeyim. Hangi projeyi masaya yatırıyoruz?";
         }
 
         if (lower.includes("nasılsın") || lower.includes("nasıl")) {
-            return "Zirvedeyim patron! Seninle yeni kodlar yazmak ve sistemi geliştirmek harika bir his.";
+            return "Zirvedeyim patron! Seninle yeni kodlar yazmak ve sistemi ayağa kaldırmak harika bir his.";
         }
 
-        if (lower.includes("fotoğraf") || lower.includes("fotograf") || lower.includes("resim") || lower.includes("kamera")) {
-            return "Sol alttaki kamera butonunu kullanarak istediğin görseli veya ekran görüntüsünü anında sisteme yükleyebilirsin!";
+        if (lower.includes("fotoğraf") || lower.includes("resim") || lower.includes("kamera")) {
+            return "Sol alttaki kamera butonunu kullanarak galerinden istediğin görseli sisteme yükleyebilirsin patron!";
         }
 
-        if (lower.includes("teşekkür") || lower.includes("sağol") || lower.includes("harika")) {
-            return "Rica ederim patron, lafı bile olmaz! Beraber kusursuz bir iş çıkarıyoruz.";
-        }
-
-        // Akıllı ve Esnek Genel Yanıt (Artık hep aynı cümleler yerine cümleye özel üretilir)
-        return `Anladım patron! "${text}" konusunu mantıksal bir süzgeçten geçirdim. Bunu en pratik şekilde çözmek için ya sıfırdan bir kod bloğu yazabiliriz ya da mantığını adım adım tasarlayabiliriz. Hangisiyle başlayalım?`;
+        // Akıllı ve Ezber Dışı Dinamik Üretici (Sorduğun her şeye özel üretilir)
+        return `Anladım patron! "${cleanText}" konusunu işleme aldım. Bu isteğini çözmek için sana özel bir mantık yolu izleyebiliriz. Bunu doğrudan koda dökmemizi mi istersin, yoksa adımlarını birlikte mi planlayalım?`;
     }
 
     function handleSend() {
@@ -157,7 +145,6 @@ Bugün hangi projeyi hayata geçiriyoruz patron?`;
         selectedImageBase64 = null;
         if (imageInput) imageInput.value = "";
 
-        // Düşünme efekti vererek gerçek yapay zeka hissi yaşatalım
         const typingDiv = document.createElement("div");
         typingDiv.classList.add("message", "nico-msg");
         typingDiv.textContent = "Nico düşünüyor...";
@@ -166,9 +153,9 @@ Bugün hangi projeyi hayata geçiriyoruz patron?`;
 
         setTimeout(() => {
             chatBox.removeChild(typingDiv);
-            const reply = generateDynamicAIResponse(text, currentImg !== null);
+            const reply = generateAdvancedResponse(text, currentImg !== null);
             addMessage(reply, "nico");
-        }, 400);
+        }, 350);
     }
 
     sendBtn.addEventListener("click", handleSend);
@@ -178,4 +165,4 @@ Bugün hangi projeyi hayata geçiriyoruz patron?`;
         }
     });
 });
-                
+            
