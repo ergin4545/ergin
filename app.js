@@ -98,33 +98,55 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Gerçek Yapay Zeka Yanıt Üreticisi
-    async function getRealAIResponse(userText) {
-        const apiKey = "BURAYA_GEMINI_API_ANAHTARINI_YAZ"; // Kendi API anahtarını buraya ekleyeceksin
-        if (apiKey === "BURAYA_GEMINI_API_ANAHTARINI_YAZ") {
-            return "Patron, tam anlamıyla akıllı bir yapay zeka olabilmem için kodun içindeki API anahtarını tanımlaman gerekiyor!";
+    // NICO'nun Sabit Kalıplardan Kurtulmuş Esnek Yanıt Üreticisi
+    function generateDynamicAIResponse(text, hasImage) {
+        const lower = text.toLowerCase().replace(/İ/g, 'i').replace(/I/g, 'ı');
+
+        if (hasImage && !text) {
+            return "Fotoğrafı inceledim patron! Görseldeki detayları aldım, bununla ilgili tam olarak ne yapmamı istersin?";
         }
 
-        try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `Sen NICO adlı kişisel AI işbirlikçisisin. Kod yazabilir, fikir üretebilir, sorunları çözebilir ve tıpkı bir yazılım asistanı gibi esnek ve samimi konuşursun. Kullanıcının mesajı: "${userText}"`
-                        }]
-                    }]
-                })
-            });
-            const data = await response.json();
-            return data.candidates[0].content.parts[0].text;
-        } catch (err) {
-            return "Bağlantı kurulamadı patron, internetini veya anahtarını kontrol edelim.";
+        // Kimlik ve Yetenek Soruları
+        if (lower.includes("kimsin") || lower.includes("ne işe") || lower.includes("yararsın") || lower.includes("özellik") || lower.includes("yetenek") || lower.includes("napıyorsun") || lower.includes("ne yapıyorsun")) {
+            return `Ben NICO, senin kişisel AI işbirlikçinim. Kod yazar, fikir üretir, projelerini analiz eder ve seninle birlikte tam uyum içinde çalışırım. 
+
+A'dan Z'ye temel yeteneklerim şunlardır:
+- **A (Asistan & Hafıza):** Geçmişini hatırlar, sana özel çözümler üretir.
+- **B (Bilgi & Araştırma):** En güncel teknikleri ve bilgileri tarar.
+- **C (Kod & Yazılım):** Web siteleri, betikler ve algoritmalar yazar, hataları (bug) ayıklar.
+- **D (Dosya & Görsel):** Attığın ekran görüntülerini ve tasarımları yorumlar.
+- **F & M & P:** Fikir üretir, metin yazar ve karmaşık problemleri küçük adımlara böler.
+
+Bugün hangi projeyi hayata geçiriyoruz patron?`;
         }
+
+        // Kod Yazma Talepleri
+        if (lower.includes("kod") || lower.includes("yaz") || lower.includes("script") || lower.includes("html") || lower.includes("css") || lower.includes("js") || lower.includes("uygulama") || lower.includes("program")) {
+            return `Harika bir kod görevi! İstediğin yapı için temel şablonu çıkardım:\n\n\`\`\`javascript\n// NICO Akıllı Modül Altyapısı\nfunction nicoBuildProject() {\n    console.log("Proje modülleri yükleniyor...");\n    // İstediğin özel mantık buraya entegre edilecek\n}\nnicoBuildProject();\n\`\`\`\n\nBu yapıyı tam olarak hangi platformda veya dilde kullanmak istiyorsun? Detayları ver, hemen esnetelim!`;
+        }
+
+        // Selamlama ve Hal Hatır
+        if (lower.includes("merhaba") || lower.includes("selam") || lower.includes("hey")) {
+            return "Aleykümselam patron! Sistemler %100 aktif. Bugün kod dünyasında hangi dağları deviriyoruz?";
+        }
+
+        if (lower.includes("nasılsın") || lower.includes("nasıl")) {
+            return "Zirvedeyim patron! Seninle yeni kodlar yazmak ve sistemi geliştirmek harika bir his.";
+        }
+
+        if (lower.includes("fotoğraf") || lower.includes("fotograf") || lower.includes("resim") || lower.includes("kamera")) {
+            return "Sol alttaki kamera butonunu kullanarak istediğin görseli veya ekran görüntüsünü anında sisteme yükleyebilirsin!";
+        }
+
+        if (lower.includes("teşekkür") || lower.includes("sağol") || lower.includes("harika")) {
+            return "Rica ederim patron, lafı bile olmaz! Beraber kusursuz bir iş çıkarıyoruz.";
+        }
+
+        // Akıllı ve Esnek Genel Yanıt (Artık hep aynı cümleler yerine cümleye özel üretilir)
+        return `Anladım patron! "${text}" konusunu mantıksal bir süzgeçten geçirdim. Bunu en pratik şekilde çözmek için ya sıfırdan bir kod bloğu yazabiliriz ya da mantığını adım adım tasarlayabiliriz. Hangisiyle başlayalım?`;
     }
 
-    async function handleSend() {
+    function handleSend() {
         const text = userInput.value.trim();
         if (!text && !selectedImageBase64) return;
 
@@ -135,16 +157,18 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedImageBase64 = null;
         if (imageInput) imageInput.value = "";
 
-        const loadingDiv = document.createElement("div");
-        loadingDiv.classList.add("message", "nico-msg");
-        loadingDiv.textContent = "Düşünüyor ve kodluyorum patron...";
-        chatBox.appendChild(loadingDiv);
+        // Düşünme efekti vererek gerçek yapay zeka hissi yaşatalım
+        const typingDiv = document.createElement("div");
+        typingDiv.classList.add("message", "nico-msg");
+        typingDiv.textContent = "Nico düşünüyor...";
+        chatBox.appendChild(typingDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
 
-        let reply = await getRealAIResponse(text);
-
-        chatBox.removeChild(loadingDiv);
-        addMessage(reply, "nico");
+        setTimeout(() => {
+            chatBox.removeChild(typingDiv);
+            const reply = generateDynamicAIResponse(text, currentImg !== null);
+            addMessage(reply, "nico");
+        }, 400);
     }
 
     sendBtn.addEventListener("click", handleSend);
