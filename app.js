@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const userInput = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
 
-    // Geçmiş mesajları yükle
     loadChatHistory();
 
     function addMessage(text, sender, saveToStorage = true) {
@@ -27,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof getHistory === "function") {
             const history = getHistory();
             if (history.length > 0) {
-                // İlk varsayılan mesajı tekrar eklememek için temizle veya koru
                 chatBox.innerHTML = "";
                 history.forEach(item => {
                     if (item && item.value) {
@@ -51,14 +49,14 @@ document.addEventListener("DOMContentLoaded", () => {
         addMessage(text, "user");
         userInput.value = "";
 
-        // Nico'nun zeka simülasyonu ve cevap üretimi
         setTimeout(() => {
             let reply = "Bunu henüz öğrenmedim ama üzerinde çalışıyorum patron!";
-            const lower = text.toLowerCase();
+            // Türkçe karakter ve büyük/küçük harf sorununu ortadan kaldıran dönüştürme:
+            const lower = text.toLowerCase().replace(/İ/g, 'i').replace(/I/g, 'ı');
             
             if (lower.includes("merhaba") || lower.includes("selam")) {
                 reply = "Aleykümselam patron! Sistemler %100 kapasiteyle emrinde.";
-            } else if (lower.includes("nasılsın")) {
+            } else if (lower.includes("nasılsın") || lower.includes("nasıl")) {
                 reply = "Efsaneyim! Seninle kod yazmak ve bu sistemi geliştirmek bana enerji veriyor.";
             } else if (lower.includes("ne yapıyorsun") || lower.includes("ne yapıyon")) {
                 reply = "Seninle geleceğin uygulamasını inşa ediyoruz patron, başka ne olsun?";
