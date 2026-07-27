@@ -62,7 +62,7 @@ async function askNico(text) {
         loading.remove();
 
         addMessage(
-            "Bağlantı kurulamadı. Worker veya Gemini ayarını kontrol et.",
+            "Hata Detayı: " + error.message,
             "nico-msg"
         );
     }
