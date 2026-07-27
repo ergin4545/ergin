@@ -131,4 +131,3 @@ imageInput.addEventListener("change", ()=>{
 
 
 console.log("NICO aktif. Worker bağlantısı hazır.");
-                         
