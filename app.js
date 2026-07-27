@@ -31,6 +31,7 @@ async function askNico(text) {
 
         const res = await fetch(WORKER_URL, {
             method: "POST",
+            mode: "cors",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -39,6 +40,9 @@ async function askNico(text) {
             })
         });
 
+        if (!res.ok) {
+            throw new Error("Sunucu HTTP hata kodu döndürdü: " + res.status);
+        }
 
         const data = await res.json();
 
@@ -62,7 +66,7 @@ async function askNico(text) {
         loading.remove();
 
         addMessage(
-            "Hata Detayı: " + error.message,
+            "Bağlantı Hatası: " + error.message,
             "nico-msg"
         );
     }
@@ -127,3 +131,4 @@ imageInput.addEventListener("change", ()=>{
 
 
 console.log("NICO aktif. Worker bağlantısı hazır.");
+                         
