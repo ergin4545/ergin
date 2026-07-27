@@ -1,6 +1,6 @@
 // NICO AI Assistant - app.js
 
-const WORKER_URL = "https://bitter-haze-2503.usermame5252.workers.dev/";
+const WORKER_URL = "https://bitter-haze-2503.username5252.workers.dev/";
 
 const chatBox = document.getElementById("chatBox");
 const userInput = document.getElementById("userInput");
