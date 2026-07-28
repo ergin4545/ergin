@@ -39,7 +39,8 @@ async function askNico(text) {
         const data = await res.json();
         loading.remove();
 
-        const replyText = data.reply || data.response;
+        // Worker'dan gelen yanıtı doğrudan alıyoruz
+        const replyText = data.reply;
 
         if (replyText) {
             addMessage(replyText, "nico-msg");
