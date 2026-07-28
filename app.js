@@ -8,7 +8,6 @@ const sendBtn = document.getElementById("sendBtn");
 const uploadBtn = document.getElementById("uploadBtn");
 const imageInput = document.getElementById("imageInput");
 
-
 // Mesaj ekleme
 function addMessage(text, type) {
     const msg = document.createElement("div");
@@ -18,17 +17,14 @@ function addMessage(text, type) {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-
 // Worker üzerinden NICO'ya gönder
 async function askNico(text) {
-
     const loading = document.createElement("div");
     loading.className = "message nico-msg";
     loading.textContent = "NICO düşünüyor...";
     chatBox.appendChild(loading);
 
     try {
-
         const res = await fetch(WORKER_URL, {
             method: "POST",
             mode: "cors",
@@ -40,17 +36,13 @@ async function askNico(text) {
             })
         });
 
-        if (!res.ok) {
-            throw new Error("Sunucu HTTP hata kodu döndürdü: " + res.status);
-        }
-
         const data = await res.json();
-
         loading.remove();
 
+        const replyText = data.reply || data.response;
 
-        if (data.reply) {
-            addMessage(data.reply, "nico-msg");
+        if (replyText) {
+            addMessage(replyText, "nico-msg");
         } else {
             addMessage(
                 "Patron, Worker cevap döndürmedi.",
@@ -58,13 +50,9 @@ async function askNico(text) {
             );
         }
 
-
     } catch (error) {
-
         console.error(error);
-
         loading.remove();
-
         addMessage(
             "Bağlantı Hatası: " + error.message,
             "nico-msg"
@@ -72,63 +60,40 @@ async function askNico(text) {
     }
 }
 
-
 // Gönder butonu
 sendBtn.addEventListener("click", () => {
-
     const text = userInput.value.trim();
-
     if (!text) return;
 
-
     addMessage(text, "user-msg");
-
     userInput.value = "";
-
     askNico(text);
-
 });
-
 
 // Enter tuşu
-userInput.addEventListener("keydown", (e)=>{
-
-    if(e.key === "Enter"){
+userInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
         sendBtn.click();
     }
-
 });
-
 
 // Fotoğraf butonu
-uploadBtn.addEventListener("click", ()=>{
-
+uploadBtn.addEventListener("click", () => {
     imageInput.click();
-
 });
 
-
 // Fotoğraf seçildiğinde
-imageInput.addEventListener("change", ()=>{
-
+imageInput.addEventListener("change", () => {
     const file = imageInput.files[0];
-
-    if(file){
-
+    if (file) {
         addMessage(
             "📷 Fotoğraf seçildi: " + file.name,
             "user-msg"
         );
-
-
         askNico(
             "Kullanıcı bir fotoğraf yükledi. Bu özelliği yakında destekle."
         );
-
     }
-
 });
 
-
 console.log("NICO aktif. Worker bağlantısı hazır.");
-                
