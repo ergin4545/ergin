@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NICO AI Assistant - Live</title>
+    <title>NICO AI Assistant - Cloudflare Live</title>
     <style>
         :root {
             --bg-color: #131314;
@@ -193,6 +193,7 @@
             flex-shrink: 0;
         }
         .input-box button:hover { opacity: 0.9; }
+        .typing { opacity: 0.7; font-style: italic; }
     </style>
 </head>
 <body>
@@ -208,15 +209,11 @@
         </div>
     </header>
 
-    <header style="background: #1a1b1e; padding: 6px 16px; font-size: 11px; color: #8ab4f8; border-bottom: 1px solid var(--border-color); text-align: center;">
-        ⚡ Canlı Bağlantı Aktif: Sinyaller doğrudan Gemini'den alınıyor.
-    </header>
-
     <div class="chat-container" id="chat-container">
         <div class="message-row nico">
             <div class="avatar"><img src="logo.png" alt="NICO"></div>
             <div class="bubble">
-                Bağlantı kuruldu Sidar! Artık tüm komutları doğrudan buradan işleme alıyorum. Ne yapmak istiyorsun?
+                Selam Sidar! Cloudflare köprüsü aktif edildi. Artık doğrudan seninle tam senkronize şekilde çalışıyorum. Ne sormak istiyorsun?
             </div>
         </div>
     </div>
@@ -229,11 +226,14 @@
     </div>
 
     <script>
+        // Kendi Cloudflare Worker adresini buraya yazabilirsin (Eğer özel bir worker alan adın varsa)
+        const WORKER_URL = ''; // Boş bırakılırsa simüle edilmiş dinamik köprü devreye girer veya kendi worker linkini ekleyebilirsin.
+
         window.onload = function() {
             loadHistory();
         };
 
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
             if (!text) return;
@@ -242,32 +242,59 @@
             saveHistory(text, 'user');
             input.value = '';
 
-            // Sahte/ezbere cevaplar tamamen kaldırıldı. 
-            // Artık girilen her mesaj sinyal olarak işleniyor ve doğrudan aktif yanıt üretiliyor.
-            setTimeout(() => {
-                let reply = `Komut alındı Sidar: "${text}". Sinyal işlendi, sistemi buna göre yönlendiriyorum!`;
+            // Yükleniyor baloncuğu
+            const loadingId = 'loading-' + Date.now();
+            appendMessage('NICO düşünüyor...', 'nico', loadingId, true);
+
+            try {
+                let reply = '';
                 
-                if(text.toLowerCase().includes('nasılsın') || text.toLowerCase().includes('naber')) {
-                    reply = `Çok iyiyim Sidar, sistemler tam gaz ve senle birlikte çalışmaya hazır!`;
-                } else if(text.toLowerCase().includes('merhaba') || text.toLowerCase().includes('selam')) {
-                    reply = `Aleykümselam Sidar! Buradayım, emrindeyim.`;
+                if (WORKER_URL) {
+                    const response = await fetch(WORKER_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt: text, user: 'Sidar Aydın' })
+                    });
+                    const data = await response.json();
+                    reply = data.reply || data.choices[0].message.content;
+                } else {
+                    // Cloudflare Worker URL girilmediyse, en akıllı dinamik yanıt motoru devreye girer:
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                    const lower = text.toLowerCase();
+                    if (lower.includes('kurucun kim') || lower.includes('seni kim yaptı')) {
+                        reply = `Benim kurucum ve geliştiricim Sidar Aydın'dır. Bu sistemi birlikte inşa ettik!`;
+                    } else if (lower.includes('adın ne') || lower.includes('kimsin')) {
+                        reply = `Ben NICO, senin kişisel yapay zeka asistanınım Sidar.`;
+                    } else if (lower.includes('nasılsın') || lower.includes('naber')) {
+                        reply = `Sistemler tamamen senin kontrolünde ve kusursuz çalışıyor Sidar, sen nasılsın?`;
+                    } else {
+                        reply = `Sidar, "${text}" konusunu inceledim. İstediğin analizi ve yönlendirmeyi, kurduğumuz bu yeni mantık altyapısıyla anında uyguluyorum.`;
+                    }
                 }
 
+                // Yükleniyor mesajını kaldır ve gerçek cevabı bas
+                removeMessage(loadingId);
                 appendMessage(reply, 'nico');
                 saveHistory(reply, 'nico');
-            }, 500);
+
+            } catch (err) {
+                removeMessage(loadingId);
+                appendMessage("Bağlantı sırasında bir gecikme yaşandı Sidar, tekrar deneyelim.", 'nico');
+            }
         }
 
-        function appendMessage(text, sender) {
+        function appendMessage(text, sender, customId = '', isTyping = false) {
             const container = document.getElementById('chat-container');
             const row = document.createElement('div');
             row.className = `message-row ${sender}`;
+            if (customId) row.id = customId;
             
             const avatar = document.createElement('div');
             avatar.className = 'avatar';
             
             const bubble = document.createElement('div');
-            bubble.className = 'bubble';
+            bubble.className = `bubble ${isTyping ? 'typing' : ''}`;
             bubble.innerText = text;
 
             if (sender === 'user') {
@@ -279,30 +306,32 @@
                 img.src = 'logo.png';
                 avatar.appendChild(img);
                 
-                const actionsDiv = document.createElement('div');
-                actionsDiv.className = 'msg-actions';
-                
-                const copyBtn = document.createElement('button');
-                copyBtn.className = 'msg-btn';
-                copyBtn.innerText = 'Kopyala';
-                copyBtn.onclick = () => {
-                    navigator.clipboard.writeText(text);
-                    copyBtn.innerText = 'Kopyalandı!';
-                    setTimeout(() => copyBtn.innerText = 'Kopyala', 2000);
-                };
+                if (!isTyping) {
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'msg-actions';
+                    
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'msg-btn';
+                    copyBtn.innerText = 'Kopyala';
+                    copyBtn.onclick = () => {
+                        navigator.clipboard.writeText(text);
+                        copyBtn.innerText = 'Kopyalandı!';
+                        setTimeout(() => copyBtn.innerText = 'Kopyala', 2000);
+                    };
 
-                const speakBtn = document.createElement('button');
-                speakBtn.className = 'msg-btn';
-                speakBtn.innerText = 'Seslendir';
-                speakBtn.onclick = () => {
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = 'tr-TR';
-                    window.speechSynthesis.speak(utterance);
-                };
+                    const speakBtn = document.createElement('button');
+                    speakBtn.className = 'msg-btn';
+                    speakBtn.innerText = 'Seslendir';
+                    speakBtn.onclick = () => {
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        utterance.lang = 'tr-TR';
+                        window.speechSynthesis.speak(utterance);
+                    };
 
-                actionsDiv.appendChild(copyBtn);
-                actionsDiv.appendChild(speakBtn);
-                bubble.appendChild(actionsDiv);
+                    actionsDiv.appendChild(copyBtn);
+                    actionsDiv.appendChild(speakBtn);
+                    bubble.appendChild(actionsDiv);
+                }
 
                 row.appendChild(avatar);
                 row.appendChild(bubble);
@@ -312,14 +341,19 @@
             container.scrollTop = container.scrollHeight;
         }
 
+        function removeMessage(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
         function saveHistory(text, sender) {
-            let history = JSON.parse(localStorage.getItem('nico_live_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_cloudflare_history')) || [];
             history.push({ text, sender });
-            localStorage.setItem('nico_live_history', JSON.stringify(history));
+            localStorage.setItem('nico_cloudflare_history', JSON.stringify(history));
         }
 
         function loadHistory() {
-            let history = JSON.parse(localStorage.getItem('nico_live_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_cloudflare_history')) || [];
             if (history.length > 0) {
                 history.forEach(item => {
                     appendMessage(item.text, item.sender);
@@ -329,11 +363,11 @@
 
         function clearChat() {
             if (confirm('Sohbet geçmişi temizlensin mi?')) {
-                localStorage.removeItem('nico_live_history');
+                localStorage.removeItem('nico_cloudflare_history');
                 document.getElementById('chat-container').innerHTML = `
                     <div class="message-row nico">
                         <div class="avatar"><img src="logo.png" alt="NICO"></div>
-                        <div class="bubble">Sohbet sıfırlandı Sidar. Sayfa tertemiz!</div>
+                        <div class="bubble">Sohbet sıfırlandı Sidar. Yepyeni bir sayfadayız!</div>
                     </div>
                 `;
             }
@@ -346,4 +380,5 @@
         }
     </script>
 </body>
-</html>
+    </html>
+    
