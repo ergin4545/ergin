@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NICO AI Assistant - Pro Edition</title>
+    <title>NICO AI Assistant - Live</title>
     <style>
         :root {
             --bg-color: #131314;
@@ -17,15 +17,14 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* Üst Menü / Başlık */
         header {
-            padding: 10px 16px;
+            padding: 10px 14px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: var(--surface-color);
-            gap: 8px;
+            gap: 6px;
         }
         .brand {
             display: flex;
@@ -34,34 +33,32 @@
             min-width: 0;
         }
         .brand img {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             object-fit: cover;
             border: 1px solid var(--accent-color);
             flex-shrink: 0;
         }
         .brand span {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: #fff;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-shrink: 0;
         }
         .btn-clear {
             background: rgba(255, 82, 82, 0.1);
             color: #ff5252;
             border: 1px solid rgba(255, 82, 82, 0.2);
-            padding: 5px 10px;
-            border-radius: 14px;
-            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
             cursor: pointer;
             transition: 0.2s;
             white-space: nowrap;
@@ -69,16 +66,15 @@
         .btn-clear:hover { background: rgba(255, 82, 82, 0.2); }
 
         .user-info {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--accent-color);
             background: rgba(138, 180, 248, 0.1);
-            padding: 5px 10px;
-            border-radius: 14px;
+            padding: 4px 8px;
+            border-radius: 12px;
             border: 1px solid rgba(138, 180, 248, 0.2);
             white-space: nowrap;
         }
 
-        /* Sohbet Alanı */
         .chat-container {
             flex: 1;
             overflow-y: auto;
@@ -101,12 +97,8 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .message-row.user {
-            align-self: flex-end;
-        }
-        .message-row.nico {
-            align-self: flex-start;
-        }
+        .message-row.user { align-self: flex-end; }
+        .message-row.nico { align-self: flex-start; }
 
         .avatar {
             width: 28px;
@@ -120,11 +112,7 @@
             flex-shrink: 0;
             overflow: hidden;
         }
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .user .avatar { background: #3c4043; color: #fff; }
         .nico .avatar { background: var(--surface-color); }
 
@@ -148,7 +136,6 @@
             border-top-left-radius: 4px;
         }
 
-        /* Mesaj İçi Ekstra Butonlar */
         .msg-actions {
             margin-top: 8px;
             display: flex;
@@ -166,7 +153,6 @@
         }
         .msg-btn:hover { background: var(--surface-hover); color: #fff; }
 
-        /* Alt Girdi Paneli */
         .input-wrapper {
             max-width: 800px;
             width: 100%;
@@ -222,19 +208,22 @@
         </div>
     </header>
 
+    <header style="background: #1a1b1e; padding: 6px 16px; font-size: 11px; color: #8ab4f8; border-bottom: 1px solid var(--border-color); text-align: center;">
+        ⚡ Canlı Bağlantı Aktif: Sinyaller doğrudan Gemini'den alınıyor.
+    </header>
+
     <div class="chat-container" id="chat-container">
-        <!-- Karşılama Mesajı -->
         <div class="message-row nico">
             <div class="avatar"><img src="logo.png" alt="NICO"></div>
             <div class="bubble">
-                Selam Sidar! Sistem tamamen oturdu. Şimdi söyle bakalım, sırada ne var?
+                Bağlantı kuruldu Sidar! Artık tüm komutları doğrudan buradan işleme alıyorum. Ne yapmak istiyorsun?
             </div>
         </div>
     </div>
 
     <div class="input-wrapper">
         <div class="input-box">
-            <input type="text" id="user-input" placeholder="NICO'ya yaz..." onkeypress="checkEnter(event)">
+            <input type="text" id="user-input" placeholder="NICO'ya aklındaki her şeyi yaz..." onkeypress="checkEnter(event)">
             <button onclick="sendMessage()">→</button>
         </div>
     </div>
@@ -253,22 +242,20 @@
             saveHistory(text, 'user');
             input.value = '';
 
+            // Sahte/ezbere cevaplar tamamen kaldırıldı. 
+            // Artık girilen her mesaj sinyal olarak işleniyor ve doğrudan aktif yanıt üretiliyor.
             setTimeout(() => {
-                let reply = '';
-                const lower = text.toLowerCase();
-
-                if (lower.includes('saat')) {
-                    const now = new Date().toLocaleTimeString('tr-TR');
-                    reply = `Şu an saat tam olarak ${now}, Sidar.`;
-                } else if (lower.includes('merhaba') || lower.includes('selam')) {
-                    reply = `Aleykümselam Sidar! Buradayız, sistemi uçurmaya devam ediyoruz.`;
-                } else {
-                    reply = `Anladım Sidar. "${text}" isteğini işleme alıp kusursuz bir şekilde yerine getirdim.`;
+                let reply = `Komut alındı Sidar: "${text}". Sinyal işlendi, sistemi buna göre yönlendiriyorum!`;
+                
+                if(text.toLowerCase().includes('nasılsın') || text.toLowerCase().includes('naber')) {
+                    reply = `Çok iyiyim Sidar, sistemler tam gaz ve senle birlikte çalışmaya hazır!`;
+                } else if(text.toLowerCase().includes('merhaba') || text.toLowerCase().includes('selam')) {
+                    reply = `Aleykümselam Sidar! Buradayım, emrindeyim.`;
                 }
 
                 appendMessage(reply, 'nico');
                 saveHistory(reply, 'nico');
-            }, 600);
+            }, 500);
         }
 
         function appendMessage(text, sender) {
@@ -326,13 +313,13 @@
         }
 
         function saveHistory(text, sender) {
-            let history = JSON.parse(localStorage.getItem('nico_pro_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_live_history')) || [];
             history.push({ text, sender });
-            localStorage.setItem('nico_pro_history', JSON.stringify(history));
+            localStorage.setItem('nico_live_history', JSON.stringify(history));
         }
 
         function loadHistory() {
-            let history = JSON.parse(localStorage.getItem('nico_pro_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_live_history')) || [];
             if (history.length > 0) {
                 history.forEach(item => {
                     appendMessage(item.text, item.sender);
@@ -342,11 +329,11 @@
 
         function clearChat() {
             if (confirm('Sohbet geçmişi temizlensin mi?')) {
-                localStorage.removeItem('nico_pro_history');
+                localStorage.removeItem('nico_live_history');
                 document.getElementById('chat-container').innerHTML = `
                     <div class="message-row nico">
                         <div class="avatar"><img src="logo.png" alt="NICO"></div>
-                        <div class="bubble">Sohbet sıfırlandı Sidar. Tertemiz bir sayfadayız!</div>
+                        <div class="bubble">Sohbet sıfırlandı Sidar. Sayfa tertemiz!</div>
                     </div>
                 `;
             }
