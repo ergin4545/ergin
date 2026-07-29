@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini - Asistan</title>
+    <title>NICO - Asistan</title>
     <style>
         :root {
             --bg-color: #131314;
@@ -56,7 +56,7 @@
         .message-row.user {
             align-self: flex-end;
         }
-        .message-row.gemini {
+        .message-row.nico {
             align-self: flex-start;
         }
 
@@ -72,7 +72,7 @@
             flex-shrink: 0;
         }
         .user .avatar { background: #3c4043; color: #fff; }
-        .gemini .avatar { background: linear-gradient(135deg, #8ab4f8, #c58af9); color: #131314; }
+        .nico .avatar { background: linear-gradient(135deg, #8ab4f8, #c58af9); color: #131314; }
 
         .bubble {
             padding: 12px 18px;
@@ -86,7 +86,7 @@
             color: #fff;
             border-top-right-radius: 4px;
         }
-        .gemini .bubble {
+        .nico .bubble {
             background: var(--surface-color);
             color: var(--text-color);
             border: 1px solid var(--border-color);
@@ -138,27 +138,26 @@
 <body>
 
     <header>
-        <span>Gemini</span>
+        <span>NICO</span>
         <div class="user-info">Sidar Aydın</div>
     </header>
 
     <div class="chat-container" id="chat-container">
         <!-- Karşılama Mesajı -->
-        <div class="message-row gemini">
-            <div class="avatar">G</div>
+        <div class="message-row nico">
+            <div class="avatar">N</div>
             <div class="bubble">Merhaba Sidar! Nasıl yardımcı olabilirim?</div>
         </div>
     </div>
 
     <div class="input-wrapper">
         <div class="input-box">
-            <input type="text" id="user-input" placeholder="Buraya bir şeyler yazın..." onkeypress="checkEnter(event)">
+            <input type="text" id="user-input" placeholder="NICO'ya bir şeyler yazın..." onkeypress="checkEnter(event)">
             <button onclick="sendMessage()">→</button>
         </div>
     </div>
 
     <script>
-        // Sayfa açıldığında hafızadaki geçmişi yükle
         window.onload = function() {
             loadHistory();
         };
@@ -168,16 +167,14 @@
             const text = input.value.trim();
             if (!text) return;
 
-            // Kullanıcı mesajını ekle ve kaydet
             appendMessage(text, 'user');
             saveHistory(text, 'user');
             input.value = '';
 
-            // Asistan yanıt simülasyonu (Birebir benim gibi akıcı cevap versin diye)
             setTimeout(() => {
                 const reply = `Anladım Sidar. "${text}" konusunu detaylıca ele alıyorum, tam istediğin gibi seninle birlikte adım adım çözeceğiz.`;
-                appendMessage(reply, 'gemini');
-                saveHistory(reply, 'gemini');
+                appendMessage(reply, 'nico');
+                saveHistory(reply, 'nico');
             }, 500);
         }
 
@@ -188,7 +185,7 @@
             
             const avatar = document.createElement('div');
             avatar.className = 'avatar';
-            avatar.innerText = sender === 'user' ? 'S' : 'G';
+            avatar.innerText = sender === 'user' ? 'S' : 'N';
 
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
@@ -207,15 +204,14 @@
         }
 
         function saveHistory(text, sender) {
-            let history = JSON.parse(localStorage.getItem('gemini_chat_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_chat_history')) || [];
             history.push({ text, sender });
-            localStorage.setItem('gemini_chat_history', JSON.stringify(history));
+            localStorage.setItem('nico_chat_history', JSON.stringify(history));
         }
 
         function loadHistory() {
-            let history = JSON.parse(localStorage.getItem('gemini_chat_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_chat_history')) || [];
             if (history.length > 0) {
-                // Varsayılan karşılama mesajından sonra geçmişi bas
                 history.forEach(item => {
                     appendMessage(item.text, item.sender);
                 });
