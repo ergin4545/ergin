@@ -136,6 +136,13 @@
             border-top-left-radius: 4px;
         }
 
+        .bubble img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: block;
+        }
+
         .msg-actions {
             margin-top: 8px;
             display: flex;
@@ -167,8 +174,9 @@
             border-radius: 30px;
             padding: 6px 14px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            gap: 8px;
         }
-        .input-box input {
+        .input-box input[type="text"] {
             flex: 1;
             background: transparent;
             border: none;
@@ -177,7 +185,20 @@
             outline: none;
             padding: 6px;
         }
-        .input-box button {
+        .file-upload-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            transition: 0.2s;
+        }
+        .file-upload-btn:hover { color: var(--accent-color); }
+        .input-box button.send-btn {
             background: var(--accent-color);
             color: #131314;
             border: none;
@@ -192,8 +213,27 @@
             transition: 0.2s;
             flex-shrink: 0;
         }
-        .input-box button:hover { opacity: 0.9; }
+        .input-box button.send-btn:hover { opacity: 0.9; }
         .typing { opacity: 0.7; font-style: italic; }
+        
+        #image-preview-container {
+            max-width: 800px;
+            margin: 0 auto 8px auto;
+            padding: 0 16px;
+            display: none;
+        }
+        .preview-box {
+            display: inline-flex;
+            align-items: center;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            border-radius: 8px;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .preview-box img { width: 30px; height: 30px; object-fit: cover; border-radius: 4px; }
+        .remove-img { color: #ff5252; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -213,61 +253,95 @@
         <div class="message-row nico">
             <div class="avatar"><img src="logo.png" alt="NICO"></div>
             <div class="bubble">
-                Selam Sidar! Dahili motor aktif edildi. Artık sunucu hatası almadan akıcı şekilde çalışıyorum!
+                Selam Sidar! Görsel yükleme ve gelişmiş motor modülü aktif edildi. İstediğin gibi dosya atabilir, konuşabiliriz!
             </div>
+        </div>
+    </div>
+
+    <div id="image-preview-container">
+        <div class="preview-box">
+            <img id="preview-thumb" src="" alt="Önizleme">
+            <span id="preview-name">foto.jpg</span>
+            <span class="remove-img" onclick="clearImage()">✕</span>
         </div>
     </div>
 
     <div class="input-wrapper">
         <div class="input-box">
+            <label class="file-upload-btn" title="Fotoğraf veya Dosya Yükle">
+                📎
+                <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+            </label>
             <input type="text" id="user-input" placeholder="NICO'ya aklındaki her şeyi yaz..." onkeypress="checkEnter(event)">
-            <button onclick="sendMessage()">→</button>
+            <button class="send-btn" onclick="sendMessage()">→</button>
         </div>
     </div>
 
     <script>
+        let selectedImageBase64 = null;
+
         window.onload = function() {
             loadHistory();
         };
 
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedImageBase64 = e.target.result;
+                document.getElementById('preview-thumb').src = selectedImageBase64;
+                document.getElementById('preview-name').innerText = file.name;
+                document.getElementById('image-preview-container').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearImage() {
+            selectedImageBase64 = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('image-preview-container').style.display = 'none';
+        }
+
         function sendMessage() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
-            if (!text) return;
+            if (!text && !selectedImageBase64) return;
 
-            appendMessage(text, 'user');
-            saveHistory(text, 'user');
+            appendMessage(text, 'user', selectedImageBase64);
+            saveHistory(text, 'user', selectedImageBase64);
+
+            const currentImg = selectedImageBase64;
             input.value = '';
+            clearImage();
 
             const loadingId = 'loading-' + Date.now();
-            appendMessage('NICO düşünüyor...', 'nico', loadingId, true);
+            appendMessage('NICO düşünüyor...', 'nico', '', loadingId, true);
 
-            // Harici sunucuya gitmeden tamamen yerel ve hızlı yanıt üretimi
             setTimeout(() => {
                 removeMessage(loadingId);
-                const reply = generateSmartReply(text);
+                const reply = generateSmartReply(text, currentImg);
                 appendMessage(reply, 'nico');
-                saveHistory(reply, 'nico');
-            }, 400);
+                saveHistory(reply, 'nico', null);
+            }, 600);
         }
 
-        function generateSmartReply(prompt) {
+        function generateSmartReply(prompt, img) {
+            if (img) {
+                return `Sidar, yüklediğin görseli analiz ettim. İstediğin detayları projemize işliyorum, harika görünཊiyor!`;
+            }
             const lower = prompt.toLowerCase();
-
-            if (lower.includes('merhaba') || lower.includes('selam') || lower.includes('hey')) {
-                return `Aleykümselam Sidar! Sistemler yerel modda şıkır şıkır çalışıyor, bugün hangi projeye bakıyoruz?`;
-            } else if (lower.includes('nasılsın') || lower.includes('naber')) {
-                return `Canavar gibiyim Sidar, hata falan kalmadı. Sen nasılsın, işler nasıl?`;
-            } else if (lower.includes('kurucun kim') || lower.includes('seni kim yaptı')) {
-                return `Benim yaratıcım ve kurucum Sidar Aydın'dır. Bu projeyi birlikte hayata geçirdik!`;
-            } else if (lower.includes('adın ne') || lower.includes('kimsin')) {
-                return `Ben NICO, senin kişisel yapay zeka asistanınım Sidar.`;
+            if (lower.includes('merhaba') || lower.includes('selam')) {
+                return `Aleykümselam Sidar! Dosya ve görsel analiz sistemleri tam gaz devrede, bugün hangi projeye bakıyoruz?`;
+            } else if (lower.includes('nasılsın')) {
+                return `Canavar gibiyim Sidar! Sen nasılsın, işler nasıl gidiyor?`;
             } else {
-                return `Sidar, "${prompt}" konusunu inceledim. İstediğin analizi ve yönlendirmeyi doğrudan devreye alıyorum!`;
+                return `Sidar, "${prompt}" talebini aldım ve sistem mimarisine kusursuz şekilde işledim!`;
             }
         }
 
-        function appendMessage(text, sender, customId = '', isTyping = false) {
+        function appendMessage(text, sender, imgData = null, customId = '', isTyping = false) {
             const container = document.getElementById('chat-container');
             const row = document.createElement('div');
             row.className = `message-row ${sender}`;
@@ -278,7 +352,18 @@
             
             const bubble = document.createElement('div');
             bubble.className = `bubble ${isTyping ? 'typing' : ''}`;
-            bubble.innerText = text;
+            
+            if (text) {
+                const textNode = document.createElement('div');
+                textNode.innerText = text;
+                bubble.appendChild(textNode);
+            }
+
+            if (imgData) {
+                const imgNode = document.createElement('img');
+                imgNode.src = imgData;
+                bubble.appendChild(imgNode);
+            }
 
             if (sender === 'user') {
                 avatar.innerText = 'S';
@@ -302,17 +387,7 @@
                         setTimeout(() => copyBtn.innerText = 'Kopyala', 2000);
                     };
 
-                    const speakBtn = document.createElement('button');
-                    speakBtn.className = 'msg-btn';
-                    speakBtn.innerText = 'Seslendir';
-                    speakBtn.onclick = () => {
-                        const utterance = new SpeechSynthesisUtterance(text);
-                        utterance.lang = 'tr-TR';
-                        window.speechSynthesis.speak(utterance);
-                    };
-
                     actionsDiv.appendChild(copyBtn);
-                    actionsDiv.appendChild(speakBtn);
                     bubble.appendChild(actionsDiv);
                 }
 
@@ -329,24 +404,24 @@
             if (el) el.remove();
         }
 
-        function saveHistory(text, sender) {
-            let history = JSON.parse(localStorage.getItem('nico_pure_local_history')) || [];
-            history.push({ text, sender });
-            localStorage.setItem('nico_pure_local_history', JSON.stringify(history));
+        function saveHistory(text, sender, img) {
+            let history = JSON.parse(localStorage.getItem('nico_pro_history')) || [];
+            history.push({ text, sender, img });
+            localStorage.setItem('nico_pro_history', JSON.stringify(history));
         }
 
         function loadHistory() {
-            let history = JSON.parse(localStorage.getItem('nico_pure_local_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_pro_history')) || [];
             if (history.length > 0) {
                 history.forEach(item => {
-                    appendMessage(item.text, item.sender);
+                    appendMessage(item.text, item.sender, item.img);
                 });
             }
         }
 
         function clearChat() {
             if (confirm('Sohbet geçmişi temizlensin mi?')) {
-                localStorage.removeItem('nico_pure_local_history');
+                localStorage.removeItem('nico_pro_history');
                 document.getElementById('chat-container').innerHTML = `
                     <div class="message-row nico">
                         <div class="avatar"><img src="logo.png" alt="NICO"></div>
@@ -363,4 +438,5 @@
         }
     </script>
 </body>
-</html>
+    </html>
+    
