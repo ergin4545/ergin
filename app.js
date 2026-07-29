@@ -33,7 +33,7 @@ async function handleUserMessage(text, user) {
     // 2. Hızlı yanıt simülasyonu / API İsteği
     try {
         // Cloudflare Worker veya backend bağlantısı
-        const response = await fetch('/api/chat', {
+        const response = await fetch('https://bitter-haze-2503.usermame5252.workers.dev', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: text, user: user })
