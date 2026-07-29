@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NICO AI Assistant - Cloudflare Live</title>
+    <title>NICO AI Assistant - Cloudflare Connected</title>
     <style>
         :root {
             --bg-color: #131314;
@@ -213,7 +213,7 @@
         <div class="message-row nico">
             <div class="avatar"><img src="logo.png" alt="NICO"></div>
             <div class="bubble">
-                Selam Sidar! Cloudflare köprüsü aktif edildi. Artık doğrudan seninle tam senkronize şekilde çalışıyorum. Ne sormak istiyorsun?
+                Selam Sidar! Cloudflare hattı bağlandı. Sinyali doğrudan alıyorum, yaz bakalım!
             </div>
         </div>
     </div>
@@ -226,8 +226,8 @@
     </div>
 
     <script>
-        // Kendi Cloudflare Worker adresini buraya yazabilirsin (Eğer özel bir worker alan adın varsa)
-        const WORKER_URL = ''; // Boş bırakılırsa simüle edilmiş dinamik köprü devreye girer veya kendi worker linkini ekleyebilirsin.
+        // Senin Cloudflare Worker adresin
+        const WORKER_URL = 'https://bitter-haze-2503.usermame5252.workers.dev';
 
         window.onload = function() {
             loadHistory();
@@ -242,45 +242,33 @@
             saveHistory(text, 'user');
             input.value = '';
 
-            // Yükleniyor baloncuğu
             const loadingId = 'loading-' + Date.now();
             appendMessage('NICO düşünüyor...', 'nico', loadingId, true);
 
             try {
                 let reply = '';
                 
-                if (WORKER_URL) {
-                    const response = await fetch(WORKER_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt: text, user: 'Sidar Aydın' })
-                    });
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: text, user: 'Sidar Aydın' })
+                });
+
+                if (response.ok) {
                     const data = await response.json();
-                    reply = data.reply || data.choices[0].message.content;
+                    // Worker'dan dönen yapıya göre yanıtı alıyoruz
+                    reply = data.reply || data.choices?.[0]?.message?.content || data.output || JSON.stringify(data);
                 } else {
-                    // Cloudflare Worker URL girilmediyse, en akıllı dinamik yanıt motoru devreye girer:
-                    await new Promise(resolve => setTimeout(resolve, 800));
-                    
-                    const lower = text.toLowerCase();
-                    if (lower.includes('kurucun kim') || lower.includes('seni kim yaptı')) {
-                        reply = `Benim kurucum ve geliştiricim Sidar Aydın'dır. Bu sistemi birlikte inşa ettik!`;
-                    } else if (lower.includes('adın ne') || lower.includes('kimsin')) {
-                        reply = `Ben NICO, senin kişisel yapay zeka asistanınım Sidar.`;
-                    } else if (lower.includes('nasılsın') || lower.includes('naber')) {
-                        reply = `Sistemler tamamen senin kontrolünde ve kusursuz çalışıyor Sidar, sen nasılsın?`;
-                    } else {
-                        reply = `Sidar, "${text}" konusunu inceledim. İstediğin analizi ve yönlendirmeyi, kurduğumuz bu yeni mantık altyapısıyla anında uyguluyorum.`;
-                    }
+                    reply = "Sunucudan yanıt alınamadı Sidar, worker CORS veya endpoint ayarlarını kontrol edelim.";
                 }
 
-                // Yükleniyor mesajını kaldır ve gerçek cevabı bas
                 removeMessage(loadingId);
                 appendMessage(reply, 'nico');
                 saveHistory(reply, 'nico');
 
             } catch (err) {
                 removeMessage(loadingId);
-                appendMessage("Bağlantı sırasında bir gecikme yaşandı Sidar, tekrar deneyelim.", 'nico');
+                appendMessage("Bağlantı hatası oluştu Sidar. Adresin çalıştığından emin olalım.", 'nico');
             }
         }
 
@@ -347,13 +335,13 @@
         }
 
         function saveHistory(text, sender) {
-            let history = JSON.parse(localStorage.getItem('nico_cloudflare_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_cf_live_history')) || [];
             history.push({ text, sender });
-            localStorage.setItem('nico_cloudflare_history', JSON.stringify(history));
+            localStorage.setItem('nico_cf_live_history', JSON.stringify(history));
         }
 
         function loadHistory() {
-            let history = JSON.parse(localStorage.getItem('nico_cloudflare_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_cf_live_history')) || [];
             if (history.length > 0) {
                 history.forEach(item => {
                     appendMessage(item.text, item.sender);
@@ -363,11 +351,11 @@
 
         function clearChat() {
             if (confirm('Sohbet geçmişi temizlensin mi?')) {
-                localStorage.removeItem('nico_cloudflare_history');
+                localStorage.removeItem('nico_cf_live_history');
                 document.getElementById('chat-container').innerHTML = `
                     <div class="message-row nico">
                         <div class="avatar"><img src="logo.png" alt="NICO"></div>
-                        <div class="bubble">Sohbet sıfırlandı Sidar. Yepyeni bir sayfadayız!</div>
+                        <div class="bubble">Sohbet sıfırlandı Sidar. Tertemiz bir sayfadayız!</div>
                     </div>
                 `;
             }
@@ -380,5 +368,4 @@
         }
     </script>
 </body>
-    </html>
-    
+</html>
