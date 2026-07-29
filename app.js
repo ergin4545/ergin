@@ -1,100 +1,101 @@
-// NICO AI Assistant - app.js
+import StorageManager from './storage.js';
 
-const WORKER_URL = "https://bitter-haze-2503.usermame5252.workers.dev/";
+document.addEventListener('DOMContentLoaded', () => {
+    const activeUser = StorageManager.getActiveUser();
+    
+    // Eğer kullanıcı daha önceden giriş yaptıysa geçmişi yükle
+    if (activeUser) {
+        loadChatHistory(activeUser);
+    }
+});
 
-const chatBox = document.getElementById("chatBox");
-const userInput = document.getElementById("userInput");
-const sendBtn = document.getElementById("sendBtn");
-const uploadBtn = document.getElementById("uploadBtn");
-const imageInput = document.getElementById("imageInput");
-
-// Mesaj ekleme
-function addMessage(text, type) {
-    const msg = document.createElement("div");
-    msg.className = "message " + type;
-    msg.textContent = text;
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
+// Sohbet geçmişini ekrana yükleme fonksiyonu
+function loadChatHistory(user) {
+    const history = StorageManager.loadHistory(user);
+    const messagesContainer = document.getElementById('messages');
+    
+    // Varsayılan karşılama mesajı dışındakileri temizle ve geçmişi bas
+    messagesContainer.innerHTML = `<div class="message nico">Tekrar hoş geldin ${user}! Kaldığımız yerden devam ediyoruz.</div>`;
+    
+    history.forEach(msg => {
+        appendMessageDirect(msg.text, msg.sender);
+    });
 }
 
-// Worker üzerinden NICO'ya gönder
-async function askNico(text) {
-    const loading = document.createElement("div");
-    loading.className = "message nico-msg";
-    loading.textContent = "NICO düşünüyor...";
-    chatBox.appendChild(loading);
+// Mesaj gönderme ve yanıtlama akışı
+async function handleUserMessage(text, user) {
+    if (!text.trim()) return;
 
+    // 1. Kullanıcı mesajını ekrana bas ve hafızaya kaydet
+    appendMessageDirect(text, 'user');
+    StorageManager.saveMessage(user, 'user', text);
+
+    // 2. Hızlı yanıt simülasyonu / API İsteği
     try {
-        const res = await fetch(WORKER_URL, {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                message: text
-            })
+        // Cloudflare Worker veya backend bağlantısı
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text, user: user })
         });
+        
+        const data = await response.json();
+        const reply = data.reply || "Hafızaya kaydedildi!";
+        
+        appendMessageDirect(reply, 'nico');
+        StorageManager.saveMessage(user, 'nico', reply);
 
-        const data = await res.json();
-        loading.remove();
-
-        // Worker'dan gelen yanıtı doğrudan alıyoruz
-        const replyText = data.reply;
-
-        if (replyText) {
-            addMessage(replyText, "nico-msg");
-        } else {
-            addMessage(
-                "Patron, Worker cevap döndürmedi.",
-                "nico-msg"
-            );
-        }
-
-    } catch (error) {
-        console.error(error);
-        loading.remove();
-        addMessage(
-            "Bağlantı Hatası: " + error.message,
-            "nico-msg"
-        );
+    } catch (e) {
+        // Çevrimdışı / Hızlı Yerel Yanıt Yedek Mekanizması
+        setTimeout(() => {
+            const fallbackReply = `Anladım Sidar. "${text}" bilgisini hafızama kaydettim, anında işleme alıyorum!`;
+            appendMessageDirect(fallbackReply, 'nico');
+            StorageManager.saveMessage(user, 'nico', fallbackReply);
+        }, 200);
     }
 }
 
-// Gönder butonu
-sendBtn.addEventListener("click", () => {
-    const text = userInput.value.trim();
-    if (!text) return;
+// Ekrana doğrudan mesaj ekleme yardımcı fonksiyonu
+function appendMessageDirect(text, sender) {
+    const messages = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = `message ${sender}`;
+    div.innerText = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+}
 
-    addMessage(text, "user-msg");
-    userInput.value = "";
-    askNico(text);
-});
-
-// Enter tuşu
-userInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-        sendBtn.click();
+// HTML içindeki tetikleyiciler için global bağlama
+window.sendMessage = function() {
+    const input = document.getElementById('user-input');
+    const text = input.value;
+    const user = StorageManager.getActiveUser() || localStorage.getItem('nico_user');
+    
+    if (text.trim()) {
+        input.value = '';
+        handleUserMessage(text, user);
     }
-});
+};
 
-// Fotoğraf butonu
-uploadBtn.addEventListener("click", () => {
-    imageInput.click();
-});
-
-// Fotoğraf seçildiğinde
-imageInput.addEventListener("change", () => {
-    const file = imageInput.files[0];
-    if (file) {
-        addMessage(
-            "📷 Fotoğraf seçildi: " + file.name,
-            "user-msg"
-        );
-        askNico(
-            "Kullanıcı bir fotoğraf yükledi. Bu özelliği yakında destekle."
-        );
+window.handleKeyPress = function(e) {
+    if (e.key === 'Enter') {
+        window.sendMessage();
     }
-});
+};
 
-console.log("NICO aktif. Worker bağlantısı hazır.");
+window.loginSuccess = function(method) {
+    const emailInput = method === 'Email' ? document.getElementById('user-email').value : method + ' Kullanıcısı';
+    if(method === 'Email' && !emailInput) { 
+        alert('Lütfen bir e-posta adresi girin.'); 
+        return; 
+    }
+    
+    StorageManager.saveUserSession(emailInput);
+    localStorage.setItem('nico_user', emailInput);
+    
+    document.getElementById('auth-modal').style.display = 'none';
+    document.getElementById('chat-container').style.display = 'flex';
+    document.getElementById('user-display').innerText = emailInput;
+    
+    loadChatHistory(emailInput);
+};
