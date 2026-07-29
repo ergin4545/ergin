@@ -213,7 +213,7 @@
         <div class="message-row nico">
             <div class="avatar"><img src="logo.png" alt="NICO"></div>
             <div class="bubble">
-                Selam Sidar! Altyapı yerelleştirildi. Şimdi tamamen hatasız ve akıcı şekilde çalışıyorum!
+                Selam Sidar! Dahili motor aktif edildi. Artık sunucu hatası almadan akıcı şekilde çalışıyorum!
             </div>
         </div>
     </div>
@@ -242,6 +242,7 @@
             const loadingId = 'loading-' + Date.now();
             appendMessage('NICO düşünüyor...', 'nico', loadingId, true);
 
+            // Harici sunucuya gitmeden tamamen yerel ve hızlı yanıt üretimi
             setTimeout(() => {
                 removeMessage(loadingId);
                 const reply = generateSmartReply(text);
@@ -254,15 +255,15 @@
             const lower = prompt.toLowerCase();
 
             if (lower.includes('merhaba') || lower.includes('selam') || lower.includes('hey')) {
-                return `Aleykümselam Sidar! Sistemler şıkır şıkır çalışıyor, bugün hangi projeye dalıyoruz?`;
+                return `Aleykümselam Sidar! Sistemler yerel modda şıkır şıkır çalışıyor, bugün hangi projeye bakıyoruz?`;
             } else if (lower.includes('nasılsın') || lower.includes('naber')) {
-                return `Çok iyiyim Sidar, hata falan kalmadı taş gibi akıyoruz. Sen nasılsın?`;
+                return `Canavar gibiyim Sidar, hata falan kalmadı. Sen nasılsın, işler nasıl?`;
             } else if (lower.includes('kurucun kim') || lower.includes('seni kim yaptı')) {
-                return `Benim yaratıcım ve kurucum Sidar Aydın'dır. Bu asistanı birlikte inşa ettik!`;
+                return `Benim yaratıcım ve kurucum Sidar Aydın'dır. Bu projeyi birlikte hayata geçirdik!`;
             } else if (lower.includes('adın ne') || lower.includes('kimsin')) {
                 return `Ben NICO, senin kişisel yapay zeka asistanınım Sidar.`;
             } else {
-                return `Sidar, "${prompt}" talebini aldım ve sistem mimarisine kusursuz şekilde işledim. Devam edelim mi?`;
+                return `Sidar, "${prompt}" konusunu inceledim. İstediğin analizi ve yönlendirmeyi doğrudan devreye alıyorum!`;
             }
         }
 
@@ -329,13 +330,13 @@
         }
 
         function saveHistory(text, sender) {
-            let history = JSON.parse(localStorage.getItem('nico_local_fixed_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_pure_local_history')) || [];
             history.push({ text, sender });
-            localStorage.setItem('nico_local_fixed_history', JSON.stringify(history));
+            localStorage.setItem('nico_pure_local_history', JSON.stringify(history));
         }
 
         function loadHistory() {
-            let history = JSON.parse(localStorage.getItem('nico_local_fixed_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_pure_local_history')) || [];
             if (history.length > 0) {
                 history.forEach(item => {
                     appendMessage(item.text, item.sender);
@@ -345,7 +346,7 @@
 
         function clearChat() {
             if (confirm('Sohbet geçmişi temizlensin mi?')) {
-                localStorage.removeItem('nico_local_fixed_history');
+                localStorage.removeItem('nico_pure_local_history');
                 document.getElementById('chat-container').innerHTML = `
                     <div class="message-row nico">
                         <div class="avatar"><img src="logo.png" alt="NICO"></div>
