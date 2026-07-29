@@ -3,152 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NICO AI Asistan</title>
+    <title>Gemini - Asistan</title>
     <style>
         :root {
             --bg-color: #131314;
             --surface-color: #1e1f20;
             --text-color: #e3e3e3;
+            --text-secondary: #c4c7c5;
             --accent-color: #8ab4f8;
             --border-color: #333537;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        /* Giriş Ekranı */
-        #auth-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 1000;
-        }
-        .auth-card {
-            background: var(--surface-color); padding: 40px 30px; border-radius: 20px; width: 100%; max-width: 420px;
-            border: 1px solid var(--border-color); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .auth-card h1 { font-size: 28px; color: #fff; margin-bottom: 10px; }
-        .auth-card p { font-size: 14px; color: #aaa; margin-bottom: 30px; line-height: 1.5; }
-        .google-btn {
-            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border-color);
-            background: #2d2e30; color: #fff; font-size: 16px; font-weight: 500; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 12px; transition: 0.2s;
-        }
-        .google-btn:hover { background: #3c3d40; }
 
-        /* Sohbet Ekranı */
-        #chat-screen { display: none; flex-direction: column; height: 100%; width: 100%; max-width: 800px; margin: 0 auto; padding: 16px; }
-        .chat-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
-        .chat-header h2 { font-size: 18px; color: #fff; }
-        .user-badge { font-size: 13px; color: var(--accent-color); background: rgba(138, 180, 248, 0.1); padding: 6px 12px; border-radius: 20px; }
-        
-        .messages { flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; gap: 16px; }
-        .message { padding: 14px 18px; border-radius: 16px; max-width: 85%; line-height: 1.6; font-size: 15px; word-break: break-word; }
-        .message.user { background: #2b313a; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .message.nico { background: var(--surface-color); color: var(--text-color); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--border-color); }
-        
-        .input-area { display: flex; gap: 10px; padding-top: 16px; border-top: 1px solid var(--border-color); }
-        .input-area input {
-            flex: 1; padding: 14px 20px; border-radius: 24px; border: 1px solid var(--border-color);
-            background: var(--surface-color); color: #fff; font-size: 15px; outline: none;
+        /* Üst Menü / Başlık */
+        header {
+            padding: 16px 24px;
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .input-area input:focus { border-color: var(--accent-color); }
-        .input-area button {
-            padding: 0 24px; border-radius: 24px; border: none; background: var(--accent-color); color: #131314; font-weight: 600; cursor: pointer; transition: 0.2s;
+        .user-info {
+            font-size: 14px;
+            color: var(--accent-color);
+            background: rgba(138, 180, 248, 0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
         }
-        .input-area button:hover { opacity: 0.9; }
+
+        /* Sohbet Alanı */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .message-row {
+            display: flex;
+            gap: 16px;
+            max-width: 85%;
+        }
+        .message-row.user {
+            align-self: flex-end;
+        }
+        .message-row.gemini {
+            align-self: flex-start;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .user .avatar { background: #3c4043; color: #fff; }
+        .gemini .avatar { background: linear-gradient(135deg, #8ab4f8, #c58af9); color: #131314; }
+
+        .bubble {
+            padding: 12px 18px;
+            border-radius: 18px;
+            line-height: 1.6;
+            font-size: 15px;
+            word-break: break-word;
+        }
+        .user .bubble {
+            background: #2b313a;
+            color: #fff;
+            border-top-right-radius: 4px;
+        }
+        .gemini .bubble {
+            background: var(--surface-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-top-left-radius: 4px;
+        }
+
+        /* Alt Girdi Paneli */
+        .input-wrapper {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto 20px auto;
+            padding: 0 16px;
+        }
+        .input-box {
+            display: flex;
+            align-items: center;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 8px 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .input-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            padding: 8px;
+        }
+        .input-box button {
+            background: var(--accent-color);
+            color: #131314;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .input-box button:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
 
-    <!-- Giriş Ekranı -->
-    <div id="auth-screen">
-        <div class="auth-card">
-            <h1>NICO AI</h1>
-            <p>Google hesabınla tek dokunuşla oturum aç ve hafıza destekli asistanınla sohbet etmeye başla.</p>
-            <button class="google-btn" onclick="loginWithGoogle()">
-                <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.17 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.83 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.17 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-                Google ile Devam Et
-            </button>
+    <header>
+        <span>Gemini</span>
+        <div class="user-info">Sidar Aydın</div>
+    </header>
+
+    <div class="chat-container" id="chat-container">
+        <!-- Karşılama Mesajı -->
+        <div class="message-row gemini">
+            <div class="avatar">G</div>
+            <div class="bubble">Merhaba Sidar! Nasıl yardımcı olabilirim?</div>
         </div>
     </div>
 
-    <!-- Sohbet Ekranı -->
-    <div id="chat-screen">
-        <div class="chat-header">
-            <h2>NICO Asistan</h2>
-            <div class="user-badge" id="user-display"></div>
-        </div>
-        <div class="messages" id="messages"></div>
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="Bir şeyler yazın..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">Gönder</button>
+    <div class="input-wrapper">
+        <div class="input-box">
+            <input type="text" id="user-input" placeholder="Buraya bir şeyler yazın..." onkeypress="checkEnter(event)">
+            <button onclick="sendMessage()">→</button>
         </div>
     </div>
 
     <script>
-        // Sayfa açıldığında daha önce oturum açılmış mı kontrol et
+        // Sayfa açıldığında hafızadaki geçmişi yükle
         window.onload = function() {
-            const savedUser = localStorage.getItem('nico_logged_user');
-            if (savedUser) {
-                showChatScreen(savedUser);
-            }
-        };
-
-        function loginWithGoogle() {
-            // Tarayıcıdaki Google oturum e-postasını veya varsayılan adı alalım
-            let userName = "Sidar Aydın"; 
-            localStorage.setItem('nico_logged_user', userName);
-            showChatScreen(userName);
-        }
-
-        function showChatScreen(user) {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('chat-screen').style.display = 'flex';
-            document.getElementById('user-display').innerText = user;
             loadHistory();
-        }
+        };
 
         function sendMessage() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
             if (!text) return;
 
+            // Kullanıcı mesajını ekle ve kaydet
             appendMessage(text, 'user');
-            saveToHistory(text, 'user');
+            saveHistory(text, 'user');
             input.value = '';
 
-            // Asistan yanıt simülasyonu (Aynı buradaki gibi akıcı ve net)
+            // Asistan yanıt simülasyonu (Birebir benim gibi akıcı cevap versin diye)
             setTimeout(() => {
-                const reply = `Anladım. "${text}" konusunu hafızama kaydettim, tam istediğin gibi işleme alıyorum.`;
-                appendMessage(reply, 'nico');
-                saveToHistory(reply, 'nico');
-            }, 400);
+                const reply = `Anladım Sidar. "${text}" konusunu detaylıca ele alıyorum, tam istediğin gibi seninle birlikte adım adım çözeceğiz.`;
+                appendMessage(reply, 'gemini');
+                saveHistory(reply, 'gemini');
+            }, 500);
         }
 
         function appendMessage(text, sender) {
-            const messages = document.getElementById('messages');
-            const div = document.createElement('div');
-            div.className = `message ${sender}`;
-            div.innerText = text;
-            messages.appendChild(div);
-            messages.scrollTop = messages.scrollHeight;
+            const container = document.getElementById('chat-container');
+            const row = document.createElement('div');
+            row.className = `message-row ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.innerText = sender === 'user' ? 'S' : 'G';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerText = text;
+
+            if (sender === 'user') {
+                row.appendChild(bubble);
+                row.appendChild(avatar);
+            } else {
+                row.appendChild(avatar);
+                row.appendChild(bubble);
+            }
+
+            container.appendChild(row);
+            container.scrollTop = container.scrollHeight;
         }
 
-        function saveToHistory(text, sender) {
-            let history = JSON.parse(localStorage.getItem('nico_chat_history')) || [];
+        function saveHistory(text, sender) {
+            let history = JSON.parse(localStorage.getItem('gemini_chat_history')) || [];
             history.push({ text, sender });
-            localStorage.setItem('nico_chat_history', JSON.stringify(history));
+            localStorage.setItem('gemini_chat_history', JSON.stringify(history));
         }
 
         function loadHistory() {
-            let history = JSON.parse(localStorage.getItem('nico_chat_history')) || [];
-            const messages = document.getElementById('messages');
-            messages.innerHTML = `<div class="message nico">Merhaba Sidar! Oturum açıldı, kaldığımız yerden devam ediyoruz. Sana nasıl yardımcı olabilirim?</div>`;
-            
-            history.forEach(item => {
-                appendMessage(item.text, item.sender);
-            });
+            let history = JSON.parse(localStorage.getItem('gemini_chat_history')) || [];
+            if (history.length > 0) {
+                // Varsayılan karşılama mesajından sonra geçmişi bas
+                history.forEach(item => {
+                    appendMessage(item.text, item.sender);
+                });
+            }
         }
 
-        function handleKeyPress(e) {
+        function checkEnter(e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
