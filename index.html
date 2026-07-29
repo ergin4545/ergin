@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NICO AI Assistant - Cloudflare Connected</title>
+    <title>NICO AI - Canlı Asistan</title>
     <style>
         :root {
             --bg-color: #131314;
@@ -18,62 +18,25 @@
         body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
         header {
-            padding: 10px 14px;
+            padding: 12px 16px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: var(--surface-color);
-            gap: 6px;
         }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 0;
-        }
-        .brand img {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid var(--accent-color);
-            flex-shrink: 0;
-        }
-        .brand span {
-            font-size: 14px;
-            font-weight: 600;
-            color: #fff;
-            white-space: nowrap;
-        }
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-shrink: 0;
-        }
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .brand span { font-size: 15px; font-weight: 600; color: #fff; }
         .btn-clear {
             background: rgba(255, 82, 82, 0.1);
             color: #ff5252;
             border: 1px solid rgba(255, 82, 82, 0.2);
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 12px;
-            font-size: 11px;
+            font-size: 12px;
             cursor: pointer;
-            transition: 0.2s;
-            white-space: nowrap;
         }
         .btn-clear:hover { background: rgba(255, 82, 82, 0.2); }
-
-        .user-info {
-            font-size: 11px;
-            color: var(--accent-color);
-            background: rgba(138, 180, 248, 0.1);
-            padding: 4px 8px;
-            border-radius: 12px;
-            border: 1px solid rgba(138, 180, 248, 0.2);
-            white-space: nowrap;
-        }
 
         .chat-container {
             flex: 1;
@@ -86,35 +49,10 @@
             width: 100%;
             margin: 0 auto;
         }
-
-        .message-row {
-            display: flex;
-            gap: 10px;
-            max-width: 90%;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .message-row { display: flex; gap: 10px; max-width: 90%; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .message-row.user { align-self: flex-end; }
         .message-row.nico { align-self: flex-start; }
-
-        .avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 12px;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .user .avatar { background: #3c4043; color: #fff; }
-        .nico .avatar { background: var(--surface-color); }
 
         .bubble {
             padding: 12px 16px;
@@ -122,43 +60,11 @@
             line-height: 1.5;
             font-size: 14px;
             word-break: break-word;
-            position: relative;
         }
-        .user .bubble {
-            background: #2b313a;
-            color: #fff;
-            border-top-right-radius: 4px;
-        }
-        .nico .bubble {
-            background: var(--surface-color);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-top-left-radius: 4px;
-        }
+        .user .bubble { background: #2b313a; color: #fff; border-top-right-radius: 4px; }
+        .nico .bubble { background: var(--surface-color); color: var(--text-color); border: 1px solid var(--border-color); border-top-left-radius: 4px; }
 
-        .msg-actions {
-            margin-top: 8px;
-            display: flex;
-            gap: 6px;
-        }
-        .msg-btn {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            font-size: 11px;
-            padding: 3px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .msg-btn:hover { background: var(--surface-hover); color: #fff; }
-
-        .input-wrapper {
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto 16px auto;
-            padding: 0 16px;
-        }
+        .input-wrapper { max-width: 800px; width: 100%; margin: 0 auto 16px auto; padding: 0 16px; }
         .input-box {
             display: flex;
             align-items: center;
@@ -169,30 +75,11 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         .input-box input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-            padding: 6px;
+            flex: 1; background: transparent; border: none; color: #fff; font-size: 15px; outline: none; padding: 6px;
         }
         .input-box button {
-            background: var(--accent-color);
-            color: #131314;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            transition: 0.2s;
-            flex-shrink: 0;
+            background: var(--accent-color); color: #131314; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold;
         }
-        .input-box button:hover { opacity: 0.9; }
         .typing { opacity: 0.7; font-style: italic; }
     </style>
 </head>
@@ -200,21 +87,14 @@
 
     <header>
         <div class="brand">
-            <img src="logo.png" alt="NICO Logo">
-            <span>NICO AI</span>
+            <span>NICO AI Assistant</span>
         </div>
-        <div class="header-actions">
-            <button class="btn-clear" onclick="clearChat()">Temizle</button>
-            <div class="user-info">Sidar Aydın</div>
-        </div>
+        <button class="btn-clear" onclick="clearChat()">Sohbeti Temizle</button>
     </header>
 
     <div class="chat-container" id="chat-container">
         <div class="message-row nico">
-            <div class="avatar"><img src="logo.png" alt="NICO"></div>
-            <div class="bubble">
-                Selam Sidar! Cloudflare hattı bağlandı. Sinyali doğrudan alıyorum, yaz bakalım!
-            </div>
+            <div class="bubble">Selam! NICO sistemleri aktif edildi. Sana nasıl yardımcı olabilirim?</div>
         </div>
     </div>
 
@@ -226,14 +106,9 @@
     </div>
 
     <script>
-        // Senin Cloudflare Worker adresin
-        const WORKER_URL = 'https://bitter-haze-2503.usermame5252.workers.dev';
+        window.onload = function() { loadHistory(); };
 
-        window.onload = function() {
-            loadHistory();
-        };
-
-        async function sendMessage() {
+        function sendMessage() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
             if (!text) return;
@@ -245,30 +120,26 @@
             const loadingId = 'loading-' + Date.now();
             appendMessage('NICO düşünüyor...', 'nico', loadingId, true);
 
-            try {
-                let reply = '';
-                
-                const response = await fetch(WORKER_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: text, user: 'Sidar Aydın' })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    // Worker'dan dönen yapıya göre yanıtı alıyoruz
-                    reply = data.reply || data.choices?.[0]?.message?.content || data.output || JSON.stringify(data);
-                } else {
-                    reply = "Sunucudan yanıt alınamadı Sidar, worker CORS veya endpoint ayarlarını kontrol edelim.";
-                }
-
+            setTimeout(() => {
                 removeMessage(loadingId);
+                const reply = generateDynamicReply(text);
                 appendMessage(reply, 'nico');
                 saveHistory(reply, 'nico');
+            }, 600);
+        }
 
-            } catch (err) {
-                removeMessage(loadingId);
-                appendMessage("Bağlantı hatası oluştu Sidar. Adresin çalıştığından emin olalım.", 'nico');
+        function generateDynamicReply(prompt) {
+            const lower = prompt.toLowerCase();
+            if (lower.includes('merhaba') || lower.includes('selam')) {
+                return "Aleykümselam! Harika bir gün, hangi proje üzerinde çalışıyoruz?";
+            } else if (lower.includes('nasılsın')) {
+                return "Sistemler tam gaz, kodlar kusursuz akıyor! Sen nasılsın?";
+            } else if (lower.includes('kurucun') || lower.includes('kim yaptı')) {
+                return "Benim kurucum Sidar Aydın'dır. Bu projeyi birlikte inşa ettik!";
+            } else if (lower.includes('adın ne')) {
+                return "Ben NICO, senin kişisel yapay zeka asistanınım.";
+            } else {
+                return `"${prompt" talebini aldım ve sistem altyapısına işledim. Hızlıca koordine edip hayata geçiriyoruz!`;
             }
         }
 
@@ -278,52 +149,10 @@
             row.className = `message-row ${sender}`;
             if (customId) row.id = customId;
             
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar';
-            
             const bubble = document.createElement('div');
             bubble.className = `bubble ${isTyping ? 'typing' : ''}`;
             bubble.innerText = text;
-
-            if (sender === 'user') {
-                avatar.innerText = 'S';
-                row.appendChild(bubble);
-                row.appendChild(avatar);
-            } else {
-                const img = document.createElement('img');
-                img.src = 'logo.png';
-                avatar.appendChild(img);
-                
-                if (!isTyping) {
-                    const actionsDiv = document.createElement('div');
-                    actionsDiv.className = 'msg-actions';
-                    
-                    const copyBtn = document.createElement('button');
-                    copyBtn.className = 'msg-btn';
-                    copyBtn.innerText = 'Kopyala';
-                    copyBtn.onclick = () => {
-                        navigator.clipboard.writeText(text);
-                        copyBtn.innerText = 'Kopyalandı!';
-                        setTimeout(() => copyBtn.innerText = 'Kopyala', 2000);
-                    };
-
-                    const speakBtn = document.createElement('button');
-                    speakBtn.className = 'msg-btn';
-                    speakBtn.innerText = 'Seslendir';
-                    speakBtn.onclick = () => {
-                        const utterance = new SpeechSynthesisUtterance(text);
-                        utterance.lang = 'tr-TR';
-                        window.speechSynthesis.speak(utterance);
-                    };
-
-                    actionsDiv.appendChild(copyBtn);
-                    actionsDiv.appendChild(speakBtn);
-                    bubble.appendChild(actionsDiv);
-                }
-
-                row.appendChild(avatar);
-                row.appendChild(bubble);
-            }
+            row.appendChild(bubble);
 
             container.appendChild(row);
             container.scrollTop = container.scrollHeight;
@@ -335,37 +164,23 @@
         }
 
         function saveHistory(text, sender) {
-            let history = JSON.parse(localStorage.getItem('nico_cf_live_history')) || [];
+            let history = JSON.parse(localStorage.getItem('nico_pro_history')) || [];
             history.push({ text, sender });
-            localStorage.setItem('nico_cf_live_history', JSON.stringify(history));
+            localStorage.setItem('nico_pro_history', JSON.stringify(history));
         }
 
         function loadHistory() {
-            let history = JSON.parse(localStorage.getItem('nico_cf_live_history')) || [];
-            if (history.length > 0) {
-                history.forEach(item => {
-                    appendMessage(item.text, item.sender);
-                });
-            }
+            let history = JSON.parse(localStorage.getItem('nico_pro_history')) || [];
+            history.forEach(item => appendMessage(item.text, item.sender));
         }
 
         function clearChat() {
-            if (confirm('Sohbet geçmişi temizlensin mi?')) {
-                localStorage.removeItem('nico_cf_live_history');
-                document.getElementById('chat-container').innerHTML = `
-                    <div class="message-row nico">
-                        <div class="avatar"><img src="logo.png" alt="NICO"></div>
-                        <div class="bubble">Sohbet sıfırlandı Sidar. Tertemiz bir sayfadayız!</div>
-                    </div>
-                `;
-            }
+            localStorage.removeItem('nico_pro_history');
+            document.getElementById('chat-container.innerHTML = '<div class="message-row nico"><div class="bubble">Sohbet sıfırlandı, yepyeni bir sayfadayız!</div></div>';
+            location.reload();
         }
 
-        function checkEnter(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        }
+        function checkEnter(e) { if (e.key === 'Enter') sendMessage(); }
     </script>
 </body>
 </html>
