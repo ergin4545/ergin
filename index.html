@@ -7,140 +7,168 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#ffffff">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0f172a; color: #f8fafc; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #ffffff; color: #0f172a; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        header { background: #1e293b; padding: 15px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
-        .header-info { display: flex; flex-direction: column; gap: 2px; }
-        .title { font-size: 1.1rem; font-weight: bold; color: #38bdf8; }
-        .sub-header { font-size: 0.75rem; color: #94a3b8; }
+        /* Üst Header */
+        header { background: #ffffff; padding: 12px 16px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .menu-toggle { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #374151; }
+        .app-logo { font-size: 1.1rem; font-weight: 600; color: #111827; }
         
-        .header-btns { display: flex; gap: 8px; }
-        .action-btn { background: #334155; color: #38bdf8; border: 1px solid #475569; padding: 6px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-weight: bold; }
-        .action-btn:hover { background: #475569; }
+        .header-auth-btns { display: flex; gap: 8px; }
+        .btn-login { background: #000000; color: white; border: none; padding: 8px 16px; border-radius: 9999px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
+        .btn-register { background: #f3f4f6; color: #111827; border: 1px solid #e5e7eb; padding: 8px 16px; border-radius: 9999px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
 
+        /* Sol Yan Menü (Sidebar) */
+        #sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #f9fafb; border-right: 1px solid #e5e7eb; transition: left 0.3s ease; z-index: 200; display: flex; flex-direction: column; justify-content: space-between; padding: 16px; }
+        #sidebar.open { left: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .sidebar-title { font-size: 1.2rem; font-weight: 600; color: #111827; }
+        .sidebar-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #6b7280; }
+        
+        .sidebar-menu { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; color: #374151; text-decoration: none; font-size: 0.95rem; cursor: pointer; }
+        .menu-item:hover { background: #f3f4f6; }
+        
+        .sidebar-footer { border-top: 1px solid #e5e7eb; padding-top: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .sidebar-footer-text { font-size: 0.75rem; color: #6b7280; line-height: 1.4; }
+        .sidebar-auth-group { display: flex; flex-direction: column; gap: 8px; }
+        .sidebar-auth-group button { width: 100%; padding: 10px; border-radius: 9999px; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-align: center; }
+
+        /* Sohbet Alanı */
+        #chat-container { flex: 1; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
         #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        .message { max-width: 85%; padding: 12px 16px; border-radius: 12px; line-height: 1.5; word-wrap: break-word; white-space: pre-wrap; }
-        .user { background: #3b82f6; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .nico { background: #1e293b; color: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid #334155; }
-        
-        .input-area { padding: 15px; background: #1e293b; display: flex; gap: 10px; border-top: 1px solid #334155; }
-        input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 1rem; outline: none; }
-        input:focus { border-color: #38bdf8; }
-        button.send-btn { padding: 0 20px; background: #38bdf8; color: #0f172a; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        button.send-btn:hover { background: #0ea5e9; }
-        .loading { color: #38bdf8; font-style: italic; }
+        .message { max-width: 85%; padding: 12px 16px; border-radius: 12px; line-height: 1.5; font-size: 0.95rem; }
+        .user { background: #f3f4f6; color: #111827; align-self: flex-end; }
+        .nico { background: #ffffff; color: #111827; align-self: flex-start; border: 1px solid #e5e7eb; }
 
-        /* Modal Pencereler */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 100; }
-        .modal-content { background: #1e293b; padding: 25px; border-radius: 16px; width: 90%; max-width: 350px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 15px; text-align: center; }
-        .modal-content h3 { color: #38bdf8; }
-        .account-list { display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto; text-align: left; }
-        .account-item { padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; cursor: pointer; color: #f8fafc; font-size: 0.9rem; }
-        .account-item:hover { border-color: #38bdf8; }
-        .modal-content input { width: 100%; }
-        .modal-content button.primary-btn { width: 100%; padding: 12px; background: #38bdf8; color: #0f172a; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        /* Alt Mesaj Giriş Paneli */
+        .input-area { padding: 16px; background: #ffffff; display: flex; justify-content: center; }
+        .input-wrapper { width: 100%; max-width: 700px; display: flex; align-items: center; background: #f4f4f5; border-radius: 9999px; padding: 8px 12px; border: 1px solid #e4e4e7; }
+        .input-wrapper input { flex: 1; border: none; background: none; padding: 8px; font-size: 0.95rem; outline: none; color: #111827; }
+        .send-btn { background: #000000; color: white; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
+
+        /* Oturum Açma Modalı */
+        #auth-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: flex-end; z-index: 300; }
+        @media (min-width: 640px) { #auth-modal { align-items: center; } }
+        
+        .modal-card { background: #ffffff; width: 100%; max-width: 420px; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; }
+        @media (min-width: 640px) { .modal-card { border-radius: 20px; } }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 1.25rem; font-weight: 600; color: #111827; text-align: center; flex: 1; }
+        .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #6b7280; }
+        
+        .modal-desc { font-size: 0.85rem; color: #6b7280; text-align: center; line-height: 1.4; }
+        
+        .auth-providers { display: flex; flex-direction: column; gap: 10px; }
+        .provider-btn { width: 100%; padding: 12px; border-radius: 9999px; border: 1px solid #d1d5db; background: #ffffff; color: #374151; font-size: 0.95rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .provider-btn:hover { background: #f9fafb; }
+        
+        .divider { display: flex; align-items: center; text-align: center; color: #9ca3af; font-size: 0.75rem; margin: 5px 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #e5e7eb; }
+        .divider::before { margin-right: .5em; }
+        .divider::after { margin-left: .5em; }
+
+        .email-input-group { display: flex; flex-direction: column; gap: 10px; }
+        .email-input-group input { width: 100%; padding: 12px 16px; border-radius: 9999px; border: 1px solid #d1d5db; outline: none; font-size: 0.95rem; }
+        .email-input-group button { width: 100%; padding: 12px; border-radius: 9999px; background: #000000; color: white; border: none; font-weight: 500; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="account-modal" class="modal">
-        <div class="modal-content">
-            <h3>🤖 Hesap Değiştir</h3>
-            <div class="account-list" id="account-list-container"></div>
-            <input type="text" id="modal-name-input" placeholder="Yeni Hesap Adı">
-            <button class="primary-btn" onclick="addNewAccount()">Ekle ve Geçiş Yap</button>
+    <div id="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <span class="sidebar-title">NICO</span>
+                <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item" onclick="toggleSidebar()">🔍 Sohbetlerde ara</div>
+                <div class="menu-item" onclick="toggleSidebar()">🎨 Görselleştirme</div>
+                <div class="menu-item" onclick="toggleSidebar()">🔌 Eklentiler</div>
+                <div class="menu-item" onclick="toggleSidebar()">🔭 Derin araştırma</div>
+            </div>
         </div>
-    </div>
-
-    <div id="pwa-modal" class="modal">
-        <div class="modal-content">
-            <h3>📱 Uygulama Olarak Yükle</h3>
-            <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.4;">
-                Bu arayüzü telefonunda tam ekran (tarayıcı çubuğu olmadan) çalıştırmak için tarayıcı menüsünden (üç nokta) <b>"Ana Ekrana Ekle"</b> veya <b>"Uygulamayı Yükle"</b> seçeneğini seçebilirsin!
-            </p>
-            <button class="primary-btn" onclick="closePwaModal()">Tamamdır</button>
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-text">
+                <b>Sana özel yanıtlar al</b><br>
+                Kaydedilen sohbetlere göre cevaplar almak için oturum aç.
+            </div>
+            <div class="sidebar-auth-group">
+                <button style="background: #000000; color: white;" onclick="openAuthModal()">Oturum aç</button>
+                <button style="background: #f3f4f6; color: #111827; border: 1px solid #e5e7eb;" onclick="openAuthModal()">Ücretsiz kaydol</button>
+            </div>
         </div>
     </div>
 
     <header>
-        <div class="header-info">
-            <span class="title">🤖 NICO (Intek Mod)</span>
-            <span class="sub-header" id="current-user-display">Aktif Hesap: Yükleniyor...</span>
+        <div class="header-left">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <span class="app-logo">NICO</span>
         </div>
-        <div class="header-btns">
-            <button class="action-btn" onclick="openAccountModal()">Profil</button>
-            <button class="action-btn" onclick="openPwaModal()">📲 Kur</button>
+        <div class="header-auth-btns">
+            <button class="btn-login" onclick="openAuthModal()">Oturum aç</button>
+            <button class="btn-register" onclick="openAuthModal()">Ücretsiz kaydol</button>
         </div>
     </header>
 
-    <div id="chat-box">
-        <div class="message nico" id="welcome-msg">Sistem aktif.</div>
+    <div id="chat-container">
+        <div id="chat-box">
+            <div class="message nico">Merhaba! NICO arayüzü ve oturum akışıyla hazır. Komutunu yazabilirsin.</div>
+        </div>
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="user-input" placeholder="Mesaj gönder..." onkeydown="if(event.key === 'Enter') sendMessage()">
+                <button class="send-btn" onclick="sendMessage()">⬆</button>
+            </div>
+        </div>
     </div>
 
-    <div class="input-area">
-        <input type="text" id="user-input" placeholder="Komutunu yaz..." onkeydown="if(event.key === 'Enter') sendMessage()">
-        <button class="send-btn" onclick="sendMessage()">Gönder</button>
+    <div id="auth-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <span class="modal-title">Oturum aç veya kaydol</span>
+                <button class="modal-close" onclick="closeAuthModal()">✕</button>
+            </div>
+            <p class="modal-desc">Daha akıllı yanıtlar alabilir, dosyalar ve görseller yükleyebilir ve daha fazlasını yapabilirsin.</p>
+            
+            <div class="auth-providers">
+                <button class="provider-btn" onclick="simulateAuth('Google')">🔵 Google ile devam et</button>
+                <button class="provider-btn" onclick="simulateAuth('Apple')">🍏 Apple ile devam et</button>
+                <button class="provider-btn" onclick="simulateAuth('Telefon')">📞 Telefonla devam et</button>
+            </div>
+
+            <div class="divider">YA DA</div>
+
+            <div class="email-input-group">
+                <input type="email" id="user-email" placeholder="E-posta adresi">
+                <button onclick="simulateAuth('E-posta')">Devam</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        let accounts = JSON.parse(localStorage.getItem('nico_accounts')) || ["Sidar", "Ahmet", "Mehmet"];
-        let currentUser = localStorage.getItem('nico_active_user') || accounts[0];
-
-        window.onload = function() {
-            if (!localStorage.getItem('nico_active_user')) {
-                localStorage.setItem('nico_active_user', currentUser);
-            }
-            updateUI();
-        };
-
-        function openAccountModal() {
-            const container = document.getElementById('account-list-container');
-            container.innerHTML = '';
-            accounts.forEach(acc => {
-                const div = document.createElement('div');
-                div.className = 'account-item';
-                div.textContent = `👤 ${acc}`;
-                div.onclick = () => switchAccount(acc);
-                container.appendChild(div);
-            });
-            document.getElementById('account-modal').style.display = 'flex';
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
         }
 
-        function switchAccount(name) {
-            currentUser = name;
-            localStorage.setItem('nico_active_user', currentUser);
-            document.getElementById('account-modal').style.display = 'none';
-            updateUI();
+        function openAuthModal() {
+            document.getElementById('auth-modal').style.display = 'flex';
+            document.getElementById('sidebar').classList.remove('open');
         }
 
-        function addNewAccount() {
-            const nameInput = document.getElementById('modal-name-input').value.trim();
-            if (!nameInput) return;
-            if (!accounts.includes(nameInput)) {
-                accounts.push(nameInput);
-                localStorage.setItem('nico_accounts', JSON.stringify(accounts));
-            }
-            currentUser = nameInput;
-            localStorage.setItem('nico_active_user', currentUser);
-            document.getElementById('account-modal').style.display = 'none';
-            document.getElementById('modal-name-input').value = '';
-            updateUI();
+        function closeAuthModal() {
+            document.getElementById('auth-modal').style.display = 'none';
         }
 
-        function openPwaModal() {
-            document.getElementById('pwa-modal').style.display = 'flex';
-        }
-
-        function closePwaModal() {
-            document.getElementById('pwa-modal').style.display = 'none';
-        }
-
-        function updateUI() {
-            document.getElementById('current-user-display').textContent = `Aktif Hesap: ${currentUser}`;
-            document.getElementById('welcome-msg').textContent = `Selam ${currentUser}! Intek/İncek modunda NICO emrinde. Profil değiştirebilir ya da uygulamayı telefona sabitleyebilirsin.`;
+        function simulateAuth(method) {
+            alert(`${method} ile oturum açma akışı tetiklendi! NICO sisteme bağlandı.`);
+            closeAuthModal();
         }
 
         async function sendMessage() {
@@ -158,18 +186,11 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             const nicoMsg = document.createElement('div');
-            nicoMsg.className = 'message nico loading';
-            nicoMsg.textContent = "NICO işliyor...";
+            nicoMsg.className = 'message nico';
+            nicoMsg.textContent = `NICO işliyor: "${text}" konusunu değerlendirdim.`;
             chatBox.appendChild(nicoMsg);
             chatBox.scrollTop = chatBox.scrollHeight;
-
-            setTimeout(() => {
-                nicoMsg.className = 'message nico';
-                nicoMsg.textContent = `[Intek Sürüm - ${currentUser}] Mesajın işlendi: "${text}" 🚀 İncek'ten selamlar, sistem tam gaz ayakta!`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }, 800);
         }
     </script>
 </body>
-    </html>
-    
+</html>
