@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NICO AI Assistant</title>
     <style>
         :root {
@@ -15,7 +15,16 @@
             --border-color: #333537;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            height: 100vh; 
+            height: 100dvh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
 
         header {
             padding: 10px 14px;
@@ -25,6 +34,7 @@
             align-items: center;
             background: var(--surface-color);
             gap: 6px;
+            flex-shrink: 0;
         }
         .brand {
             display: flex;
@@ -60,10 +70,8 @@
             border-radius: 12px;
             font-size: 11px;
             cursor: pointer;
-            transition: 0.2s;
             white-space: nowrap;
         }
-        .btn-clear:hover { background: rgba(255, 82, 82, 0.2); }
         .user-info {
             font-size: 11px;
             color: var(--accent-color);
@@ -84,17 +92,13 @@
             max-width: 800px;
             width: 100%;
             margin: 0 auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .message-row {
             display: flex;
             gap: 10px;
             max-width: 90%;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         .message-row.user { align-self: flex-end; }
         .message-row.nico { align-self: flex-start; }
@@ -155,15 +159,15 @@
             padding: 3px 8px;
             border-radius: 6px;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .msg-btn:hover { background: var(--surface-hover); color: #fff; }
 
         .input-wrapper {
             max-width: 800px;
             width: 100%;
-            margin: 0 auto 16px auto;
-            padding: 0 16px;
+            margin: 0 auto;
+            padding: 10px 16px;
+            background: var(--bg-color);
+            flex-shrink: 0;
         }
         .input-box {
             display: flex;
@@ -180,9 +184,10 @@
             background: transparent;
             border: none;
             color: #fff;
-            font-size: 15px;
+            font-size: 16px; /* Mobilde zoom yapmaması için 16px */
             outline: none;
             padding: 6px;
+            width: 100%;
         }
         .file-upload-btn {
             background: transparent;
@@ -194,9 +199,7 @@
             align-items: center;
             justify-content: center;
             padding: 4px;
-            transition: 0.2s;
         }
-        .file-upload-btn:hover { color: var(--accent-color); }
         .input-box button.send-btn {
             background: var(--accent-color);
             color: #131314;
@@ -209,17 +212,16 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            transition: 0.2s;
             flex-shrink: 0;
         }
-        .input-box button.send-btn:hover { opacity: 0.9; }
         .typing { opacity: 0.7; font-style: italic; }
         
         #image-preview-container {
             max-width: 800px;
-            margin: 0 auto 8px auto;
-            padding: 0 16px;
+            margin: 0 auto;
+            padding: 0 16px 6px 16px;
             display: none;
+            flex-shrink: 0;
         }
         .preview-box {
             display: inline-flex;
@@ -252,7 +254,7 @@
         <div class="message-row nico">
             <div class="avatar"><img src="logo.png" alt="NICO"></div>
             <div class="bubble">
-                Selam Sidar! Cloudflare Worker köprüsü devrede. API anahtarı derdi olmadan uçuşa hazırız!
+                Selam Sidar! Mobil klavye ve dokunma optimizasyonu tamamlandı. Yazmaya başlayabilirsin!
             </div>
         </div>
     </div>
@@ -271,19 +273,33 @@
                 📎
                 <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
             </label>
-            <input type="text" id="user-input" placeholder="NICO'ya yaz..." onkeypress="checkEnter(event)">
-            <button class="send-btn" onclick="sendMessage()">→</button>
+            <input type="text" id="user-input" placeholder="NICO'ya yaz..." autocomplete="off">
+            <button class="send-btn" id="send-button" type="button">➔</button>
         </div>
     </div>
 
     <script>
-        // Cloudflare Worker adresini buraya yazıyorsun:
         const WORKER_URL = "https://bitter-haze-2503.usermame5252.workers.dev";
-
         let selectedImageBase64 = null;
 
         window.onload = function() {
             loadHistory();
+            
+            // Dokunma ve tıklama olaylarını garantiye alalım
+            const sendBtn = document.getElementById('send-button');
+            const userInput = document.getElementById('user-input');
+
+            sendBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                sendMessage();
+            });
+
+            userInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
         };
 
         function handleFileSelect(event) {
@@ -429,13 +445,6 @@
                 `;
             }
         }
-
-        function checkEnter(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        }
     </script>
 </body>
-                                    </html>
-                                    
+</html>
