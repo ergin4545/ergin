@@ -18,9 +18,13 @@
         .menu-toggle { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #374151; }
         .app-logo { font-size: 1.1rem; font-weight: 600; color: #111827; }
         
-        .header-auth-btns { display: flex; gap: 8px; }
+        .header-auth-btns { display: flex; gap: 8px; align-items: center; }
         .btn-login { background: #000000; color: white; border: none; padding: 8px 16px; border-radius: 9999px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
         .btn-register { background: #f3f4f6; color: #111827; border: 1px solid #e5e7eb; padding: 8px 16px; border-radius: 9999px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
+        
+        /* Aktif Hesap Rozeti */
+        .user-badge { display: none; align-items: center; gap: 8px; background: #f3f4f6; padding: 6px 12px; border-radius: 9999px; font-size: 0.85rem; font-weight: 500; color: #111827; cursor: pointer; border: 1px solid #e5e7eb; }
+        .user-badge img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
 
         /* Sol Yan Menü (Sidebar) */
         #sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #f9fafb; border-right: 1px solid #e5e7eb; transition: left 0.3s ease; z-index: 200; display: flex; flex-direction: column; justify-content: space-between; padding: 16px; }
@@ -51,7 +55,7 @@
         .input-wrapper input { flex: 1; border: none; background: none; padding: 8px; font-size: 0.95rem; outline: none; color: #111827; }
         .send-btn { background: #000000; color: white; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
 
-        /* Oturum Açma Modalı */
+        /* Ana Oturum Açma Modalı (ChatGPT Tarzı) */
         #auth-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: flex-end; z-index: 300; }
         @media (min-width: 640px) { #auth-modal { align-items: center; } }
         
@@ -61,21 +65,30 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; }
         .modal-title { font-size: 1.25rem; font-weight: 600; color: #111827; text-align: center; flex: 1; }
         .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #6b7280; }
-        
         .modal-desc { font-size: 0.85rem; color: #6b7280; text-align: center; line-height: 1.4; }
         
         .auth-providers { display: flex; flex-direction: column; gap: 10px; }
         .provider-btn { width: 100%; padding: 12px; border-radius: 9999px; border: 1px solid #d1d5db; background: #ffffff; color: #374151; font-size: 0.95rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .provider-btn:hover { background: #f9fafb; }
-        
-        .divider { display: flex; align-items: center; text-align: center; color: #9ca3af; font-size: 0.75rem; margin: 5px 0; }
-        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #e5e7eb; }
-        .divider::before { margin-right: .5em; }
-        .divider::after { margin-left: .5em; }
 
-        .email-input-group { display: flex; flex-direction: column; gap: 10px; }
-        .email-input-group input { width: 100%; padding: 12px 16px; border-radius: 9999px; border: 1px solid #d1d5db; outline: none; font-size: 0.95rem; }
-        .email-input-group button { width: 100%; padding: 12px; border-radius: 9999px; background: #000000; color: white; border: none; font-weight: 500; cursor: pointer; }
+        /* Google Hesap Seçici Ekranı (Gönderdiğin Ekran Görüntüsünün Aynısı) */
+        #google-account-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 400; }
+        .google-card { background: #ffffff; width: 100%; max-width: 400px; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
+        .google-header { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: 500; color: #374151; }
+        .google-title { font-size: 1.5rem; font-weight: 400; color: #111827; margin-top: 4px; }
+        .google-subtitle { font-size: 0.9rem; color: #4b5563; }
+        .google-subtitle span { color: #2563eb; font-weight: 500; }
+        
+        .account-list { display: flex; flex-direction: column; border-top: 1px solid #e5e7eb; margin-top: 4px; }
+        .account-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #e5e7eb; cursor: pointer; transition: background 0.2s; }
+        .account-row:hover { background: #f9fafb; padding-left: 8px; padding-right: 8px; border-radius: 8px; }
+        .account-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #374151; }
+        .account-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+        .account-name { font-size: 0.95rem; font-weight: 500; color: #111827; }
+        .account-email { font-size: 0.8rem; color: #6b7280; }
+        
+        .google-footer-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .google-footer-actions button { background: none; border: none; color: #2563eb; font-weight: 500; cursor: pointer; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -94,13 +107,12 @@
             </div>
         </div>
         <div class="sidebar-footer">
-            <div class="sidebar-footer-text">
+            <div class="sidebar-footer-text" id="sidebar-footer-desc">
                 <b>Sana özel yanıtlar al</b><br>
                 Kaydedilen sohbetlere göre cevaplar almak için oturum aç.
             </div>
-            <div class="sidebar-auth-group">
+            <div class="sidebar-auth-group" id="sidebar-auth-group">
                 <button style="background: #000000; color: white;" onclick="openAuthModal()">Oturum aç</button>
-                <button style="background: #f3f4f6; color: #111827; border: 1px solid #e5e7eb;" onclick="openAuthModal()">Ücretsiz kaydol</button>
             </div>
         </div>
     </div>
@@ -110,15 +122,19 @@
             <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
             <span class="app-logo">NICO</span>
         </div>
-        <div class="header-auth-btns">
+        <div class="header-auth-btns" id="header-auth-container">
             <button class="btn-login" onclick="openAuthModal()">Oturum aç</button>
             <button class="btn-register" onclick="openAuthModal()">Ücretsiz kaydol</button>
+        </div>
+        <div class="user-badge" id="user-badge" onclick="openGoogleAccountModal()">
+            <img id="badge-avatar" src="" alt="Avatar">
+            <span id="display-username">Hesap</span>
         </div>
     </header>
 
     <div id="chat-container">
         <div id="chat-box">
-            <div class="message nico">Merhaba! NICO arayüzü ve oturum akışıyla hazır. Komutunu yazabilirsin.</div>
+            <div class="message nico" id="welcome-msg">Merhaba! NICO arayüzü ve hesap yöneticisi hazır. Komutunu yazabilirsin.</div>
         </div>
         <div class="input-area">
             <div class="input-wrapper">
@@ -137,24 +153,51 @@
             <p class="modal-desc">Daha akıllı yanıtlar alabilir, dosyalar ve görseller yükleyebilir ve daha fazlasını yapabilirsin.</p>
             
             <div class="auth-providers">
-                <button class="provider-btn" onclick="simulateAuth('Google')">🔵 Google ile devam et</button>
-                <button class="provider-btn" onclick="simulateAuth('Apple')">🍏 Apple ile devam et</button>
-                <button class="provider-btn" onclick="simulateAuth('Telefon')">📞 Telefonla devam et</button>
+                <button class="provider-btn" onclick="openGoogleAccountModal()">🔵 Google ile devam et</button>
+                <button class="provider-btn" onclick="selectAccount('Apple Kullanıcısı', 'apple@icloud.com', '🍏')">🍏 Apple ile devam et</button>
+                <button class="provider-btn" onclick="selectAccount('Mobil Kullanıcı', '+90 555 ...', '📞')">📞 Telefonla devam et</button>
             </div>
+        </div>
+    </div>
 
-            <div class="divider">YA DA</div>
+    <div id="google-account-modal">
+        <div class="google-card">
+            <div class="google-header">
+                <span>🌐</span> Google ile oturum açın
+            </div>
+            <div>
+                <div class="google-title">Bir hesap seçin</div>
+                <div class="google-subtitle"><span>NICO AI</span> uygulamasına devam edin</div>
+            </div>
+            
+            <div class="account-list" id="account-list-container">
+                </div>
 
-            <div class="email-input-group">
-                <input type="email" id="user-email" placeholder="E-posta adresi">
-                <button onclick="simulateAuth('E-posta')">Devam</button>
+            <div class="google-footer-actions">
+                <button onclick="addNewGoogleAccount()">+ Başka bir hesap ekle</button>
+                <button onclick="closeGoogleAccountModal()" style="color: #6b7280;">İptal</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Kayıtlı hesap listesi
+        let accounts = JSON.parse(localStorage.getItem('nico_google_accounts')) || [
+            { name: "Hüsnü Ergin", email: "husnuergin4545@gmail.com", avatar: "https://i.pravatar.cc/150?img=12" },
+            { name: "Hüsnü Ergin", email: "husnuergin2525@gmail.com", avatar: "H" },
+            { name: "Sidar Aydın", email: "sidar@gmail.com", avatar: "https://i.pravatar.cc/150?img=68" }
+        ];
+
+        let activeAccount = JSON.parse(localStorage.getItem('nico_active_account')) || null;
+
+        window.onload = function() {
+            if (activeAccount) {
+                applyActiveAccount(activeAccount);
+            }
+        };
+
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('open');
+            document.getElementById('sidebar').classList.toggle('open');
         }
 
         function openAuthModal() {
@@ -166,9 +209,83 @@
             document.getElementById('auth-modal').style.display = 'none';
         }
 
-        function simulateAuth(method) {
-            alert(`${method} ile oturum açma akışı tetiklendi! NICO sisteme bağlandı.`);
+        function openGoogleAccountModal() {
             closeAuthModal();
+            renderGoogleAccounts();
+            document.getElementById('google-account-modal').style.display = 'flex';
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        function closeGoogleAccountModal() {
+            document.getElementById('google-account-modal').style.display = 'none';
+        }
+
+        function renderGoogleAccounts() {
+            const container = document.getElementById('account-list-container');
+            container.innerHTML = '';
+            accounts.forEach(acc => {
+                const row = document.createElement('div');
+                row.className = 'account-row';
+                row.onclick = () => selectAccount(acc.name, acc.email, acc.avatar);
+                
+                let avatarHtml = '';
+                if (acc.avatar.startsWith('http')) {
+                    avatarHtml = `<img src="${acc.avatar}" class="account-avatar">`;
+                } else {
+                    avatarHtml = `<div class="account-avatar">${acc.avatar}</div>`;
+                }
+
+                row.innerHTML = `
+                    ${avatarHtml}
+                    <div class="account-info">
+                        <span class="account-name">${acc.name}</span>
+                        <span class="account-email">${acc.email}</span>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function selectAccount(name, email, avatar) {
+            const acc = { name, email, avatar };
+            activeAccount = acc;
+            localStorage.setItem('nico_active_account', JSON.stringify(acc));
+            applyActiveAccount(acc);
+            closeGoogleAccountModal();
+        }
+
+        function addNewGoogleAccount() {
+            const name = prompt("Yeni hesap adı gir:");
+            const email = prompt("Yeni e-posta adresi gir:");
+            if (name && email) {
+                const newAcc = { name, email, avatar: name.charAt(0).toUpperCase() };
+                accounts.push(newAcc);
+                localStorage.setItem('nico_google_accounts', JSON.stringify(accounts));
+                selectAccount(newAcc.name, newAcc.email, newAcc.avatar);
+            }
+        }
+
+        function applyActiveAccount(acc) {
+            document.getElementById('header-auth-container').style.display = 'none';
+            const badge = document.getElementById('user-badge');
+            badge.style.display = 'flex';
+            document.getElementById('display-username').textContent = acc.name;
+            
+            const badgeAvatar = document.getElementById('badge-avatar');
+            if (acc.avatar && acc.avatar.startsWith('http')) {
+                badgeAvatar.src = acc.avatar;
+                badgeAvatar.style.display = 'block';
+            } else {
+                badgeAvatar.style.display = 'none';
+            }
+
+            document.getElementById('sidebar-footer-desc').innerHTML = `<b>Aktif Oturum</b><br>${acc.email}`;
+            document.getElementById('sidebar-auth-group').innerHTML = `<button style="background: #ef4444; color: white;" onclick="logout()">Oturumu Kapat</button>`;
+        }
+
+        function logout() {
+            localStorage.removeItem('nico_active_account');
+            location.reload();
         }
 
         async function sendMessage() {
@@ -187,7 +304,7 @@
 
             const nicoMsg = document.createElement('div');
             nicoMsg.className = 'message nico';
-            nicoMsg.textContent = `NICO işliyor: "${text}" konusunu değerlendirdim.`;
+            nicoMsg.textContent = `NICO (${activeAccount ? activeAccount.email : 'Misafir'}): "${text}" isteğini Google IAM onaylı işledim.`;
             chatBox.appendChild(nicoMsg);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
