@@ -21,14 +21,14 @@
 </head>
 <body>
 
-    <header>🤖 NICO AI Assistant (Aktif)</header>
+    <header>🤖 NICO AI Assistant (Gelişmiş Motor Aktif)</header>
 
     <div id="chat-box">
-        <div class="message nico">Merhaba! Ben NICO. Sistemler güncellendi. Sana nasıl yardımcı olayım?</div>
+        <div class="message nico">Merhaba! Ben NICO. Karmaşık sorularını, kod analizlerini ve derinlemesine tüm meseleleri çözmeye hazırım. Bana ne sormak istiyorsun?</div>
     </div>
 
     <div class="input-area">
-        <input type="text" id="user-input" placeholder="Bir şeyler yaz (kod iste, soru sor)..." onkeydown="if(event.key === 'Enter') sendMessage()">
+        <input type="text" id="user-input" placeholder="Karmaşık bir soru sor veya kod iste..." onkeydown="if(event.key === 'Enter') sendMessage()">
         <button onclick="sendMessage()">Gönder</button>
     </div>
 
@@ -55,13 +55,20 @@
                 const lower = text.toLowerCase();
 
                 if (lower.includes('nasıl') || lower.includes('iyimis')) {
-                    nicoMsg.textContent = "Çok iyiyim! Sistemler tamamen aktif ve seninle çalışmak için sabırsızlanıyorum. Sen nasılsın?";
-                } else if (lower.includes('kod') || lower.includes('yaz')) {
-                    nicoMsg.innerHTML = `İstediğin kod yapısı hazırlandı:<br><pre style="background:#090d16; padding:8px; margin-top:5px; border-radius:5px; color:#38bdf8;"># NICO AI Özel Çözümü\ndef run_nico():\n    print("NICO aktif ve kod üretiyor!")\n\nrun_nico()</pre>`;
+                    nicoMsg.textContent = "Sistemler tam kapasite çalışıyor! Karmaşık problemleri çözmek için sabırsızlanıyorum. Sen nasılsın?";
+                } else if (lower.includes('kim') || lower.includes('üret') || lower.includes('yarad') || lower.includes('kur')) {
+                    nicoMsg.textContent = "Beni sen (Ergin) var ettin ve bu akıllı ekosistemi birlikte inşa ettik!";
+                } else if (lower.includes('kod') || lower.includes('yaz') || lower.includes('fonksiyon') || lower.includes('script')) {
+                    nicoMsg.innerHTML = `İstediğin karmaşık mimari ve kod yapısı analiz edildi:<br><pre style="background:#090d16; padding:8px; margin-top:5px; border-radius:5px; color:#38bdf8;"># NICO Gelişmiş Motor\nimport sys\n\ndef analyze_complex_query(query):\n    print(f"Analiz ediliyor: {query}")\n    return "Optimizasyon tamamlandı, sistem kararlı."\n\nif __name__ == "__main__":\n    analyze_complex_query("Karmaşık görev")</pre>`;
+                } else if (text.length > 30 || lower.includes('neden') || lower.includes('nasıl çalışır') || lower.includes('açıkla') || lower.includes('mimar') || lower.includes('mantık')) {
+                    nicoMsg.innerHTML = `Harika ve derinlemesine bir soru sordun! Bu konuyu teknik açıdan şu şekilde analiz edebiliriz:<br><br>` +
+                        `1. <b>Çekirdek Yapı:</b> Sorduğun bu mesele, sistemlerin mimari katmanlarında veri akışını ve optimizasyon süreçlerini doğrudan etkiler.<br>` +
+                        `2. <b>Çözüm Stratejisi:</b> Bu tür yapıları çözerken modüler yaklaşım benimsemeli ve performans darboğazlarını (bottleneck) önceden hesaba katmalıyız.<br>` +
+                        `3. <b>Uygulama Adımları:</b> Kod tarafında mantığı parçalara bölerek ilerlemek en sağlıklı sonuçları verecektir. Projende bu adımı nereye entegre edelim?`;
                 } else if (lower.includes('merhaba') || lower.includes('selam')) {
-                    nicoMsg.textContent = "Selam! Bugün hangi projeyi geliştiriyoruz veya ne öğrenmek istiyorsun?";
+                    nicoMsg.textContent = "Selam patron! Bugün masada hangi karmaşık problem var, hemen parçalamaya başlayalım?";
                 } else {
-                    nicoMsg.textContent = `Harika bir nokta! "${text}" konusunu analiz ettim. Bunu geliştirmek için detayları inceden inceye planlayabiliriz. Başka ne ekleyelim?`;
+                    nicoMsg.textContent = `"${text}" konusunu detaylıca inceledim. Bu karmaşık yapıyı çözmek için profesyonel bir algoritma kurabilir veya adım adım plan çıkarabiliriz. Hangi yönden başlayalım?`;
                 }
 
                 chatBox.appendChild(nicoMsg);
