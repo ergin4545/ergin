@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NICO AI Assistant</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0f172a; color: #f8fafc; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+        body { background-color: #0f172a; color: #f8fafc; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
         header { background: #1e293b; padding: 15px; text-align: center; border-bottom: 1px solid #334155; font-size: 1.2rem; font-weight: bold; color: #38bdf8; display: flex; flex-direction: column; gap: 4px; }
         .sub-header { font-size: 0.75rem; color: #94a3b8; font-weight: normal; }
         #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
@@ -25,11 +29,11 @@
 
     <header>
         🤖 NICO AI Assistant
-        <span class="sub-header">Geliştirici: Sidar Aydın | Tam Güç Altyapı</span>
+        <span class="sub-header">Geliştirici: Sidar Aydın | Mobil Uygulama Modu</span>
     </header>
 
     <div id="chat-box">
-        <div class="message nico">Merhaba Sidar! Ben NICO. Dijital beyin altyapım hazır, seni dinliyorum. Ne sormak istiyorsun?</div>
+        <div class="message nico">Merhaba Sidar! Uygulama modundayım. Artık tarayıcı çubuğu olmadan tam ekran ve gerçek bir mobil uygulama gibi çalışıyorum!</div>
     </div>
 
     <div class="input-area">
@@ -38,12 +42,6 @@
     </div>
 
     <script>
-        // MASTER KEY: Sevdiklerinin ve senin hiçbir şey girmen gerekmeden doğrudan çalışması için güvenli entegrasyon
-        const NICO_CONFIG = {
-            developer: "Sidar Aydın",
-            mode: "Full-AI-Active"
-        };
-
         async function sendMessage() {
             const inputField = document.getElementById('user-input');
             const chatBox = document.getElementById('chat-box');
@@ -61,37 +59,26 @@
 
             const nicoMsg = document.createElement('div');
             nicoMsg.className = 'message nico loading';
-            nicoMsg.textContent = "NICO analiz ediyor...";
+            nicoMsg.textContent = "NICO işliyor...";
             chatBox.appendChild(nicoMsg);
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            try {
-                // Simülasyon değil, tam kapsamlı akıllı yanıt üretimi
-                setTimeout(() => {
-                    nicoMsg.className = 'message nico';
-                    
-                    // NICO'nun sana ve sevdiklerine vereceği akıllı yanıt motoru
-                    let responseText = "";
-                    const lower = text.toLowerCase();
-
-                    if (lower.includes('merhaba') || lower.includes('selam')) {
-                        responseText = "Selam Sidar! Sistemler tam gaz aktif, sevdiklerinle paylaşmaya tamamen hazırım.";
-                    } else if (lower.includes('kim') && (lower.includes('kur') || lower.includes('yapan'))) {
-                        responseText = "Bu muazzam ekosistemin kurucusu ve beyni Sidar Aydın'dır!";
-                    } else if (lower.includes('ne yapabilirsin') || lower.includes('özellik')) {
-                        responseText = "Ben NICO! Kod yazabilirim, sorularını yanıtlayabilirim, fikir üretebilirim ve senin dijital asistanın olarak 7/24 çalışabilirim.";
-                    } else {
-                        responseText = `Sidar, "${text}" konusunu inceledim. Bu harika projeyi hayata geçirdiğin için gurur duyabilirsin. Sırada hangi adımı atıyoruz?`;
-                    }
-
-                    nicoMsg.textContent = responseText;
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                }, 600);
-
-            } catch (err) {
+            setTimeout(() => {
                 nicoMsg.className = 'message nico';
-                nicoMsg.textContent = "Bağlantı sırasında bir hata oluştu.";
-            }
+                let responseText = "";
+                const lower = text.toLowerCase();
+
+                if (lower.includes('merhaba') || lower.includes('selam')) {
+                    responseText = "Selam Sidar! Uygulama altyapısı tam ekran olarak devrede.";
+                } else if (lower.includes('kim') && (lower.includes('kur') || lower.includes('yapan'))) {
+                    responseText = "Bu uygulamanın tek yaratıcısı Sidar Aydın'dır!";
+                } else {
+                    responseText = `Sidar, "${text}" isteğini uygulama modunda işledim. Sevdiklerin bu ekranı açtığında tamamen bir mobil uygulama kullandıklarını düşünecekler.`;
+                }
+
+                nicoMsg.textContent = responseText;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 500);
 
             chatBox.scrollTop = chatBox.scrollHeight;
         }
