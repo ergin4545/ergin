@@ -1,94 +1,28 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>NICO TEST</title>
-
-<style>
-
-body{
-    margin:0;
-    height:100vh;
-    background:#131314;
-    color:white;
-    display:flex;
-    flex-direction:column;
-    font-family:Arial;
-}
-
-#chat{
-    flex:1;
-    padding:20px;
-}
-
-.input-area{
-    display:flex;
-    gap:10px;
-    padding:20px;
-}
-
-input{
-    flex:1;
-    padding:15px;
-    border-radius:20px;
-    background:#222;
-    color:white;
-    border:1px solid #555;
-}
-
-button{
-    width:60px;
-    height:50px;
-    border-radius:50%;
-    border:none;
-    background:#8ab4f8;
-    font-size:20px;
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nico AI</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
-
 <body>
+    <div class="chat-container">
+        <header>
+            <h1>Nico AI</h1>
+            <button id="clear-chat">Sohbeti Temizle</button>
+        </header>
+        
+        <div id="chat-messages" class="chat-messages"></div>
 
-
-<div id="chat">
-
-<h2>🤖 NICO AI</h2>
-
-<p>Selam Sidar! NICO aktif.</p>
-
-</div>
-
-
-
-<div class="input-area">
-
-<input id="text" placeholder="Yaz...">
-
-
-<button onclick="testButton()">
-➤
-</button>
-
-
-</div>
-
-
-
-<script>
-
-function testButton(){
-
-alert("BUTON ÇALIŞTI");
-
-}
-
-
-</script>
-
-
+        <div class="chat-input-area">
+            <input type="file" id="image-input" accept="image/*" hidden>
+            <button id="upload-btn" title="Fotoğraf Yükle">📷</button>
+            <textarea id="user-input" placeholder="Nico'ya bir şeyler yazın..." rows="1"></textarea>
+            <button id="send-btn">Gönder</button>
+        </div>
+    </div>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
