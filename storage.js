@@ -1,41 +1,29 @@
-function saveChat(){
+const STORAGE_KEY = 'nico_chat_history';
 
-localStorage.setItem(
-"NICO_HISTORY",
-document.getElementById(
-"chat-container"
-).innerHTML
-);
+export const StorageManager = {
+    getHistory() {
+        try {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        } catch (e) {
+            console.error('Geçmiş okunamadı:', e);
+            return [];
+        }
+    },
 
+    saveHistory(history) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        } catch (e) {
+            console.error('Geçmiş kaydedilemedi:', e);
+        }
+    },
 
-}
-
-
-
-function loadChat(){
-
-
-const old =
-localStorage.getItem(
-"NICO_HISTORY"
-);
-
-
-
-if(old){
-
-document.getElementById(
-"chat-container"
-).innerHTML=old;
-
-}
-
-
-}
-
-
-
-window.addEventListener(
-"load",
-loadChat
-);
+    clearHistory() {
+        try {
+            localStorage.removeItem(STORAGE_KEY);
+        } catch (e) {
+            console.error('Geçmiş temizlenemedi:', e);
+        }
+    }
+};
