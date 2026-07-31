@@ -1,3 +1,4 @@
+console.log("NICO app.js çalıştı");
 const WORKER_URL =
 "https://bitter-haze-2503.usermame5252.workers.dev/";
 
@@ -168,6 +169,4 @@ container.appendChild(row);
 
 container.scrollTop=
 container.scrollHeight;
-
-
-
+}
