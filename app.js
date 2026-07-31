@@ -1,150 +1,99 @@
-const WORKER_URL =
-"https://bitter-haze-2503.usermame5252.workers.dev/";
+import { StorageManager } from './storage.js';
 
+const WORKER_URL = 'https://bitter-haze-2503.usermame5252.workers.dev/';
+const chatMessages = document.getElementById('chat-messages');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const clearChatBtn = document.getElementById('clear-chat');
+const imageInput = document.getElementById('image-input');
+const uploadBtn = document.getElementById('upload-btn');
 
-document.addEventListener("DOMContentLoaded", () => {
+let chatHistory = StorageManager.getHistory();
+let selectedImageBase64 = null;
 
-    const input = document.getElementById("user-input");
-    const button = document.getElementById("send-button");
-    const container = document.getElementById("chat-container");
-
-
-    if (!input || !button || !container) {
-        console.log("NICO: HTML element bulunamadı");
-        return;
-    }
-
-
-    console.log("NICO hazır");
-
-
-    button.addEventListener("click", sendMessage);
-
-
-    input.addEventListener("keydown", (e) => {
-
-        if (e.key === "Enter") {
-            sendMessage();
-        }
-
+function renderHistory() {
+    chatMessages.innerHTML = '';
+    chatHistory.forEach(msg => {
+        appendMessage(msg.role === 'user' ? 'Kullanıcı' : 'Nico', msg.text, msg.role);
     });
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
+function appendMessage(sender, text, role) {
+    const div = document.createElement('div');
+    div.classList.add('message', role === 'user' ? 'user' : 'ai');
+    div.textContent = text;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
+async function sendMessage() {
+    const text = userInput.value.trim();
+    if (!text && !selectedImageBase64) return;
 
-    async function sendMessage() {
-
-
-        const text = input.value.trim();
-
-
-        if (!text) return;
-
-
-        addMessage(text, "user");
-
-
-        input.value = "";
-
-
-        const loading = document.createElement("div");
-
-        loading.id = "loading";
-
-        loading.className = "message-row nico";
-
-
-        loading.innerHTML = `
-            <div class="bubble">
-                NICO düşünüyor...
-            </div>
-        `;
-
-
-        container.appendChild(loading);
-
-
-
-        try {
-
-
-            const response = await fetch(
-                WORKER_URL,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        message: text
-                    })
-                }
-            );
-
-
-            const data = await response.json();
-
-
-            loading.remove();
-
-
-            addMessage(
-                data.reply || "Cevap alınamadı",
-                "nico"
-            );
-
-
-            if (typeof saveChat === "function") {
-                saveChat();
+    let parts = [{ text: text || "Bu görseli açıkla." }];
+    
+    if (selectedImageBase64) {
+        parts.push({
+            inline_data: {
+                mime_type: "image/jpeg",
+                data: selectedImageBase64.split(',')[1]
             }
-
-
-        } catch(error) {
-
-
-            loading.remove();
-
-
-            addMessage(
-                "Bağlantı hatası: " + error.message,
-                "nico"
-            );
-
-
-        }
-
+        });
     }
 
+    appendMessage('Kullanıcı', text || '[Görsel Gönderildi]', 'user');
+    chatHistory.push({ role: 'user', text: text || '[Görsel Gönderildi]' });
+    
+    userInput.value = '';
+    selectedImageBase64 = null;
+    
+    try {
+        const response = await fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: parts }]
+            })
+        });
 
+        const data = await response.json();
+        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
 
-    function addMessage(text, type) {
-
-
-        const row = document.createElement("div");
-
-        row.className = "message-row " + type;
-
-
-        const bubble = document.createElement("div");
-
-        bubble.className = "bubble";
-
-
-        bubble.innerText = text;
-
-
-        row.appendChild(bubble);
-
-
-        container.appendChild(row);
-
-
-        container.scrollTop =
-        container.scrollHeight;
-
+        appendMessage('Nico', aiText, 'ai');
+        chatHistory.push({ role: 'model', text: aiText });
+        
+        StorageManager.saveHistory(chatHistory);
+    } catch (err) {
+        appendMessage('Sistem', 'Bağlantı hatası oluştu.', 'ai');
     }
+}
 
-
+uploadBtn.addEventListener('click', () => imageInput.click());
+imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = () => { 
+            selectedImageBase64 = reader.result; 
+            appendMessage('Sistem', '📷 Görsel eklendi. Şimdi mesajınızı yazıp gönderebilirsiniz.', 'ai');
+        };
+        reader.readAsDataURL(file);
+    }
 });
-          
+
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', (e) => { 
+    if (e.key === 'Enter' && !e.shiftKey) { 
+        e.preventDefault(); 
+        sendMessage(); 
+    } 
+});
+
+clearChatBtn.addEventListener('click', () => {
+    StorageManager.clearHistory();
+    chatHistory = [];
+    chatMessages.innerHTML = '';
+});
+
+renderHistory();
