@@ -1,122 +1,69 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NICO AI</title>
-    <style>
-        :root {
-            --bg-color: #131314;
-            --surface-color: #1e1f20;
-            --text-color: #e3e3e3;
-            --text-secondary: #c4c7c5;
-            --accent-color: #8ab4f8;
-            --border-color: #333537;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
-        header { padding: 12px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--surface-color); }
-        .brand { font-size: 15px; font-weight: 600; color: #fff; }
-        .user-badge { font-size: 12px; color: var(--accent-color); background: rgba(138, 180, 248, 0.1); padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(138, 180, 248, 0.2); }
-        .chat-container { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; max-width: 800px; width: 100%; margin: 0 auto; -webkit-overflow-scrolling: touch; }
-        .message-row { display: flex; gap: 10px; max-width: 85%; }
-        .message-row.user { align-self: flex-end; }
-        .message-row.nico { align-self: flex-start; }
-        .bubble { padding: 12px 16px; border-radius: 16px; line-height: 1.5; font-size: 14px; word-break: break-word; }
-        .user .bubble { background: #2b313a; color: #fff; border-top-right-radius: 4px; }
-        .nico .bubble { background: var(--surface-color); color: var(--text-color); border: 1px solid var(--border-color); border-top-left-radius: 4px; }
-        .input-wrapper { max-width: 800px; width: 100%; margin: 0 auto; padding: 12px 16px; background: var(--bg-color); }
-        .input-box { display: flex; align-items: center; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 30px; padding: 6px 14px; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        .input-box input { flex: 1; background: transparent; border: none; color: #fff; font-size: 15px; outline: none; padding: 6px; }
-        .send-btn { background: var(--accent-color); color: #131314; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-        .typing { opacity: 0.7; font-style: italic; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NICO AI</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+
 </head>
+
 <body>
 
-    <header>
-        <div class="brand">NICO AI</div>
-        <div class="user-badge">Sidar Aydın</div>
-    </header>
+<header>
+    <div class="brand">🤖 NICO AI</div>
+    <div class="user-badge">Sidar Aydın</div>
+</header>
 
-    <div class="chat-container" id="chat-container">
-        <div class="message-row nico">
-            <div class="bubble">Selam Sidar! NICO aktif. Yazmaya başlayabilirsin.</div>
-        </div>
-    </div>
 
-    <div class="input-wrapper">
-        <div class="input-box">
-            <input type="text" id="user-input" placeholder="NICO'ya yaz..." autocomplete="off">
-            <button class="send-btn" id="send-button" type="button">➔</button>
-        </div>
-    </div>
+<div id="chat-container" class="chat-container">
 
-    <script>
-        // API anahtarını buraya tırnak içine ekleyebilirsin
-        const API_KEY = "BURAYA_API_ANAHTARINI_YAZ";
-        const container = document.getElementById('chat-container');
+<div class="message-row nico">
+<div class="bubble">
+Selam Sidar! NICO aktif. Yazabilirsin.
+</div>
+</div>
 
-        window.onload = function() {
-            document.getElementById('send-button').addEventListener('click', sendMessage);
-            document.getElementById('user-input').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') sendMessage();
-            });
-        };
+</div>
 
-        async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if (!text) return;
 
-            appendMessage(text, 'user');
-            input.value = '';
 
-            const loadingId = 'loading-' + Date.now();
-            appendMessage('NICO düşünüyor...', 'nico', loadingId);
+<div class="input-wrapper">
 
-            try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: text }] }] })
-                });
+<div class="input-box">
 
-                const data = await res.json();
-                removeMessage(loadingId);
+<input 
+id="user-input"
+placeholder="NICO'ya yaz..."
+autocomplete="off">
 
-                let reply = "Yanıt alınamadı.";
-                if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    reply = data.candidates[0].content.parts[0].text;
-                } else if (data.error) {
-                    reply = "Hata: " + data.error.message;
-                }
 
-                appendMessage(reply, 'nico');
-            } catch (err) {
-                removeMessage(loadingId);
-                appendMessage("Bağlantı hatası: " + err.message, 'nico');
-            }
-        }
+<button id="send-button">
+➤
+</button>
 
-        function appendMessage(text, sender, customId = '') {
-            const row = document.createElement('div');
-            row.className = `message-row ${sender}`;
-            if (customId) row.id = customId;
 
-            const bubble = document.createElement('div');
-            bubble.className = `bubble ${customId ? 'typing' : ''}`;
-            bubble.innerText = text;
+</div>
 
-            row.appendChild(bubble);
-            container.appendChild(row);
-            container.scrollTop = container.scrollHeight;
-        }
+</div>
 
-        function removeMessage(id) {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        }
-    </script>
+
+
+<script src="storage.js"></script>
+<script src="app.js"></script>
+
+
+<script>
+
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("sw.js");
+}
+
+</script>
+
+
 </body>
 </html>
