@@ -31,16 +31,19 @@ async function sendMessage() {
     const text = userInput.value.trim();
     if (!text && !selectedImageBase64) return;
 
-    let parts = [{ text: text || "Bu görseli açıkla." }];
+    // OpenAI/NVIDIA uyumlu mesaj yapısı
+    let userContent = text || "Bu görseli açıkla.";
     
-    if (selectedImageBase64) {
-        parts.push({
-            inline_data: {
-                mime_type: "image/jpeg",
-                data: selectedImageBase64.split(',')[1]
-            }
-        });
-    }
+    // Eğer görsel varsa formatı hazırlıyoruz
+    let messagesPayload = [
+        {
+            role: "user",
+            content: selectedImageBase64 ? [
+                { type: "text", text: userContent },
+                { type: "image_url", image_url: { url: selectedImageBase64 } }
+            ] : userContent
+        }
+    ];
 
     appendMessage('Kullanıcı', text || '[Görsel Gönderildi]', 'user');
     chatHistory.push({ role: 'user', text: text || '[Görsel Gönderildi]' });
@@ -53,12 +56,13 @@ async function sendMessage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: parts }]
+                messages: messagesPayload
             })
         });
 
         const data = await response.json();
-        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
+        // NVIDIA/OpenAI standart yanıt yolu
+        const aiText = data.choices?.[0]?.message?.content || data.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
 
         appendMessage('Nico', aiText, 'ai');
         chatHistory.push({ role: 'model', text: aiText });
@@ -97,3 +101,4 @@ clearChatBtn.addEventListener('click', () => {
 });
 
 renderHistory();
+    
