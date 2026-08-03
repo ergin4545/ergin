@@ -1,6 +1,11 @@
 import { StorageManager } from './storage.js';
 
-const WORKER_URL = 'https://bitter-haze-2503.usermame5252.workers.dev/';
+// Google AI Studio'dan aldığın ücretsiz API anahtarın entegre edildi:
+const GEMINI_API_KEY = "AQ.Ab8RN6LSEVp4isPzLO2Dn1TuaaQRo2XIj7YpSAQ12w6OzgYWcg";
+
+// Doğrudan Google Gemini resmi ücretsiz adresi
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
 const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
@@ -31,19 +36,35 @@ async function sendMessage() {
     const text = userInput.value.trim();
     if (!text && !selectedImageBase64) return;
 
-    // OpenAI/NVIDIA uyumlu mesaj yapısı
     let userContent = text || "Bu görseli açıkla.";
     
-    // Eğer görsel varsa formatı hazırlıyoruz
-    let messagesPayload = [
-        {
-            role: "user",
-            content: selectedImageBase64 ? [
-                { type: "text", text: userContent },
-                { type: "image_url", image_url: { url: selectedImageBase64 } }
-            ] : userContent
-        }
-    ];
+    let contentsPayload = [];
+    
+    chatHistory.forEach(msg => {
+        contentsPayload.push({
+            role: msg.role === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.text }]
+        });
+    });
+
+    let currentParts = [{ text: userContent }];
+    
+    if (selectedImageBase64) {
+        const base64Data = selectedImageBase64.split(',')[1];
+        const mimeType = selectedImageBase64.match(/data:(.*?);base64/)?.[1] || 'image/jpeg';
+        
+        currentParts.push({
+            inline_data: {
+                mime_type: mimeType,
+                data: base64Data
+            }
+        });
+    }
+
+    contentsPayload.push({
+        role: 'user',
+        parts: currentParts
+    });
 
     appendMessage('Kullanıcı', text || '[Görsel Gönderildi]', 'user');
     chatHistory.push({ role: 'user', text: text || '[Görsel Gönderildi]' });
@@ -52,17 +73,17 @@ async function sendMessage() {
     selectedImageBase64 = null;
     
     try {
-        const response = await fetch(WORKER_URL, {
+        const response = await fetch(GEMINI_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                messages: messagesPayload
+                contents: contentsPayload
             })
         });
 
         const data = await response.json();
-        // NVIDIA/OpenAI standart yanıt yolu
-        const aiText = data.choices?.[0]?.message?.content || data.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
+        
+        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || data.error?.message || "Yanıt alınamadı.";
 
         appendMessage('Nico', aiText, 'ai');
         chatHistory.push({ role: 'model', text: aiText });
@@ -101,4 +122,4 @@ clearChatBtn.addEventListener('click', () => {
 });
 
 renderHistory();
-    
+        
