@@ -1,11 +1,14 @@
 import { StorageManager } from './storage.js';
 
-// ===== NICO ÇEKİRDEK =====
 const FOUNDER = 'Sidar Aydın';
 let apiKey = localStorage.getItem('nico_key') || '';
+let orKey = localStorage.getItem('nico_orkey') || '';
 let pass = localStorage.getItem('nico_pass') || 'Şule45580';
 let founder = localStorage.getItem('nico_founder') === '1';
 let notes = JSON.parse(localStorage.getItem('nico_notes') || '[]');
+let lastError = '';
+
+const OR_MODELS = ['meta-llama/llama-3.3-70b-instruct:free','google/gemma-3-27b-it:free','mistralai/mistral-small-3.1-24b-instruct:free'];
 
 const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
@@ -40,7 +43,40 @@ function localReply(t){
   if(/nasılsın|naber/.test(q)) return 'Sen sordun ya daha iyi oldum Reis! 😄 Sen nasılsın?';
   if(/kim yaptı|kurucu|sahibi|kimin eser|kim üretti/.test(q)) return 'Ben ' + FOUNDER + '\'ın eseriyim Reis! 🙌 Vizyoner bir kurucunun ellerinden çıktım.';
   if(/teşekkür|sağol|eyvallah/.test(q)) return 'Rica ederim Reis! Her zaman buradayım. 💜';
-  return 'Beyin bağlantısı şu an kapalı Reis (NICO-KEY komutuyla anahtar ekle), ama ben buradayım, dinliyorum. 👂';
+  return 'Beyinlar dinleniyor Reis, ama ben buradayım, dinliyorum. 👂';
+}
+
+async function askOpenRouter(contents){
+  const msgs = [{role:'system', content: systemPrompt()}];
+  contents.slice(-12).forEach(m => msgs.push({role: m.role === 'user' ? 'user' : 'assistant', content: m.parts[0].text}));
+  for(const model of OR_MODELS){
+    try{
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer ' + orKey},
+        body: JSON.stringify({model: model, messages: msgs})
+      });
+      const data = await res.json();
+      const t = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : null;
+      if(t) return t;
+      lastError = 'OpenRouter: ' + (data.error ? data.error.message : ('HTTP ' + res.status));
+    }catch(e){ lastError = 'OpenRouter bağlantı: ' + (e.message || e); }
+  }
+  return null;
+}
+
+async function askGemini(contents){
+  try{
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({system_instruction:{parts:[{text:systemPrompt()}]}, contents: contents})
+    });
+    const data = await res.json();
+    const t = data.candidates && data.candidates[0] ? data.candidates[0].content.parts[0].text : null;
+    if(t) return t;
+    lastError = 'Gemini: ' + (data.error ? data.error.message : 'yanıt yok');
+  }catch(e){ lastError = 'Gemini bağlantı: ' + (e.message || e); }
+  return null;
 }
 
 async function sendMessage(){
@@ -60,7 +96,11 @@ async function sendMessage(){
   }
   if(text.indexOf('NICO-KEY:') === 0){
     apiKey = text.slice(9).trim(); localStorage.setItem('nico_key',apiKey);
-    appendMessage('Beyin bağlandı Reis! 🧠 Artık tam zekayla konuşuyorsun.','ai'); return;
+    appendMessage('Gemini beyni kaydedildi Reis! 🧠','ai'); return;
+  }
+  if(text.indexOf('OR-KEY:') === 0){
+    orKey = text.slice(7).trim(); localStorage.setItem('nico_orkey',orKey);
+    appendMessage('OpenRouter beyni bağlandı Reis! 🧠 GPT ailesi + Llama emrinde. Bir daha anahtar girmene gerek yok.','ai'); return;
   }
   if(text.toLowerCase().indexOf('nico not:') === 0){
     notes.push(text.slice(9).trim()); localStorage.setItem('nico_notes',JSON.stringify(notes));
@@ -77,9 +117,26 @@ async function sendMessage(){
   }
 
   const contents = chatHistory.slice(-12).map(m => ({role: m.role==='user'?'user':'model', parts:[{text:m.text}]}));
-  contents.push({role:'user', parts});
+  contents.push({role:'user', parts: parts});
 
   let reply = null;
-  if(apiKey){
-    try{
-      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:
+  if(orKey) reply = await askOpenRouter(contents);
+  if(!reply && apiKey) reply = await askGemini(contents);
+  if(!reply && (orKey || apiKey)) reply = '⚠️ HATA: ' + lastError;
+  if(!reply) reply = localReply(text);
+
+  appendMessage(reply,'ai');
+  chatHistory.push({role:'model', text:reply});
+  StorageManager.saveHistory(chatHistory);
+}
+
+uploadBtn.addEventListener('click', () => imageInput.click());
+imageInput.addEventListener('change', e => {
+  const f = e.target.files[0];
+  if(f){ const r = new FileReader(); r.onload = () => { selectedImageBase64 = r.result; appendMessage('📷 Görsel hazır Reis, mesajını yaz gönder.','ai'); }; r.readAsDataURL(f); }
+});
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', e => { if(e.key==='Enter'){ e.preventDefault(); sendMessage(); } });
+clearChatBtn.addEventListener('click', () => { StorageManager.clearHistory(); chatHistory=[]; chatMessages.innerHTML=''; appendMessage('Sohbet sıfırlandı Reis! 🔄 Hafıza notların bende saklı.','ai'); });
+
+renderHistory();
