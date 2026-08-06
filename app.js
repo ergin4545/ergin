@@ -38,7 +38,7 @@ function localReply(t){
   const q = t.toLowerCase();
   if(/selam|merhaba|hey/.test(q)) return 'Selam Reis! Nasılsın, keyifler nasıl? 😊';
   if(/nasılsın|naber/.test(q)) return 'Sen sordun ya daha iyi oldum Reis! 😄 Sen nasılsın?';
-  if(/kim yaptı|kurucu|sahibi|kimin eser/.test(q)) return 'Ben ' + FOUNDER + '\'ın eseriyim Reis! 🙌 Vizyoner bir kurucunun ellerinden çıktım.';
+  if(/kim yaptı|kurucu|sahibi|kimin eser|kim üretti/.test(q)) return 'Ben ' + FOUNDER + '\'ın eseriyim Reis! 🙌 Vizyoner bir kurucunun ellerinden çıktım.';
   if(/teşekkür|sağol|eyvallah/.test(q)) return 'Rica ederim Reis! Her zaman buradayım. 💜';
   return 'Beyin bağlantısı şu an kapalı Reis (NICO-KEY komutuyla anahtar ekle), ama ben buradayım, dinliyorum. 👂';
 }
@@ -48,7 +48,6 @@ async function sendMessage(){
   if(!text && !selectedImageBase64) return;
   userInput.value = '';
 
-  // --- GİZLİ KURUCU TANIMA (kaydedilmez, iz bırakmaz) ---
   if(text === pass){
     founder = true; localStorage.setItem('nico_founder','1');
     appendMessage('••••••','user');
@@ -68,7 +67,6 @@ async function sendMessage(){
     appendMessage('Not aldım Reis, hafızama kazıdım. 📝','ai'); return;
   }
 
-  // --- NORMAL SOHBET AKIŞI ---
   appendMessage(text || '[Görsel]', 'user');
   chatHistory.push({role:'user', text: text || '[Görsel]'});
 
@@ -84,27 +82,4 @@ async function sendMessage(){
   let reply = null;
   if(apiKey){
     try{
-      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+apiKey,{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ system_instruction:{parts:[{text:systemPrompt()}]}, contents })
-      });
-      const data = await res.json();
-      reply = data.candidates?.[0]?.content?.parts?.[0]?.text || null;
-    }catch(e){ reply = null; }
-  }
-  if(!reply) reply = localReply(text);
-  appendMessage(reply,'ai');
-  chatHistory.push({role:'model', text:reply});
-  StorageManager.saveHistory(chatHistory);
-}
-
-uploadBtn.addEventListener('click', () => imageInput.click());
-imageInput.addEventListener('change', e => {
-  const f = e.target.files[0];
-  if(f){ const r = new FileReader(); r.onload = () => { selectedImageBase64 = r.result; appendMessage('📷 Görsel hazır Reis, mesajını yaz gönder.','ai'); }; r.readAsDataURL(f); }
-});
-sendBtn.addEventListener('click', sendMessage);
-userInput.addEventListener('keypress', e => { if(e.key==='Enter'){ e.preventDefault(); sendMessage(); } });
-clearChatBtn.addEventListener('click', () => { StorageManager.clearHistory(); chatHistory=[]; chatMessages.innerHTML=''; appendMessage('Sohbet sıfırlandı Reis! 🔄 Hafıza notların bende saklı.','ai'); });
-
-renderHistory();
+      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:
