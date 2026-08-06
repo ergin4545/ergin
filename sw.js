@@ -1,53 +1,12 @@
-const CACHE="nico-v1";
-
-
-const FILES=[
-
-"./",
-"./index.html",
-"./style.css",
-"./app.js",
-"./storage.js"
-
-];
-
-
-
-self.addEventListener(
-"install",
-event=>{
-
-
-event.waitUntil(
-
-caches.open(CACHE)
-.then(cache=>cache.addAll(FILES))
-
-);
-
-
+// NICO önbellek temizlikçisi - eski zulayı siler, hep günceli gösterir
+self.addEventListener('install', function(e){ self.skipWaiting(); });
+self.addEventListener('activate', function(e){
+  e.waitUntil(
+    caches.keys().then(function(keys){
+      return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    }).then(function(){ return self.clients.claim(); })
+  );
 });
-
-
-
-
-self.addEventListener(
-"fetch",
-event=>{
-
-
-event.respondWith(
-
-caches.match(event.request)
-.then(
-response=>
-
-response ||
-fetch(event.request)
-
-)
-
-);
-
-
+self.addEventListener('fetch', function(e){
+  e.respondWith(fetch(e.request));
 });
