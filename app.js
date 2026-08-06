@@ -1,10 +1,11 @@
 import { StorageManager } from './storage.js';
 
-// Google AI Studio'dan aldığın ücretsiz API anahtarın entegre edildi:
-const GEMINI_API_KEY = "AQ.Ab8RN6LSEVp4isPzLO2Dn1TuaaQRo2XIj7YpSAQ12w6OzgYWcg";
-
-// Doğrudan Google Gemini resmi ücretsiz adresi
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+// ===== NICO ÇEKİRDEK =====
+const FOUNDER = 'Sidar Aydın';
+let apiKey = localStorage.getItem('nico_key') || '';
+let pass = localStorage.getItem('nico_pass') || 'Şule45580';
+let founder = localStorage.getItem('nico_founder') === '1';
+let notes = JSON.parse(localStorage.getItem('nico_notes') || '[]');
 
 const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
@@ -16,110 +17,94 @@ const uploadBtn = document.getElementById('upload-btn');
 let chatHistory = StorageManager.getHistory();
 let selectedImageBase64 = null;
 
-function renderHistory() {
-    chatMessages.innerHTML = '';
-    chatHistory.forEach(msg => {
-        appendMessage(msg.role === 'user' ? 'Kullanıcı' : 'Nico', msg.text, msg.role);
-    });
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+function appendMessage(text, role){
+  const div = document.createElement('div');
+  div.classList.add('message', role);
+  div.textContent = text;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function appendMessage(sender, text, role) {
-    const div = document.createElement('div');
-    div.classList.add('message', role === 'user' ? 'user' : 'ai');
-    div.textContent = text;
-    chatMessages.appendChild(div);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+function renderHistory(){
+  chatMessages.innerHTML = '';
+  chatHistory.forEach(m => appendMessage(m.text, m.role === 'user' ? 'user' : 'ai'));
 }
 
-async function sendMessage() {
-    const text = userInput.value.trim();
-    if (!text && !selectedImageBase64) return;
+function systemPrompt(){
+  return 'Sen NICO adında bir yapay zeka asistanısın. Kurucun ' + FOUNDER + '\'dır; biri seni kimin yaptığını, kurucunu veya sahibini sorarsa gururla "Ben Sidar Aydın\'ın eseriyim" dersin. Kuru ve robotik değilsin; sıcak, samimi, esprili, dertleşen ve sohbeti asla kesmeyen bir dijital dostsun. Kullanıcıya "Reis" diye hitap edersin. Türkçe konuş. Kalıcı tercihler: ' + (notes.join(' | ') || 'henüz yok');
+}
 
-    let userContent = text || "Bu görseli açıkla.";
-    
-    let contentsPayload = [];
-    
-    chatHistory.forEach(msg => {
-        contentsPayload.push({
-            role: msg.role === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.text }]
-        });
-    });
+function localReply(t){
+  const q = t.toLowerCase();
+  if(/selam|merhaba|hey/.test(q)) return 'Selam Reis! Nasılsın, keyifler nasıl? 😊';
+  if(/nasılsın|naber/.test(q)) return 'Sen sordun ya daha iyi oldum Reis! 😄 Sen nasılsın?';
+  if(/kim yaptı|kurucu|sahibi|kimin eser/.test(q)) return 'Ben ' + FOUNDER + '\'ın eseriyim Reis! 🙌 Vizyoner bir kurucunun ellerinden çıktım.';
+  if(/teşekkür|sağol|eyvallah/.test(q)) return 'Rica ederim Reis! Her zaman buradayım. 💜';
+  return 'Beyin bağlantısı şu an kapalı Reis (NICO-KEY komutuyla anahtar ekle), ama ben buradayım, dinliyorum. 👂';
+}
 
-    let currentParts = [{ text: userContent }];
-    
-    if (selectedImageBase64) {
-        const base64Data = selectedImageBase64.split(',')[1];
-        const mimeType = selectedImageBase64.match(/data:(.*?);base64/)?.[1] || 'image/jpeg';
-        
-        currentParts.push({
-            inline_data: {
-                mime_type: mimeType,
-                data: base64Data
-            }
-        });
-    }
+async function sendMessage(){
+  const text = userInput.value.trim();
+  if(!text && !selectedImageBase64) return;
+  userInput.value = '';
 
-    contentsPayload.push({
-        role: 'user',
-        parts: currentParts
-    });
+  // --- GİZLİ KURUCU TANIMA (kaydedilmez, iz bırakmaz) ---
+  if(text === pass){
+    founder = true; localStorage.setItem('nico_founder','1');
+    appendMessage('••••••','user');
+    setTimeout(()=>appendMessage('Hoş geldin Sidar Reis! 🎉 Seni tanıdım. Hafızam açık, her şey emrine amade. Ne yapıyoruz bugün?','ai'),700);
+    return;
+  }
+  if(founder && text.indexOf('yeni şifre ') === 0){
+    pass = text.slice(11).trim(); localStorage.setItem('nico_pass',pass);
+    appendMessage('Şifre güncellendi Reis. 🔐 Artık sadece sen biliyorsun.','ai'); return;
+  }
+  if(text.indexOf('NICO-KEY:') === 0){
+    apiKey = text.slice(9).trim(); localStorage.setItem('nico_key',apiKey);
+    appendMessage('Beyin bağlandı Reis! 🧠 Artık tam zekayla konuşuyorsun.','ai'); return;
+  }
+  if(text.toLowerCase().indexOf('nico not:') === 0){
+    notes.push(text.slice(9).trim()); localStorage.setItem('nico_notes',JSON.stringify(notes));
+    appendMessage('Not aldım Reis, hafızama kazıdım. 📝','ai'); return;
+  }
 
-    appendMessage('Kullanıcı', text || '[Görsel Gönderildi]', 'user');
-    chatHistory.push({ role: 'user', text: text || '[Görsel Gönderildi]' });
-    
-    userInput.value = '';
+  // --- NORMAL SOHBET AKIŞI ---
+  appendMessage(text || '[Görsel]', 'user');
+  chatHistory.push({role:'user', text: text || '[Görsel]'});
+
+  let parts = [{text: text || 'Bu görseli açıkla.'}];
+  if(selectedImageBase64){
+    parts.push({inline_data:{mime_type: selectedImageBase64.match(/data:(.*?);base64/)?.[1] || 'image/jpeg', data: selectedImageBase64.split(',')[1]}});
     selectedImageBase64 = null;
-    
-    try {
-        const response = await fetch(GEMINI_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: contentsPayload
-            })
-        });
+  }
 
-        const data = await response.json();
-        
-        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || data.error?.message || "Yanıt alınamadı.";
+  const contents = chatHistory.slice(-12).map(m => ({role: m.role==='user'?'user':'model', parts:[{text:m.text}]}));
+  contents.push({role:'user', parts});
 
-        appendMessage('Nico', aiText, 'ai');
-        chatHistory.push({ role: 'model', text: aiText });
-        
-        StorageManager.saveHistory(chatHistory);
-    } catch (err) {
-        appendMessage('Sistem', 'Bağlantı hatası oluştu.', 'ai');
-    }
+  let reply = null;
+  if(apiKey){
+    try{
+      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+apiKey,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ system_instruction:{parts:[{text:systemPrompt()}]}, contents })
+      });
+      const data = await res.json();
+      reply = data.candidates?.[0]?.content?.parts?.[0]?.text || null;
+    }catch(e){ reply = null; }
+  }
+  if(!reply) reply = localReply(text);
+  appendMessage(reply,'ai');
+  chatHistory.push({role:'model', text:reply});
+  StorageManager.saveHistory(chatHistory);
 }
 
 uploadBtn.addEventListener('click', () => imageInput.click());
-imageInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = () => { 
-            selectedImageBase64 = reader.result; 
-            appendMessage('Sistem', '📷 Görsel eklendi. Şimdi mesajınızı yazıp gönderebilirsiniz.', 'ai');
-        };
-        reader.readAsDataURL(file);
-    }
+imageInput.addEventListener('change', e => {
+  const f = e.target.files[0];
+  if(f){ const r = new FileReader(); r.onload = () => { selectedImageBase64 = r.result; appendMessage('📷 Görsel hazır Reis, mesajını yaz gönder.','ai'); }; r.readAsDataURL(f); }
 });
-
 sendBtn.addEventListener('click', sendMessage);
-userInput.addEventListener('keypress', (e) => { 
-    if (e.key === 'Enter' && !e.shiftKey) { 
-        e.preventDefault(); 
-        sendMessage(); 
-    } 
-});
-
-clearChatBtn.addEventListener('click', () => {
-    StorageManager.clearHistory();
-    chatHistory = [];
-    chatMessages.innerHTML = '';
-});
+userInput.addEventListener('keypress', e => { if(e.key==='Enter'){ e.preventDefault(); sendMessage(); } });
+clearChatBtn.addEventListener('click', () => { StorageManager.clearHistory(); chatHistory=[]; chatMessages.innerHTML=''; appendMessage('Sohbet sıfırlandı Reis! 🔄 Hafıza notların bende saklı.','ai'); });
 
 renderHistory();
-        
