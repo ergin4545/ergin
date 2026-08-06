@@ -28,3 +28,4 @@ NICO, Gemini yapay zekâ modeliyle çalışan kişisel bir AI asistanıdır.
 
 ## Lisans
 Bu proje kişisel kullanım ve geliştirme amacıyla hazırlanmıştır.
+NICO v2 yayında 🚀
