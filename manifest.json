@@ -1,25 +1,12 @@
 {
-"name":"NICO AI",
-"short_name":"NICO",
-"start_url":"./",
-"display":"standalone",
-"background_color":"#131314",
-"theme_color":"#8ab4f8",
-
-"icons":[
-
-{
-"src":"icon-192.png",
-"sizes":"192x192",
-"type":"image/png"
-},
-
-{
-"src":"icon-512.png",
-"sizes":"512x512",
-"type":"image/png"
+  "name": "NICO AI Assistant",
+  "short_name": "NICO",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#131314",
+  "icons": [
+    { "src": "nico-logo.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "nico-logo.png", "sizes": "512x512", "type": "image/png" }
+  ]
 }
-
-]
-
-
