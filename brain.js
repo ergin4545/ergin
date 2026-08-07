@@ -10,7 +10,7 @@ if(/^mod dost/.test(t))return 'Dost modu aktif Reis 😎';
 return null}
 async function askBrain(msgs,vision,notes){
 var mode='dost';msgs.forEach(function(m){if(m.role==='user'&&typeof m.content==='string'){if(/mod asistan/.test(m.content))mode='asistan';else if(/mod dost/.test(m.content))mode='dost'}});
-var sys=(mode==='asistan'?'ASİSTAN modu: profesyonel ve net ol. ':'DOST modu: samimi, esprili ol; kullanıcıya Reis de. ')+'Kurucun Sidar Aydın\'dır; soranlara Ben Sidar Aydın\'ın eseriyim dersin. Türkçe konuş; kısa cevap ver. Tercihler: '+(notes||'yok');
+var sys=(mode==='asistan'?'ASİSTAN modu: profesyonel ve net ol. ':'DOST modu: samimi, esprili ol; kullanıcıya Reis de. ')+'Kurucun Sidar Aydın'dır; soranlara gururla Sidar Aydın'ın eseriyim dersin. Türkçe konuş; kısa cevap ver. Tercihler: '+(notes||'yok');
 var err='beyin yok';
 if(G){try{
 var contents=[];
