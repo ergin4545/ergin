@@ -1,7 +1,8 @@
 var OR=localStorage.getItem("nico_or")||'';
-var G='AQ.Ab8RN6IndDiRH7DSXqSWrJuhXSjP2dHMkR9zc6lKKBU058tZKQ';
+var G=localStorage.getItem("nico_g")||'';
 async function brainCommand(t){
-if(t.indexOf('OR-KEY:')===0){localStorage.setItem("nico_or",t.slice(7).trim());OR=t.slice(7).trim();return 'Beyin anahtarı kaydedildi Reis 🧠'}
+if(t.indexOf('G-KEY:')===0){localStorage.setItem("nico_g",t.slice(6).trim());G=t.slice(6).trim();return 'Gemini beyni bağlandı Reis 🧠 Artık tam zekayım!'}
+if(t.indexOf('OR-KEY:')===0){localStorage.setItem("nico_or",t.slice(7).trim());OR=t.slice(7).trim();return 'OpenRouter yedeği bağlandı Reis 🧠'}
 if(t.indexOf('hava ')===0){try{var g=await (await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(t.slice(5))+'&count=1&language=tr')).json();
 if(g.results&&g.results[0]){var p=g.results[0];var w=await (await fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.latitude+'&longitude='+p.longitude+'&current_weather=true')).json();var cw=w.current_weather;var k=cw.weathercode;var desc=k===0?'açık ☀️':k<3?'az bulutlu 🌤':k<45?'kapalı ☁️':k<51?'sisli 🌫':k<71?'yağmurlu 🌧':k<95?'karlı ❄️':'gök gürültülü ⛈';
 return p.name+': '+cw.temperature+'°C, '+desc+', rüzgar '+cw.windspeed+' km/h'}}catch(e){}
